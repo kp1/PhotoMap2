@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PhotoMap2</string>
+    <string name="title_activity_photo_map">Map</string>
+    <string name="action_settings">Setting</string>
+    <string name="google_maps_key">AIzaSyCrR_m4U-5N5hqvUyCqF3jtmIcnRCk-5Yg</string>
+
+</resources>
