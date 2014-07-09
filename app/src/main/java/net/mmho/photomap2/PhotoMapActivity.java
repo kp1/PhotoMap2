@@ -22,12 +22,14 @@ import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 
 public class PhotoMapActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	final static String TAG="MapActivity";
-    final static int PARTITION_RATIO = 5;
+    final static int PARTITION_RATIO = 10;
 
     private static Context context;
 
@@ -80,6 +82,7 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
 	OnCameraChangeListener myCameraChangeListener = new OnCameraChangeListener(){
 		@Override
 		public void onCameraChange(CameraPosition position) {
+            mMap.clear();
 			if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
             getSupportLoaderManager().restartLoader(0, null, PhotoMapActivity.this);
 		}
@@ -139,6 +142,9 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
         mGroup = new Grouping(photoCursor);
         mGroup.doGrouping(getPartitionDistance(mapBounds));
         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
+        for(PhotoGroup p:mGroup){
+            mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+        }
     }
 
     @Override
