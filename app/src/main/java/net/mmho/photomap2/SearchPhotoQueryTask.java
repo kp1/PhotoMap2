@@ -21,7 +21,7 @@ public class SearchPhotoQueryTask extends AsyncTask<LatLngBounds,Void,PhotoCurso
 	
 	@Override
 	protected void onPostExecute(PhotoCursor result) {
-//		if(!mCursor.isClosed()) mCursor.close();
+		if(!result.isClosed()) result.close();
 		super.onPostExecute(result);
 	}
 	

@@ -3,6 +3,7 @@ package net.mmho.photomap2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -22,25 +23,45 @@ public class PhotoMapActivity extends FragmentActivity {
 
 	final static String TAG="MapActivity";
 	final static int SEARCH_PHOTO_DELAY = 250;
+    final static int PARTITION_RATIO = 5;
+
+    private static Context context;
+
 	private SupportMapFragment mapFragment;
 	private GoogleMap mMap;
-	
-	private static Context context;
 	private PhotoCursor photoCursor;
+    private Grouping group;
+
 	final private Handler mHandler = new Handler();
+
 	private Runnable delayed = new Runnable() {
 		@Override
 		public void run() {
+            final LatLngBounds b = mMap.getProjection().getVisibleRegion().latLngBounds;
 			SearchPhotoQueryTask photoQuery = new SearchPhotoQueryTask(){
 				protected void onPostExecute(PhotoCursor result) {
 					photoCursor = result;
-					if(BuildConfig.DEBUG) Log.d(TAG,"count:"+Integer.toString(photoCursor.getCount()));
+					if(BuildConfig.DEBUG) Log.d(TAG,"count:"+photoCursor.getCount());
+                    if(photoCursor.getCount()!=0){
+                        group = new Grouping(photoCursor);
+                        group.doGrouping(getPartitionDistance(b));
+                        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+group.size());
+                    }
 					super.onPostExecute(result);
 				}
 			};
-			photoQuery.execute(mMap.getProjection().getVisibleRegion().latLngBounds);
+			photoQuery.execute(b);
 		}
 	};
+
+    private float getPartitionDistance(LatLngBounds b){
+        LatLng ne = b.northeast; // north-east
+        LatLng sw = b.southwest; // south-west
+        float[] d = new float[3];
+        Location.distanceBetween(ne.latitude,ne.longitude,sw.latitude,sw.longitude,d);
+        return d[0]/PARTITION_RATIO;
+    }
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

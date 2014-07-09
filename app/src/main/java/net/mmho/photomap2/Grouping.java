@@ -6,9 +6,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
-/**
- * Created by kp on 14/07/09.
- */
 public class Grouping extends ArrayList<PhotoGroup> {
     final PhotoCursor mCursor;
 
@@ -25,7 +22,7 @@ public class Grouping extends ArrayList<PhotoGroup> {
             for(i=0;i<this.size();i++){
                 LatLng p = mCursor.getLocation();
                 LatLng c = this.get(i).getCenter();
-                float[] d = new float[0];
+                float[] d = new float[3];
                 Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
                 if(d[0]<distance){
                     this.get(i).append(p,mCursor.getID());
