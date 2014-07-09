@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -28,24 +27,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 public class PhotoMapActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 	final static String TAG="MapActivity";
-	final static int SEARCH_PHOTO_DELAY = 250;
     final static int PARTITION_RATIO = 5;
 
     private static Context context;
 
 	private SupportMapFragment mapFragment;
 	private GoogleMap mMap;
+    private LatLngBounds mapBounds;
 	private PhotoCursor photoCursor;
-    private Grouping group;
+    private Grouping mGroup;
 
-	final private Handler mHandler = new Handler();
-
-	private Runnable delayed = new Runnable() {
-		@Override
-		public void run() {
-            getSupportLoaderManager().restartLoader(0,null,PhotoMapActivity.this);
-        }
-	};
 
     private float getPartitionDistance(LatLngBounds b){
         LatLng ne = b.northeast; // north-east
@@ -63,14 +54,6 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
         return new String(b);
     }
 
-    private String createQueryString(LatLngBounds bounds) {
-        LatLng start = bounds.southwest;
-        LatLng end = bounds.northeast;
-        StringBuilder b = new StringBuilder();
-        b.append("(latitude between ").append(start.latitude).append(" and ").append(end.latitude).append(")");
-        b.append(" and (longitude between ").append(start.longitude).append(" and ").append(end.longitude).append(")");
-        return new String(b);
-    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +81,7 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
 		@Override
 		public void onCameraChange(CameraPosition position) {
 			if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
-			mHandler.removeCallbacks(delayed);
-			mHandler.postDelayed(delayed, SEARCH_PHOTO_DELAY);
+            getSupportLoaderManager().restartLoader(0, null, PhotoMapActivity.this);
 		}
 	};
 	
@@ -132,10 +114,19 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
 		e.apply();
 	}
 
+    private String createQueryString(LatLngBounds bounds) {
+        LatLng start = bounds.southwest;
+        LatLng end = bounds.northeast;
+        StringBuilder b = new StringBuilder();
+        b.append("(latitude between ").append(start.latitude).append(" and ").append(end.latitude).append(")");
+        b.append(" and (longitude between ").append(start.longitude).append(" and ").append(end.longitude).append(")");
+        return new String(b);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        LatLngBounds b = mMap.getProjection().getVisibleRegion().latLngBounds;
-        String q = createQueryString(b);
+        mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+        String q = createQueryString(mapBounds);
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         return new CursorLoader(getContext(),uri, PhotoCursor.projection, q, null, null);
 
@@ -144,6 +135,10 @@ public class PhotoMapActivity extends FragmentActivity implements LoaderManager.
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
+        photoCursor = new PhotoCursor(cursor);
+        mGroup = new Grouping(photoCursor);
+        mGroup.doGrouping(getPartitionDistance(mapBounds));
+        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
     }
 
     @Override
