@@ -43,27 +43,26 @@ public class SearchPhotoQueryTask extends AsyncTask<LatLngBounds,Void,Cursor>{
     		MediaStore.Images.Media.DATE_TAKEN,
     		MediaStore.Images.Media.ORIENTATION,
     	};
-    	
+
     	mCursor = PhotoMapActivity.getContext().getContentResolver().query(uri, projection, q, null, o);
 		return mCursor;
 	}
 
 	private String createQueryOrder(double latitude,double longitude) {
-    	String o = "((latitude-("+Double.toString(latitude)+
-				"))*(latitude-("+Double.toString(latitude)+")))+"+
-				"((longitude-("+Double.toString(longitude)+
-				"))*(longitude-("+Double.toString(longitude)+"))) "+
-				"asc limit 50"; 
-    	return o;
+        StringBuilder b = new StringBuilder();
+        b.append("((latitude-(").append(latitude).append("))*(latitude-(").append(latitude).append(")))+");
+        b.append("((longitude-(").append(longitude).append("))*(longitude-(").append(longitude).append("))) ");
+        b.append("asc limit 50");
+    	return new String(b);
 	}
 
 	private String createQueryString(LatLngBounds bounds) {
 		LatLng start = bounds.southwest;
 		LatLng end = bounds.northeast;
-
-		String q = "(latitude between " + Double.toString(start.latitude) + " and " + Double.toString(end.latitude) + ")"
-	    		+ " and (longitude between " + Double.toString(start.longitude) + " and " + Double.toString(end.longitude) +")";
-		return q;
+        StringBuilder b = new StringBuilder();
+        b.append("(latitude between ").append(start.latitude).append(" and ").append(end.latitude).append(")");
+        b.append(" and (longitude between ").append(start.longitude).append(" and ").append(end.longitude).append(")");
+		return new String(b);
 	}
 	
 }
