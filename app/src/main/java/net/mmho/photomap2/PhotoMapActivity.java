@@ -3,7 +3,6 @@ package net.mmho.photomap2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -27,17 +26,17 @@ public class PhotoMapActivity extends FragmentActivity {
 	private GoogleMap mMap;
 	
 	private static Context context;
-	private Cursor photoCursor;
+	private PhotoCursor photoCursor;
 	final private Handler mHandler = new Handler();
 	private Runnable delayed = new Runnable() {
 		@Override
 		public void run() {
 			SearchPhotoQueryTask photoQuery = new SearchPhotoQueryTask(){
-				protected void onPostExecute(Cursor result) {
+				protected void onPostExecute(PhotoCursor result) {
 					photoCursor = result;
 					if(BuildConfig.DEBUG) Log.d(TAG,"count:"+Integer.toString(photoCursor.getCount()));
 					super.onPostExecute(result);
-				};
+				}
 			};
 			photoQuery.execute(mMap.getProjection().getVisibleRegion().latLngBounds);
 		}
