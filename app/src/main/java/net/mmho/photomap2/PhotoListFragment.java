@@ -8,19 +8,21 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 public class PhotoListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    private static final String TAG = "PhotoListFragment";
     private PhotoCursor mCursor;
     private PhotoGroup mGroup;
-    private  ArrayAdapter<PhotoGroup.Group> adapter;
+    private  PhotoListAdapter adapter;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mGroup = new PhotoGroup(null);
-        adapter= new ArrayAdapter<PhotoGroup.Group>(getActivity(), R.layout.fragment_photo_list,mGroup);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup);
         setListAdapter(adapter);
         getLoaderManager().initLoader(0,null,this);
     }
@@ -34,11 +36,14 @@ public class PhotoListFragment extends ListFragment implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
         adapter.clear();
         mCursor = new PhotoCursor(data);
         mGroup = new PhotoGroup(mCursor);
         mGroup.exec(4000);
+        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
         adapter.addAll(mGroup);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
