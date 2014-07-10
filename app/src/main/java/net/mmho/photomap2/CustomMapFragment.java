@@ -38,7 +38,7 @@ public class CustomMapFragment extends MapFragment implements LoaderManager.Load
         super.onResume();
         mMap = getMap();
         mMap.setOnCameraChangeListener(myCameraChangeListener);
-
+        getLoaderManager().initLoader(0,null,this);
     }
 
     GoogleMap.OnCameraChangeListener myCameraChangeListener=
