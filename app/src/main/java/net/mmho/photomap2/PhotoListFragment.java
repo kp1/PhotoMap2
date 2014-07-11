@@ -19,8 +19,11 @@ public class PhotoListFragment extends ListFragment implements LoaderManager.Loa
     private  PhotoListAdapter adapter;
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        setRetainInstance(true);
+
         mGroup = new PhotoGroup(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup);
         setListAdapter(adapter);
@@ -44,7 +47,6 @@ public class PhotoListFragment extends ListFragment implements LoaderManager.Loa
         mGroup.exec(4000);
         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
         adapter.addAll(mGroup);
-        adapter.notifyDataSetChanged();
     }
 
     @Override
