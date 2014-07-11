@@ -1,6 +1,7 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.provider.MediaStore;
@@ -43,7 +44,12 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
         ((TextView) v.findViewById(R.id.title)).setText(g.size() + ":" + g.toString());
         Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),g.get(0), MediaStore.Images.Thumbnails.MICRO_KIND,null);
         ((ImageView)v.findViewById(R.id.thumbnail)).setImageBitmap(b);
-        if(position%2==0) v.setBackgroundColor(Color.LTGRAY);
+        Configuration c = context.getResources().getConfiguration();
+        boolean landscape = c.orientation == Configuration.ORIENTATION_LANDSCAPE;
+        boolean color;
+        if(landscape) color = position % 4 == 1 || position % 4 == 2;
+        else color = position%2==1;
+        if(color) v.setBackgroundColor(Color.LTGRAY);
         else v.setBackgroundColor(Color.WHITE);
 
         return v;
