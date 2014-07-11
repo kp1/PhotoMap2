@@ -23,8 +23,12 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
             this.add(id);
         }
 
-        LatLng getCenter(){
+        public LatLng getCenter(){
             return area.getCenter();
+        }
+        public String toString() {
+            LatLng c = area.getCenter();
+            return String.format("% 8.5f , % 8.5f",c.latitude,c.longitude);
         }
 
         void append(LatLng point,long id){

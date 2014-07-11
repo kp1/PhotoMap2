@@ -1,6 +1,7 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +11,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-/**
- * Created by kp1 on 2014/07/10.
- */
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
 
     private Context context;
@@ -39,7 +37,10 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
             v = inflater.inflate(id,null);
         }
         PhotoGroup.Group g = group.get(position);
-        ((TextView) v.findViewById(R.id.title)).setText(g.size()+":"+g.getCenter().toString());
+        ((TextView) v.findViewById(R.id.title)).setText(g.size()+":"+g.toString());
+        if(position%2==0) v.setBackgroundColor(Color.LTGRAY);
+        else v.setBackgroundColor(Color.WHITE);
+
         return v;
     }
 }

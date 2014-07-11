@@ -30,8 +30,9 @@ public class PhotoListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String q = QueryBuilder.createQuery();  // all list
+        String o = QueryBuilder.sortDate();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,null);
+        return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,o);
     }
 
     @Override
