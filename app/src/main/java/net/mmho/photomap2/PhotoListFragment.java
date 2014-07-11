@@ -1,7 +1,6 @@
 package net.mmho.photomap2;
 
 import android.app.Fragment;
-import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -9,13 +8,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 
 public class PhotoListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -35,7 +32,6 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(0,null,this);
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.activity_photo_list,container,false);
