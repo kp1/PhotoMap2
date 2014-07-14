@@ -24,7 +24,7 @@ public class PhotoMapActivity extends Activity {
 		
 		setContentView(R.layout.activity_photo_map);
 
-        CustomMapFragment f = (CustomMapFragment)getFragmentManager().findFragmentById(R.id.map);
+        PhotoMapFragment f = (PhotoMapFragment)getFragmentManager().findFragmentById(R.id.map);
         mMap = f.getMap();
         if(savedInstanceState==null) loadPreference();
 

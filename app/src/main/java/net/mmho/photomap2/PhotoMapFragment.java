@@ -4,20 +4,24 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Camera;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class CustomMapFragment extends MapFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class PhotoMapFragment extends MapFragment implements LoaderManager.LoaderCallbacks<Cursor>{
 	final static String TAG="CustomMapFragment";
 	final static int PARTITION_RATIO = 10;
 
@@ -34,10 +38,11 @@ public class CustomMapFragment extends MapFragment implements LoaderManager.Load
 	}
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mMap = getMap();
         mMap.setOnCameraChangeListener(myCameraChangeListener);
+        mMap.setOnMarkerClickListener(myMakerClickListener);
         getLoaderManager().initLoader(0,null,this);
     }
 
@@ -47,7 +52,23 @@ public class CustomMapFragment extends MapFragment implements LoaderManager.Load
             public void onCameraChange(CameraPosition position) {
                 mMap.clear();
                 if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
-                getLoaderManager().restartLoader(0, null, CustomMapFragment.this);
+                getLoaderManager().restartLoader(0, null, PhotoMapFragment.this);
+            }
+        };
+
+    GoogleMap.OnMarkerClickListener myMakerClickListener=
+        new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if(BuildConfig.DEBUG) Log.d(TAG,"onMarkerClick");
+                for(PhotoGroup.Group p:mGroup){
+                    if(p.marker.equals(marker)){
+                        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+p.getArea());
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(),0));
+                        break;
+                    }
+                }
+                return false;
             }
         };
 
@@ -77,7 +98,7 @@ public class CustomMapFragment extends MapFragment implements LoaderManager.Load
         mGroup.exec(getPartitionDistance(mapBounds));
         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
         for(PhotoGroup.Group p:mGroup){
-            mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+            p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
         }
     }
 

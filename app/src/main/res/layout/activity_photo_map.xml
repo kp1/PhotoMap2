@@ -4,4 +4,4 @@
     android:layout_height="match_parent"
     android:id="@+id/map"
     tools:context=".PhotoMapActivity"
-    android:name="net.mmho.photomap2.CustomMapFragment"/>
+    android:name="net.mmho.photomap2.PhotoMapFragment"/>

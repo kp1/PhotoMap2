@@ -4,6 +4,7 @@ import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
     }
 
     public class Group extends ArrayList<Long> {
+        public Marker marker;
         private LatLngBounds area;
         Group(LatLng p,long id){
             LatLngBounds.Builder b = new LatLngBounds.Builder();
@@ -25,6 +27,9 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
 
         public LatLng getCenter(){
             return area.getCenter();
+        }
+        public LatLngBounds getArea(){
+            return area;
         }
         public String toString() {
             LatLng c = area.getCenter();

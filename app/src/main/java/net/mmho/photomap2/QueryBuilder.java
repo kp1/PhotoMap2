@@ -20,7 +20,7 @@ public class QueryBuilder {
         LatLng end = bounds.northeast;
         String q[] = {LATITUDE,BETWEEN, String.valueOf(start.latitude),AND, String.valueOf(end.latitude),
                  AND, LONGITUDE,BETWEEN, String.valueOf(start.longitude),AND, String.valueOf(end.longitude)};
-        StringBuilder b = null;
+        StringBuilder b = new StringBuilder();
         for(String s:q){
             b.append(s);
         }
