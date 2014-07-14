@@ -4,14 +4,13 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Camera;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.ViewTreeObserver;
 
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -29,21 +28,33 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
     private LatLngBounds mapBounds;
     private PhotoCursor photoCursor;
     private PhotoGroup mGroup;
+    private int widthPix;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
-		if(savedInstanceState==null){
-			setRetainInstance(true);
-		}
+		setRetainInstance(true);
 	}
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+
+        ViewTreeObserver observer = getView().getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                int width = getView().getWidth();
+                int height = getView().getHeight();
+                widthPix = Math.min(width, height);
+            }
+        });
+
+
         mMap = getMap();
         mMap.setOnCameraChangeListener(myCameraChangeListener);
         mMap.setOnMarkerClickListener(myMakerClickListener);
-        getLoaderManager().initLoader(0,null,this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
     GoogleMap.OnCameraChangeListener myCameraChangeListener=
@@ -64,11 +75,26 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
                 for(PhotoGroup.Group p:mGroup){
                     if(p.marker.equals(marker)){
                         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+p.getArea());
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(),0));
+                        //stop CameraChangeListener
+                        mMap.setOnCameraChangeListener(null);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(), widthPix/10), myCancelableCallback);
                         break;
                     }
                 }
-                return false;
+                return true;
+            }
+        };
+
+    GoogleMap.CancelableCallback myCancelableCallback=
+        new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                mMap.setOnCameraChangeListener(myCameraChangeListener);
+            }
+
+            @Override
+            public void onCancel() {
+                mMap.setOnCameraChangeListener(myCameraChangeListener);
             }
         };
 
