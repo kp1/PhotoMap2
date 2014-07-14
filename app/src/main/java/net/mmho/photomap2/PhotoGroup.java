@@ -40,6 +40,15 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
             area = area.including(point);
             this.add(id);
         }
+
+        public boolean equals(Group g) {
+            if(size()!=g.size()) return false;
+            if(getArea().equals(g.getArea())) return false;
+            for(int i=0;i<size();i++){
+                if(!get(i).equals(g.get(i))) return false;
+            }
+            return true;
+        }
     }
 
     void exec(float distance){
@@ -63,6 +72,14 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
                 this.add(g);
             }
         }while(mCursor.moveToNext());
+    }
+
+    boolean equals(PhotoGroup photoGroup){
+        if(photoGroup.size()!=size()) return false;
+        for(int i=0;i<size();i++){
+            if(!get(i).equals(photoGroup.get(i))) return false;
+        }
+        return true;
     }
 
 

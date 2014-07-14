@@ -61,7 +61,6 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
-                mMap.clear();
                 if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
                 getLoaderManager().restartLoader(0, null, PhotoMapFragment.this);
             }
@@ -120,11 +119,14 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
         photoCursor = new PhotoCursor(cursor);
-        mGroup = new PhotoGroup(photoCursor);
-        mGroup.exec(getPartitionDistance(mapBounds));
-        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
-        for(PhotoGroup.Group p:mGroup){
-            p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+        PhotoGroup g = new PhotoGroup(photoCursor);
+        g.exec(getPartitionDistance(mapBounds));
+        if(mGroup==null || !mGroup.equals(g)){
+            mGroup = g;
+            mMap.clear();
+            for(PhotoGroup.Group p:mGroup){
+                p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+            }
         }
     }
 
