@@ -52,12 +52,12 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
 
 
         mMap = getMap();
-        mMap.setOnCameraChangeListener(myCameraChangeListener);
-        mMap.setOnMarkerClickListener(myMakerClickListener);
+        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+        mMap.setOnMarkerClickListener(photoGroupClickListener);
         getLoaderManager().initLoader(0, null, this);
     }
 
-    GoogleMap.OnCameraChangeListener myCameraChangeListener=
+    GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
@@ -67,7 +67,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
             }
         };
 
-    GoogleMap.OnMarkerClickListener myMakerClickListener=
+    GoogleMap.OnMarkerClickListener photoGroupClickListener =
         new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -77,7 +77,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
                         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+p.getArea());
                         //stop CameraChangeListener
                         mMap.setOnCameraChangeListener(null);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(), widthPix/10), myCancelableCallback);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(), widthPix/10), animateCameraCallback);
                         break;
                     }
                 }
@@ -85,16 +85,16 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
             }
         };
 
-    GoogleMap.CancelableCallback myCancelableCallback=
+    GoogleMap.CancelableCallback animateCameraCallback =
         new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
-                mMap.setOnCameraChangeListener(myCameraChangeListener);
+                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
 
             @Override
             public void onCancel() {
-                mMap.setOnCameraChangeListener(myCameraChangeListener);
+                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
         };
 
