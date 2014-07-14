@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
@@ -15,7 +16,7 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
         mCursor = c;
     }
 
-    public class Group extends ArrayList<Long> {
+    public class Group extends ArrayList<Long> implements Serializable{
         public Marker marker;
         private LatLngBounds area;
         Group(LatLng p,long id){

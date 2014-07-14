@@ -3,6 +3,7 @@ package net.mmho.photomap2;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 
 public class PhotoListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -37,10 +39,22 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
         View parent = inflater.inflate(R.layout.activity_photo_list,container,false);
         AbsListView list = (AbsListView)parent.findViewById(R.id.list);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(onItemClickListener);
         return parent;
 
     }
 
+    AdapterView.OnItemClickListener onItemClickListener=
+            new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    if(BuildConfig.DEBUG) Log.d(TAG,"onItemClick:"+position);
+                    Intent i = new Intent(getActivity(),ThumbnailActivity.class);
+                    PhotoGroup.Group g = mGroup.get(position);
+                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,g);
+                    startActivity(i);
+                }
+            };
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String q = QueryBuilder.createQuery();  // all list
