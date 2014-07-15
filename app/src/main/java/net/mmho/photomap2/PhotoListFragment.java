@@ -20,7 +20,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final String TAG = "PhotoListFragment";
     private PhotoCursor mCursor;
-    private PhotoGroup mGroup;
+    private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
 
     @Override
@@ -29,7 +29,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
 
         setRetainInstance(true);
 
-        mGroup = new PhotoGroup(null);
+        mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup);
         getLoaderManager().initLoader(0,null,this);
     }
@@ -50,6 +50,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if(BuildConfig.DEBUG) Log.d(TAG,"onItemClick:"+position);
                     Intent i = new Intent(getActivity(),ThumbnailActivity.class);
+                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,mGroup.get(position));
                     startActivity(i);
                 }
             };
@@ -66,7 +67,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
         if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
         adapter.clear();
         mCursor = new PhotoCursor(data);
-        mGroup = new PhotoGroup(mCursor);
+        mGroup = new PhotoGroupList(mCursor);
         mGroup.exec(4000);
         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
         adapter.addAll(mGroup);

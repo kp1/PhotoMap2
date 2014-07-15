@@ -27,7 +27,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
     private PhotoCursor photoCursor;
-    private PhotoGroup mGroup;
+    private PhotoGroupList mGroup;
     private int widthPix;
 
 	public void onCreate(Bundle savedInstanceState){
@@ -71,7 +71,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
             @Override
             public boolean onMarkerClick(Marker marker) {
                 if(BuildConfig.DEBUG) Log.d(TAG,"onMarkerClick");
-                for(PhotoGroup.Group p:mGroup){
+                for(PhotoGroup p:mGroup){
                     if(p.marker.equals(marker)){
                         if(BuildConfig.DEBUG) Log.d(TAG,"group:"+p.getArea());
                         //stop CameraChangeListener
@@ -119,12 +119,12 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
         photoCursor = new PhotoCursor(cursor);
-        PhotoGroup g = new PhotoGroup(photoCursor);
+        PhotoGroupList g = new PhotoGroupList(photoCursor);
         g.exec(getPartitionDistance(mapBounds));
         if(mGroup==null || !mGroup.equals(g)){
             mGroup = g;
             mMap.clear();
-            for(PhotoGroup.Group p:mGroup){
+            for(PhotoGroup p:mGroup){
                 p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
             }
         }

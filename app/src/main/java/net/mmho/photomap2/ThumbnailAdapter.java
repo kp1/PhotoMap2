@@ -35,7 +35,7 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         else{
             v = inflater.inflate(id,null);
         }
-        Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),group.get(0),
+        Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),group.get(position),
                    MediaStore.Images.Thumbnails.MICRO_KIND,null);
         ((ImageView)v.findViewById(R.id.thumbnail)).setImageBitmap(b);
         return v;

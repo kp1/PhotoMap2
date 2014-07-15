@@ -15,14 +15,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
+public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private Context context;
     private int id;
-    private List<PhotoGroup.Group> group;
+    private List<PhotoGroup> group;
     private LayoutInflater inflater;
 
-    public PhotoListAdapter(Context c, int resource, List<PhotoGroup.Group> objects) {
+    public PhotoListAdapter(Context c, int resource, List<PhotoGroup> objects) {
         super(c, resource, objects);
         context = c;
         id = resource;
@@ -40,7 +40,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
         else {
             v = inflater.inflate(id,null);
         }
-        PhotoGroup.Group g = group.get(position);
+        PhotoGroup g = group.get(position);
         ((TextView) v.findViewById(R.id.title)).setText(g.getID(0) + ":" + g.toString());
         Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),g.getID(0), MediaStore.Images.Thumbnails.MICRO_KIND,null);
         ((ImageView)v.findViewById(R.id.thumbnail)).setImageBitmap(b);
