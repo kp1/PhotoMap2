@@ -16,14 +16,16 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
         mCursor = c;
     }
 
-    public class Group extends ArrayList<Long> implements Serializable{
+    public class Group{
         public Marker marker;
         private LatLngBounds area;
+        private ArrayList<Long> list = new ArrayList<Long>();
+
         Group(LatLng p,long id){
             LatLngBounds.Builder b = new LatLngBounds.Builder();
             b.include(p);
             area = b.build();
-            this.add(id);
+            list.add(id);
         }
 
         public LatLng getCenter(){
@@ -32,22 +34,28 @@ public class PhotoGroup extends ArrayList<PhotoGroup.Group> {
         public LatLngBounds getArea(){
             return area;
         }
+
         public String toString() {
             LatLng c = area.getCenter();
             return String.format("% 8.5f , % 8.5f",c.latitude,c.longitude);
         }
 
+        public int size(){
+            return list.size();
+        }
+
+        public long getID(int index){
+            return list.get(index);
+        }
+
         void append(LatLng point,long id){
             area = area.including(point);
-            this.add(id);
+            list.add(id);
         }
 
         public boolean equals(Group g) {
-            if(size()!=g.size()) return false;
-            if(getArea().equals(g.getArea())) return false;
-            for(int i=0;i<size();i++){
-                if(!get(i).equals(g.get(i))) return false;
-            }
+            if(!list.equals(g.list)) return false;
+            if(!area.equals(g.area)) return false;
             return true;
         }
     }

@@ -41,8 +41,8 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup.Group> {
             v = inflater.inflate(id,null);
         }
         PhotoGroup.Group g = group.get(position);
-        ((TextView) v.findViewById(R.id.title)).setText(g.size() + ":" + g.toString());
-        Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),g.get(0), MediaStore.Images.Thumbnails.MICRO_KIND,null);
+        ((TextView) v.findViewById(R.id.title)).setText(g.getID(0) + ":" + g.toString());
+        Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),g.getID(0), MediaStore.Images.Thumbnails.MICRO_KIND,null);
         ((ImageView)v.findViewById(R.id.thumbnail)).setImageBitmap(b);
         Configuration c = context.getResources().getConfiguration();
         boolean landscape = c.orientation == Configuration.ORIENTATION_LANDSCAPE;

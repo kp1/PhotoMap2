@@ -50,8 +50,6 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if(BuildConfig.DEBUG) Log.d(TAG,"onItemClick:"+position);
                     Intent i = new Intent(getActivity(),ThumbnailActivity.class);
-                    PhotoGroup.Group g = mGroup.get(position);
-                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,g);
                     startActivity(i);
                 }
             };

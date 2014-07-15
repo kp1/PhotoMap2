@@ -20,7 +20,7 @@ public class ThumbnailFragment extends Fragment {
         Bundle bundle = getArguments();
         mGroup = (PhotoGroup.Group) bundle.getSerializable(ThumbnailActivity.EXTRA_GROUP);
 
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,mGroup);
+//        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,mGroup);
 
     }
 
