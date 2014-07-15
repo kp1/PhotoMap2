@@ -16,16 +16,15 @@ public class ThumbnailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
 
-
+        Bundle bundle = getArguments();
+        group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
+        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,group.getIDList());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.activity_thumbnail,container,false);
         AbsListView list = (AbsListView)parent.findViewById(R.id.thumbnail_grid);
-        Bundle bundle = getArguments();
-        group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,group.getIDList());
         list.setAdapter(adapter);
         return parent;
     }
