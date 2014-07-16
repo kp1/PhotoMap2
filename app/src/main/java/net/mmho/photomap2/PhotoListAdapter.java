@@ -28,24 +28,32 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    static class ViewHolder{
+        TextView title;
+        ThumbnailImageView thumbnail;
+    }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
-        Log.d("adapter","getView:"+position );
+        ViewHolder holder;
         if(convertView!=null){
             v = convertView;
+            holder = (ViewHolder)v.getTag();
         }
         else {
             v = inflater.inflate(id,null);
+            holder = new ViewHolder();
+            holder.title = (TextView) v.findViewById(R.id.title);
+            holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
+            v.setTag(holder);
         }
         PhotoGroup g = group.get(position);
-        ((TextView) v.findViewById(R.id.title)).setText(g.size()+":"+g.toString());
-        ThumbnailImageView i = (ThumbnailImageView)v.findViewById(R.id.thumbnail);
-        i.setImageBitmap(null);
+        holder.title.setText(g.size()+":"+g.toString());
+        holder.thumbnail.setImageBitmap(null);
 
         Bundle b = new Bundle();
         b.putLong(ThumbnailImageView.EXTRA_ID,g.getID(0));
-        manager.initLoader(ID_IMAGES + position, b, i);
+        manager.initLoader(ID_IMAGES + position, b, holder.thumbnail);
 
         return v;
     }

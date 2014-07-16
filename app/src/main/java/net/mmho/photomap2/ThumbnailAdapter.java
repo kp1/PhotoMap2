@@ -30,28 +30,35 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    private class ViewHolder{
+        ThumbnailImageView thumbnail;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(BuildConfig.DEBUG) Log.d(TAG, "getView:" + position);
 
         View v;
+        ViewHolder holder;
         if(convertView!=null){
             v = convertView;
-
+            holder = (ViewHolder) v.getTag();
         }
         else{
             v = inflater.inflate(id,null);
+            holder = new ViewHolder();
+            holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
+            v.setTag(holder);
         }
 
-        ThumbnailImageView i = (ThumbnailImageView)v.findViewById(R.id.thumbnail);
-        i.setImageBitmap(null);
+        holder.thumbnail.setImageBitmap(null);
 
         int width= ((GridView)parent).getColumnWidth();
         v.setLayoutParams(new AbsListView.LayoutParams(width, width));
 
         Bundle b = new Bundle();
         b.putLong(ThumbnailImageView.EXTRA_ID,group.get(position));
-        manager.initLoader(ID_IMAGES + position, b, i);
+        manager.initLoader(ID_IMAGES + position, b, holder.thumbnail);
 
         return v;
     }

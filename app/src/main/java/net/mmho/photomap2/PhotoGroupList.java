@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.app.LoaderManager;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
