@@ -1,32 +1,30 @@
 package net.mmho.photomap2;
 
+import android.app.LoaderManager;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.provider.MediaStore;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
-    private Context context;
+    private static final int ID_IMAGES = 100;
     private int id;
     private List<PhotoGroup> group;
     private LayoutInflater inflater;
+    private LoaderManager manager;
 
-    public PhotoListAdapter(Context c, int resource, List<PhotoGroup> objects) {
-        super(c, resource, objects);
-        context = c;
+    public PhotoListAdapter(Context context, int resource, List<PhotoGroup> objects,LoaderManager m) {
+        super(context, resource, objects);
         id = resource;
         group = objects;
+        manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -41,16 +39,13 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             v = inflater.inflate(id,null);
         }
         PhotoGroup g = group.get(position);
-        ((TextView) v.findViewById(R.id.title)).setText(g.getID(0) + ":" + g.toString());
-        Bitmap b = MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(),g.getID(0), MediaStore.Images.Thumbnails.MICRO_KIND,null);
-        ((ImageView)v.findViewById(R.id.thumbnail)).setImageBitmap(b);
-        Configuration c = context.getResources().getConfiguration();
-        boolean landscape = c.orientation == Configuration.ORIENTATION_LANDSCAPE;
-        boolean color;
-        if(landscape) color = position % 4 == 1 || position % 4 == 2;
-        else color = position%2==1;
-        if(color) v.setBackgroundColor(Color.LTGRAY);
-        else v.setBackgroundColor(Color.WHITE);
+        ((TextView) v.findViewById(R.id.title)).setText(g.size()+":"+g.toString());
+        ThumbnailImageView i = (ThumbnailImageView)v.findViewById(R.id.thumbnail);
+        i.setImageBitmap(null);
+
+        Bundle b = new Bundle();
+        b.putLong(ThumbnailImageView.EXTRA_ID,g.getID(0));
+        manager.initLoader(ID_IMAGES + position, b, i);
 
         return v;
     }

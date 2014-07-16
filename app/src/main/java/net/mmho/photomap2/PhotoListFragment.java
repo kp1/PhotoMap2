@@ -30,7 +30,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
         setRetainInstance(true);
 
         mGroup = new PhotoGroupList(null);
-        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup,getLoaderManager());
         getLoaderManager().initLoader(0,null,this);
     }
 

@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content">
-   <ImageView
-        android:id="@+id/thumbnail"
-        android:src="@android:drawable/ic_menu_search"
-        android:layout_alignParentLeft="true"
-        android:padding="4dp"
-        android:layout_width="64dp"
-        android:layout_height="64dp" />
+   <FrameLayout
+       android:id="@+id/thumbnail_frame"
+       android:layout_width="96dp"
+       android:layout_height="96dp"
+       android:padding="8dp"
+       android:layout_alignParentLeft="true">
+       <net.mmho.photomap2.ThumbnailImageView
+            android:id="@+id/thumbnail"
+            android:src="@android:drawable/ic_menu_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
+    </FrameLayout>
+
     <TextView
         android:id="@+id/title"
-        android:layout_toRightOf="@id/thumbnail"
+        android:layout_toRightOf="@id/thumbnail_frame"
         android:layout_centerVertical="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -10,26 +10,23 @@ import android.widget.ImageView;
 
 public class ThumbnailImageView extends ImageView implements LoaderManager.LoaderCallbacks<Bitmap>{
 
-    private Context context;
+    public static final String EXTRA_ID="image_id";
 
     public ThumbnailImageView(Context context) {
         super(context);
-        this.context = context;
     }
 
     public ThumbnailImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
     }
 
     public ThumbnailImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.context = context;
     }
 
     @Override
     public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
-        return new ThumbnailLoader(context,args.getLong("test"));
+        return new ThumbnailLoader(getContext(),args.getLong(EXTRA_ID));
     }
 
     @Override
