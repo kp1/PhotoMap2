@@ -15,7 +15,7 @@
             android:scaleType="centerCrop"/>
     </FrameLayout>
 
-    <TextView
+    <net.mmho.photomap2.GeocodeTextView
         android:id="@+id/title"
         android:layout_toRightOf="@id/thumbnail_frame"
         android:layout_centerVertical="true"

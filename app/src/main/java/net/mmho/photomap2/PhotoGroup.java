@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
-public class PhotoGroup implements Parcelable {
+public class PhotoGroup implements Parcelable{
     public Marker marker;
     private LatLngBounds area;
     private ArrayList<Long> id_list = new ArrayList<Long>();

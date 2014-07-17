@@ -15,6 +15,7 @@ import java.util.List;
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private static final int ID_IMAGES = 100;
+    private static final int ID_TEXT = 500;
     private int id;
     private List<PhotoGroup> group;
     private LayoutInflater inflater;
@@ -29,7 +30,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     }
 
     static class ViewHolder{
-        TextView title;
+        GeocodeTextView title;
         ThumbnailImageView thumbnail;
     }
     @Override
@@ -43,7 +44,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         else {
             v = inflater.inflate(id,null);
             holder = new ViewHolder();
-            holder.title = (TextView) v.findViewById(R.id.title);
+            holder.title = (GeocodeTextView) v.findViewById(R.id.title);
             holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
         }
@@ -51,9 +52,14 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         holder.title.setText(g.size()+":"+g.toString());
         holder.thumbnail.setImageBitmap(null);
 
-        Bundle b = new Bundle();
-        b.putLong(ThumbnailImageView.EXTRA_ID,g.getID(0));
-        manager.initLoader(ID_IMAGES + position, b, holder.thumbnail);
+        Bundle imageBundle = new Bundle();
+        imageBundle.putLong(ThumbnailImageView.EXTRA_ID, g.getID(0));
+        manager.initLoader(ID_IMAGES + position, imageBundle, holder.thumbnail);
+
+        Bundle textBundle = new Bundle();
+        textBundle.putParcelable(GeocodeTextView.EXTRA_LOCATION,g.getCenter());
+        manager.initLoader(ID_TEXT+position,textBundle,holder.title);
+
 
         return v;
     }
