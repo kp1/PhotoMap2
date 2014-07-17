@@ -20,9 +20,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class PhotoMapFragment extends MapFragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class PhotoMapFragment extends MapFragment {
 	final static String TAG="CustomMapFragment";
 	final static int PARTITION_RATIO = 10;
+    final static int PHOTO_CURSOR_LOADER = 0;
+    final static int PHOTO_GROUP_LOADER = 1;
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -54,7 +56,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
         mMap = getMap();
         mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
         mMap.setOnMarkerClickListener(photoGroupClickListener);
-        getLoaderManager().initLoader(0, null, this);
+        getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
     }
 
     GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
@@ -62,7 +64,7 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
             @Override
             public void onCameraChange(CameraPosition position) {
                 if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
-                getLoaderManager().restartLoader(0, null, PhotoMapFragment.this);
+                getLoaderManager().restartLoader(0, null,photoListLoaderCallback);
             }
         };
 
@@ -105,35 +107,56 @@ public class PhotoMapFragment extends MapFragment implements LoaderManager.Loade
         return d[0]/PARTITION_RATIO;
     }
 
+    LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
+        new LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+                mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                String q = QueryBuilder.createQuery(mapBounds);
+                Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, null);
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-        String q = QueryBuilder.createQuery(mapBounds);
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, null);
-
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
-        photoCursor = new PhotoCursor(cursor);
-        PhotoGroupList g = new PhotoGroupList(photoCursor);
-        g.exec(getPartitionDistance(mapBounds));
-        if(mGroup==null || !mGroup.equals(g)){
-            mGroup = g;
-            mMap.clear();
-            for(PhotoGroup p:mGroup){
-                p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
             }
-        }
-    }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> objectLoader) {
-        photoCursor = null;
-        mGroup.clear();
-    }
+            @Override
+            public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+                if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
+                photoCursor = new PhotoCursor(cursor);
+                getLoaderManager().restartLoader(PHOTO_GROUP_LOADER,null,photoGroupListLoaderCallbacks);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> objectLoader) {
+                photoCursor = null;
+                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
+                mGroup.clear();
+            }
+        };
+
+    LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
+        new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
+            @Override
+            public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+                Log.d(TAG,"count:"+photoCursor.getCount());
+                return new PhotoGroupListLoader(getActivity().getApplicationContext(),photoCursor,getPartitionDistance(mapBounds));
+            }
+
+            @Override
+            public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+                Log.d(TAG,"PhotoGroupList.onLoadFinish:"+data.toString());
+                if(mGroup==null || !mGroup.equals(data)){
+                    mGroup = data;
+                    mMap.clear();
+                    for(PhotoGroup p:mGroup){
+                        p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+                    }
+                }
+            }
+
+            @Override
+            public void onLoaderReset(Loader<PhotoGroupList> loader) {
+
+            }
+        };
 
 }
