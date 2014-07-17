@@ -9,14 +9,16 @@ import java.util.ArrayList;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup> {
     final PhotoCursor mCursor;
+    static float distance = 0;
 
     PhotoGroupList(PhotoCursor c){
         mCursor = c;
     }
 
-    void exec(float distance){
+    PhotoGroupList exec(float distance){
         this.clear();
-        if(!mCursor.moveToFirst()) return;
+        this.distance = distance;
+        if(!mCursor.moveToFirst()) return this;
 
         do{
             int i;
@@ -35,9 +37,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup> {
                 this.add(g);
             }
         }while(mCursor.moveToNext());
+        return this;
     }
 
-    boolean equals(PhotoGroupList photoGroup){
+    public boolean equals(PhotoGroupList photoGroup){
         if(photoGroup.size()!=size()) return false;
         for(int i=0;i<size();i++){
             if(!get(i).equals(photoGroup.get(i))) return false;
@@ -45,6 +48,8 @@ public class PhotoGroupList extends ArrayList<PhotoGroup> {
         return true;
     }
 
-
+    float getDistance(){
+        return distance;
+    }
 
 }

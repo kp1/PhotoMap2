@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
-public class PhotoListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class PhotoListFragment extends Fragment {
 
     private static final String TAG = "PhotoListFragment";
     private PhotoCursor mCursor;
@@ -31,7 +31,7 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup,getLoaderManager());
-        getLoaderManager().initLoader(0,null,this);
+        getLoaderManager().initLoader(0,null,photoCursorCallbacks);
     }
 
     @Override
@@ -54,27 +54,46 @@ public class PhotoListFragment extends Fragment implements LoaderManager.LoaderC
                     startActivity(i);
                 }
             };
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String q = QueryBuilder.createQuery();  // all list
-        String o = QueryBuilder.sortDate();
-        Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,o);
-    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
-        adapter.clear();
-        mCursor = new PhotoCursor(data);
-        mGroup = new PhotoGroupList(mCursor);
-        mGroup.exec(4000);
-        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+mGroup.size());
-        adapter.addAll(mGroup);
-    }
+    private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
+    new LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            String q = QueryBuilder.createQuery();  // all list
+            String o = QueryBuilder.sortDate();
+            Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,o);
+        }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        adapter.clear();
-    }
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
+            mCursor = new PhotoCursor(data);
+            getLoaderManager().initLoader(1, null, photoGroupListLoaderCallbacks);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            adapter.clear();
+        }
+    };
+
+    private final LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
+    new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
+        @Override
+        public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,4000);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+            adapter.clear();
+            adapter.addAll(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<PhotoGroupList> loader) {
+
+        }
+    };
 }
