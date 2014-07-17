@@ -8,14 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
-    private static final int ID_IMAGES = 100;
-    private static final int ID_TEXT = 500;
     private int id;
     private List<PhotoGroup> group;
     private LayoutInflater inflater;
@@ -30,8 +29,9 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     }
 
     static class ViewHolder{
-        GeocodeTextView title;
-        ThumbnailImageView thumbnail;
+        TextView title;
+        TextView description;
+        ImageView thumbnail;
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -44,22 +44,16 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         else {
             v = inflater.inflate(id,null);
             holder = new ViewHolder();
-            holder.title = (GeocodeTextView) v.findViewById(R.id.title);
-            holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
+            holder.title = (TextView) v.findViewById(R.id.title);
+            holder.description = (TextView) v.findViewById(R.id.description);
+            holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
         }
         PhotoGroup g = group.get(position);
-        holder.title.setText(g.size()+":"+g.toString());
+        holder.description.setText(g.size()+":"+g.toString());
         holder.thumbnail.setImageBitmap(null);
 
-        Bundle imageBundle = new Bundle();
-        imageBundle.putLong(ThumbnailImageView.EXTRA_ID, g.getID(0));
-        manager.initLoader(ID_IMAGES + position, imageBundle, holder.thumbnail);
-
-        Bundle textBundle = new Bundle();
-        textBundle.putParcelable(GeocodeTextView.EXTRA_LOCATION,g.getCenter());
-        manager.initLoader(ID_TEXT+position,textBundle,holder.title);
-
+        ((PhotoCardLayout)v).startLoading(g,position,manager);
 
         return v;
     }

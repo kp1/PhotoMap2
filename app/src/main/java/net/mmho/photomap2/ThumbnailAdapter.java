@@ -46,15 +46,14 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         }
         else{
             v = inflater.inflate(id,null);
+            final int width= ((GridView)parent).getColumnWidth();
+            v.setLayoutParams(new AbsListView.LayoutParams(width, width));
             holder = new ViewHolder();
             holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
         }
 
         holder.thumbnail.setImageBitmap(null);
-
-        int width= ((GridView)parent).getColumnWidth();
-        v.setLayoutParams(new AbsListView.LayoutParams(width, width));
 
         Bundle b = new Bundle();
         b.putLong(ThumbnailImageView.EXTRA_ID,group.get(position));

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<net.mmho.photomap2.PhotoCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content">
    <FrameLayout
        android:id="@+id/thumbnail_frame"
@@ -7,7 +7,7 @@
        android:layout_height="96dp"
        android:padding="8dp"
        android:layout_alignParentLeft="true">
-       <net.mmho.photomap2.ThumbnailImageView
+       <ImageView
             android:id="@+id/thumbnail"
             android:src="@android:drawable/ic_menu_search"
             android:layout_width="match_parent"
@@ -15,13 +15,22 @@
             android:scaleType="centerCrop"/>
     </FrameLayout>
 
-    <net.mmho.photomap2.GeocodeTextView
+    <TextView
         android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/thumbnail_frame"
+        android:layout_centerVertical="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_toRightOf="@id/thumbnail_frame"
         android:layout_toLeftOf="@+id/overflow"
         android:layout_alignParentBottom="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:maxLines="1"
         android:ellipsize="end"/>
 
@@ -33,4 +42,4 @@
         android:layout_alignParentRight="true"
         android:src="@drawable/abc_ic_menu_moreoverflow_normal_holo_light"/>
 
-</RelativeLayout>
+</net.mmho.photomap2.PhotoCardLayout>
