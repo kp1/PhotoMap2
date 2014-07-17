@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".PhotoMapActivity"
+            android:name=".PhotoListActivity"
             android:label="@string/title_activity_photo_map" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,9 +17,9 @@
             </intent-filter>
         </activity>
 
-        <!--<activity android:name=".PhotoMapActivity"/>-->
+        <activity android:name=".PhotoMapActivity"/>
         <activity android:name=".ThumbnailActivity"/>
-        <activity android:name=".PhotoListActivity"/>
+        <!--<activity android:name=".PhotoListActivity"/>-->
 
         <meta-data
             android:name="com.google.android.gms.version"
