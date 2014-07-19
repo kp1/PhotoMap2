@@ -3,9 +3,6 @@ package net.mmho.photomap2;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-/**
- * Created by kp on 14/07/17.
- */
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     private PhotoGroupList list;

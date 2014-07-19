@@ -18,14 +18,12 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
     private static final int ID_IMAGES= 100;
     private static final String TAG = "ThumbnailAdapter";
     private int id;
-    private List<Long> group;
     private LayoutInflater inflater;
     private LoaderManager manager;
 
     public ThumbnailAdapter(Context c, int resource, List<Long> objects,LoaderManager m) {
         super(c, resource, objects);
         id = resource;
-        group = objects;
         manager = m;
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -54,10 +52,7 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         }
 
         holder.thumbnail.setImageBitmap(null);
-
-        Bundle b = new Bundle();
-        b.putLong(ThumbnailImageView.EXTRA_ID,group.get(position));
-        manager.initLoader(ID_IMAGES + position, b, holder.thumbnail);
+        holder.thumbnail.startLoading(manager,position,getItem(position));
 
         return v;
     }

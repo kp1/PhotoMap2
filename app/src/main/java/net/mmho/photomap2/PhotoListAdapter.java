@@ -15,15 +15,14 @@ import java.util.List;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
+    private static final String TAG = "PhotoListAdapter";
     private int id;
-    private List<PhotoGroup> group;
     private LayoutInflater inflater;
     private LoaderManager manager;
 
     public PhotoListAdapter(Context context, int resource, List<PhotoGroup> objects,LoaderManager m) {
         super(context, resource, objects);
         id = resource;
-        group = objects;
         manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -35,6 +34,9 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
+        if(BuildConfig.DEBUG) Log.d(TAG,"getView:"+position);
+
         View v;
         ViewHolder holder;
         if(convertView!=null){
@@ -49,7 +51,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
         }
-        PhotoGroup g = group.get(position);
+        PhotoGroup g = getItem(position);
         holder.description.setText(g.size()+":"+g.toString());
         holder.thumbnail.setImageBitmap(null);
 

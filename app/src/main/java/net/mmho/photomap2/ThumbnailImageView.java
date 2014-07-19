@@ -4,13 +4,17 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.graphics.Bitmap;
+import android.location.Address;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
-public class ThumbnailImageView extends ImageView implements LoaderManager.LoaderCallbacks<Bitmap>{
+import java.util.List;
 
-    public static final String EXTRA_ID="image_id";
+public class ThumbnailImageView extends ImageView{
+
+    private static final String TAG = "ThumbnailImageView";
 
     public ThumbnailImageView(Context context) {
         super(context);
@@ -24,19 +28,23 @@ public class ThumbnailImageView extends ImageView implements LoaderManager.Loade
         super(context, attrs, defStyle);
     }
 
-    @Override
-    public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
-        return new ThumbnailLoader(getContext(),args.getLong(EXTRA_ID));
+    LoaderCallbacks callbacks =
+        new LoaderCallbacks() {
+            @Override
+            public void GeocodeCallback(List<Address> data) {
+
+            }
+
+            @Override
+            public void ThumbnailCallback(Bitmap data) {
+                Log.d(TAG,"bitmap is "+data.toString());
+                setImageBitmap(data);
+            }
+        };
+
+    public void startLoading(LoaderManager manager,int id,long image_id){
+        Bundle b = new Bundle();
+        b.putLong(ThumbnailCallbacks.EXTRA_ID, image_id);
+        manager.initLoader(id,b,new ThumbnailCallbacks(getContext(),callbacks));
     }
-
-    @Override
-    public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
-        setImageBitmap(data);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Bitmap> loader) {
-    }
-
 }
