@@ -1,12 +1,15 @@
 package net.mmho.photomap2;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -21,6 +24,7 @@ public class PhotoCardLayout extends RelativeLayout{
     private ImageView thumbnail;
     private TextView title;
     private TextView description;
+    private ImageView menu;
 
 
 
@@ -43,7 +47,19 @@ public class PhotoCardLayout extends RelativeLayout{
         thumbnail = (ImageView)findViewById(R.id.thumbnail);
         title = (TextView)findViewById(R.id.title);
         description = (TextView)findViewById(R.id.description);
+        menu = (ImageView)findViewById(R.id.overflow);
+        menu.setOnClickListener(onClickListener);
     }
+
+    OnClickListener onClickListener =
+        new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getContext(),PhotoMapActivity.class);
+                i.putExtra(PhotoMapActivity.EXTRA_GROUP,group);
+                getContext().startActivity(i);
+            }
+        };
 
     public void startLoading(PhotoGroup g,int position,LoaderManager manager){
         group = g;

@@ -10,11 +10,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 
 public class PhotoMapActivity extends Activity {
+    final public static String EXTRA_GROUP="group";
 
-	final static String TAG="MapActivity";
+	final private static String TAG="MapActivity";
 
 	private GoogleMap mMap;
 
@@ -26,9 +28,15 @@ public class PhotoMapActivity extends Activity {
 
         PhotoMapFragment f = (PhotoMapFragment)getFragmentManager().findFragmentById(R.id.map);
         mMap = f.getMap();
-        if(savedInstanceState==null) loadPreference();
+        Bundle bundle = getIntent().getExtras();
+        PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
+        if(group!=null){
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),20),0));
+        }
+        else if(savedInstanceState==null) loadPreference();
 
 	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -41,6 +49,14 @@ public class PhotoMapActivity extends Activity {
 		super.onStop();
 		savePreference();
 	}
+
+    private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
+        double lat_distance = (bounds.southwest.latitude - bounds.northeast.latitude)*(percentile/2);
+        double lng_distance = (bounds.southwest.longitude - bounds.northeast.longitude)*(percentile/2);
+        LatLng northeast = new LatLng(bounds.northeast.latitude-lat_distance,bounds.northeast.longitude-lng_distance);
+        LatLng southwest = new LatLng(bounds.southwest.latitude+lat_distance,bounds.southwest.longitude+lng_distance);
+        return new LatLngBounds(northeast,southwest);
+    }
 
     private void loadPreference(){
         SharedPreferences pref = getPreferences(MODE_PRIVATE);
