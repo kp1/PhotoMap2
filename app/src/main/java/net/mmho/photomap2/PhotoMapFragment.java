@@ -2,6 +2,7 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.location.Location;
@@ -30,7 +31,6 @@ public class PhotoMapFragment extends MapFragment {
     private LatLngBounds mapBounds;
     private PhotoCursor photoCursor;
     private PhotoGroupList mGroup;
-    private int widthPix;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -40,18 +40,6 @@ public class PhotoMapFragment extends MapFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
-        ViewTreeObserver observer = getView().getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                int width = getView().getWidth();
-                int height = getView().getHeight();
-                widthPix = Math.min(width, height);
-            }
-        });
-
 
         mMap = getMap();
         mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
@@ -72,30 +60,16 @@ public class PhotoMapFragment extends MapFragment {
         new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                if(BuildConfig.DEBUG) Log.d(TAG,"onMarkerClick");
-                for(PhotoGroup p:mGroup){
-                    if(p.marker.equals(marker)){
-                        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+p.getArea());
-                        //stop CameraChangeListener
-                        mMap.setOnCameraChangeListener(null);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(p.getArea(), widthPix/10), animateCameraCallback);
+                for(PhotoGroup group:mGroup){
+                    if(group.marker.equals(marker)){
+                        if(BuildConfig.DEBUG) Log.d(TAG,"group:"+group.getArea());
+                        Intent i = new Intent(getActivity(),ThumbnailActivity.class);
+                        i.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
+                        startActivity(i);
                         break;
                     }
                 }
                 return true;
-            }
-        };
-
-    GoogleMap.CancelableCallback animateCameraCallback =
-        new GoogleMap.CancelableCallback() {
-            @Override
-            public void onFinish() {
-                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-            }
-
-            @Override
-            public void onCancel() {
-                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
         };
 
@@ -120,7 +94,6 @@ public class PhotoMapFragment extends MapFragment {
 
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-                if(BuildConfig.DEBUG) Log.d(TAG,"count:"+cursor.getCount());
                 photoCursor = new PhotoCursor(cursor);
                 getLoaderManager().restartLoader(PHOTO_GROUP_LOADER,null,photoGroupListLoaderCallbacks);
             }
@@ -137,13 +110,11 @@ public class PhotoMapFragment extends MapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                Log.d(TAG,"count:"+photoCursor.getCount());
                 return new PhotoGroupListLoader(getActivity().getApplicationContext(),photoCursor,getPartitionDistance(mapBounds));
             }
 
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-                Log.d(TAG,"PhotoGroupList.onLoadFinish:"+data.toString());
                 if(mGroup==null || !mGroup.equals(data)){
                     mGroup = data;
                     mMap.clear();
