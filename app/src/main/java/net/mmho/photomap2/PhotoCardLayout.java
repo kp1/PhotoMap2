@@ -92,20 +92,22 @@ public class PhotoCardLayout extends RelativeLayout{
 
         @Override
         public void onLoadFinished(Loader<List<Address>> loader, List<Address> data) {
-            Address address = data.get(0);
-            if(BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
-            for(Address a:data){
-                if(BuildConfig.DEBUG) Log.d(TAG,a.toString());
-            }
-            StringBuilder builder = new StringBuilder();
-            if(address.getMaxAddressLineIndex()>0){
-                builder.append(address.getAddressLine(1));
-            }
-            else{
-                builder.append(address.getAddressLine(0));
+            Address address;
+            if(data!=null) {
+                address = data.get(0);
+                if (BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
+                for (Address a : data) {
+                    if (BuildConfig.DEBUG) Log.d(TAG, a.toString());
+                }
+                StringBuilder builder = new StringBuilder();
+                if (address.getMaxAddressLineIndex() > 0) {
+                    builder.append(address.getAddressLine(1));
+                } else {
+                    builder.append(address.getAddressLine(0));
 
+                }
+                description.setText(new String(builder));
             }
-            description.setText(new String(builder));
         }
 
         @Override
