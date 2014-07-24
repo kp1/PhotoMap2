@@ -3,7 +3,7 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-   <FrameLayout
+   <RelativeLayout
        android:id="@+id/thumbnail_frame"
        android:layout_width="96dp"
        android:layout_height="96dp"
@@ -15,7 +15,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"/>
-    </FrameLayout>
+       <TextView
+           android:id="@+id/count"
+           android:layout_height="18dp"
+           android:layout_width="24dp"
+           android:layout_alignParentBottom="true"
+           android:layout_alignParentRight="true"
+           android:background="@drawable/badge_base"/>
+
+   </RelativeLayout>
+
 
     <TextView
         android:id="@+id/title"
