@@ -25,6 +25,7 @@ public class PhotoCardLayout extends RelativeLayout{
     private ThumbnailImageView thumbnail;
     private TextView title;
     private TextView description;
+    private TextView count;
     private ImageView menu;
 
     private PhotoGroup group = null;
@@ -48,6 +49,7 @@ public class PhotoCardLayout extends RelativeLayout{
         description = (TextView)findViewById(R.id.description);
         menu = (ImageView)findViewById(R.id.overflow);
         menu.setOnClickListener(onClickListener);
+        count = (TextView)findViewById(R.id.count);
     }
 
     OnClickListener onClickListener =
@@ -60,9 +62,11 @@ public class PhotoCardLayout extends RelativeLayout{
             }
         };
 
-    public void startLoading(PhotoGroup g,int loader_id,LoaderManager manager){
+    public void setData(PhotoGroup g, int loader_id, LoaderManager manager){
         if(group==null || !group.equals(g)) {
             group = g;
+
+            count.setText(String.format("%2d",g.size()));
 
             thumbnail.setImageBitmap(null);
             thumbnail.startLoading(manager,loader_id*2,g.getID(0));
