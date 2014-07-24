@@ -3,7 +3,7 @@ package net.mmho.photomap2;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.Loader;
 import android.location.Address;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -13,11 +13,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 
 public class PhotoCardLayout extends RelativeLayout{
 
     private static final String TAG = "PhotoCardLayout";
+    public static final String EXTRA_LOCATION = "location";
+
     private ThumbnailImageView thumbnail;
     private TextView title;
     private TextView description;
@@ -65,37 +69,45 @@ public class PhotoCardLayout extends RelativeLayout{
 
             Bundle b = new Bundle();
             description.setText(g.toString());
-            b.putParcelable(GeocodeCallbacks.EXTRA_LOCATION, g.getCenter());
+            b.putParcelable(EXTRA_LOCATION, g.getCenter());
             manager.destroyLoader(loader_id*2+1);
-            manager.restartLoader(loader_id*2+1, b, new GeocodeCallbacks(getContext(), callback));
+            manager.restartLoader(loader_id*2+1, b,this.loaderCallbacks);
         }
         else{
             if(BuildConfig.DEBUG) Log.d(TAG,"already loading.");
         }
     }
-    LoaderCallbacks callback =
-            new LoaderCallbacks() {
-                @Override
-                public void GeocodeCallback(List<Address> data) {
-                    Address address = data.get(0);
-                    if(BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
-                    for(Address a:data){
-                        if(BuildConfig.DEBUG) Log.d(TAG,a.toString());
-                    }
-                    StringBuilder builder = new StringBuilder();
-                    if(address.getMaxAddressLineIndex()>0){
-                        builder.append(address.getAddressLine(1));
-                    }
-                    else{
-                        builder.append(address.getAddressLine(0));
 
-                    }
-                    description.setText(new String(builder));
-                }
+    private LoaderManager.LoaderCallbacks<List<Address>> loaderCallbacks
+            = new LoaderManager.LoaderCallbacks<List<Address>>() {
 
-                @Override
-                public void ThumbnailCallback(Bitmap data) {
-                }
-            };
+        @Override
+        public Loader<List<Address>> onCreateLoader(int id, Bundle args) {
+            return new GeocodeLoader(getContext(), (LatLng) args.getParcelable(EXTRA_LOCATION));
+        }
+
+        @Override
+        public void onLoadFinished(Loader<List<Address>> loader, List<Address> data) {
+            Address address = data.get(0);
+            if(BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
+            for(Address a:data){
+                if(BuildConfig.DEBUG) Log.d(TAG,a.toString());
+            }
+            StringBuilder builder = new StringBuilder();
+            if(address.getMaxAddressLineIndex()>0){
+                builder.append(address.getAddressLine(1));
+            }
+            else{
+                builder.append(address.getAddressLine(0));
+
+            }
+            description.setText(new String(builder));
+        }
+
+        @Override
+        public void onLoaderReset(Loader<List<Address>> loader) {
+
+        }
+    };
 
 }

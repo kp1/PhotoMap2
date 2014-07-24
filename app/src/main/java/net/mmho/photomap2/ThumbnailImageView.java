@@ -2,18 +2,17 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.Loader;
 import android.graphics.Bitmap;
-import android.location.Address;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.ImageView;
 
-import java.util.List;
-
 public class ThumbnailImageView extends ImageView{
 
     private static final String TAG = "ThumbnailImageView";
+    private static final java.lang.String EXTRA_ID = "thumbnail_id";
     private long image_id = -1;
 
     public ThumbnailImageView(Context context) {
@@ -28,31 +27,36 @@ public class ThumbnailImageView extends ImageView{
         super(context, attrs, defStyle);
     }
 
-    LoaderCallbacks callbacks =
-        new LoaderCallbacks() {
-            @Override
-            public void GeocodeCallback(List<Address> data) {
-
-            }
-
-            @Override
-            public void ThumbnailCallback(Bitmap data) {
-                setImageBitmap(data);
-            }
-        };
-
     public void startLoading(LoaderManager manager,int loader_id,long image_id){
 
         if(image_id!=this.image_id) {
             setImageBitmap(null);
             this.image_id = image_id;
             Bundle b = new Bundle();
-            b.putLong(ThumbnailCallbacks.EXTRA_ID, image_id);
+            b.putLong(EXTRA_ID, image_id);
             manager.destroyLoader(loader_id);
-            manager.restartLoader(loader_id, b, new ThumbnailCallbacks(getContext(), callbacks));
+            manager.restartLoader(loader_id, b,this.loaderCallbacks);
         }
         else{
             if(BuildConfig.DEBUG)Log.d(TAG,"image #"+image_id+" is already loading.");
         }
     }
+
+    LoaderManager.LoaderCallbacks<Bitmap> loaderCallbacks=
+        new LoaderManager.LoaderCallbacks<Bitmap>() {
+            @Override
+            public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
+                return new ThumbnailLoader(getContext(),args.getLong(EXTRA_ID));
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
+                setImageBitmap(data);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Bitmap> loader) {
+
+            }
+        };
 }
