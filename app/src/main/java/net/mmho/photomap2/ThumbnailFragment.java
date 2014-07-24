@@ -18,7 +18,7 @@ public class ThumbnailFragment extends Fragment {
 
         Bundle bundle = getArguments();
         group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,group.getIDList(),getLoaderManager());
+        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,group.getIDList(),getLoaderManager(),0);
     }
 
     @Override

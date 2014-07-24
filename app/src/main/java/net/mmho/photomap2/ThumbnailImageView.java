@@ -2,7 +2,6 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.os.Bundle;
@@ -15,6 +14,7 @@ import java.util.List;
 public class ThumbnailImageView extends ImageView{
 
     private static final String TAG = "ThumbnailImageView";
+    private long image_id = -1;
 
     public ThumbnailImageView(Context context) {
         super(context);
@@ -37,14 +37,22 @@ public class ThumbnailImageView extends ImageView{
 
             @Override
             public void ThumbnailCallback(Bitmap data) {
-                Log.d(TAG,"bitmap is "+data.toString());
                 setImageBitmap(data);
             }
         };
 
-    public void startLoading(LoaderManager manager,int id,long image_id){
-        Bundle b = new Bundle();
-        b.putLong(ThumbnailCallbacks.EXTRA_ID, image_id);
-        manager.initLoader(id,b,new ThumbnailCallbacks(getContext(),callbacks));
+    public void startLoading(LoaderManager manager,int loader_id,long image_id){
+
+        if(image_id!=this.image_id) {
+            setImageBitmap(null);
+            this.image_id = image_id;
+            Bundle b = new Bundle();
+            b.putLong(ThumbnailCallbacks.EXTRA_ID, image_id);
+            manager.destroyLoader(loader_id);
+            manager.restartLoader(loader_id, b, new ThumbnailCallbacks(getContext(), callbacks));
+        }
+        else{
+            if(BuildConfig.DEBUG)Log.d(TAG,"image #"+image_id+" is already loading.");
+        }
     }
 }
