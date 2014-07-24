@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <net.mmho.photomap2.PhotoCardLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content">
+    android:id="@+id/card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
    <FrameLayout
        android:id="@+id/thumbnail_frame"
        android:layout_width="96dp"
        android:layout_height="96dp"
        android:padding="8dp"
        android:layout_alignParentLeft="true">
-       <ImageView
+       <net.mmho.photomap2.ThumbnailImageView
             android:id="@+id/thumbnail"
             android:src="@android:drawable/ic_menu_search"
             android:layout_width="match_parent"

@@ -2,7 +2,6 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,15 +15,17 @@ import java.util.List;
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private static final String TAG = "PhotoListAdapter";
-    private int id;
+    private int resource;
     private LayoutInflater inflater;
     private LoaderManager manager;
+    private int loader_id;
 
-    public PhotoListAdapter(Context context, int resource, List<PhotoGroup> objects,LoaderManager m) {
+    public PhotoListAdapter(Context context, int resource, List<PhotoGroup> objects,LoaderManager m,int loader_id_base) {
         super(context, resource, objects);
-        id = resource;
+        this.resource = resource;
         manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        loader_id = loader_id_base;
     }
 
     static class ViewHolder{
@@ -39,23 +40,25 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
         View v;
         ViewHolder holder;
+        int id;
         if(convertView!=null){
             v = convertView;
             holder = (ViewHolder)v.getTag();
+            id = (Integer)v.getTag(R.id.card);
         }
         else {
-            v = inflater.inflate(id,null);
+            v = inflater.inflate(resource,null);
             holder = new ViewHolder();
             holder.title = (TextView) v.findViewById(R.id.title);
             holder.description = (TextView) v.findViewById(R.id.description);
             holder.thumbnail = (ImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
+            id = loader_id++;
+            v.setTag(R.id.card,id);
         }
         PhotoGroup g = getItem(position);
-        holder.description.setText(g.size()+":"+g.toString());
-        holder.thumbnail.setImageBitmap(null);
 
-        ((PhotoCardLayout)v).startLoading(g,position,manager);
+        ((PhotoCardLayout)v).startLoading(g,id,manager);
 
         return v;
     }

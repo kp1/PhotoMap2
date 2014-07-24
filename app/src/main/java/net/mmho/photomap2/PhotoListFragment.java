@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 public class PhotoListFragment extends Fragment {
 
     private static final String TAG = "PhotoListFragment";
+    private static final int ADAPTER_LOADER_ID = 1000;
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
@@ -30,7 +31,7 @@ public class PhotoListFragment extends Fragment {
         setRetainInstance(true);
 
         mGroup = new PhotoGroupList(null);
-        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup,getLoaderManager());
+        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
         getLoaderManager().initLoader(0,null,photoCursorCallbacks);
     }
 
