@@ -19,6 +19,7 @@
 
         <activity android:name=".PhotoMapActivity"/>
         <activity android:name=".ThumbnailActivity"/>
+        <activity android:name=".PhotoViewActivity"/>
         <!--<activity android:name=".PhotoListActivity"/>-->
 
         <meta-data

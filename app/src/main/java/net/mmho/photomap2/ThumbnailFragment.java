@@ -1,11 +1,13 @@
 package net.mmho.photomap2;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 
 public class ThumbnailFragment extends Fragment {
 
@@ -26,11 +28,18 @@ public class ThumbnailFragment extends Fragment {
         View parent = inflater.inflate(R.layout.activity_thumbnail,container,false);
         AbsListView list = (AbsListView)parent.findViewById(R.id.thumbnail_grid);
         list.setAdapter(adapter);
+        list.setOnItemClickListener(clickListener);
         return parent;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
+    AdapterView.OnItemClickListener clickListener =
+        new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(getActivity(),PhotoViewActivity.class);
+                i.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                i.putExtra(PhotoViewActivity.EXTRA_POSITION,position);
+                startActivity(i);
+            }
+        };
 }
