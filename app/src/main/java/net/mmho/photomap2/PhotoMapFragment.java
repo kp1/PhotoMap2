@@ -10,11 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.ViewTreeObserver;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -23,7 +22,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class PhotoMapFragment extends MapFragment {
 	final static String TAG="CustomMapFragment";
-	final static int PARTITION_RATIO = 10;
+	final static int PARTITION_RATIO = 6;
     final static int PHOTO_CURSOR_LOADER = 0;
     final static int PHOTO_GROUP_LOADER = 1;
 
@@ -118,8 +117,10 @@ public class PhotoMapFragment extends MapFragment {
                 if(mGroup==null || !mGroup.equals(data)){
                     mGroup = data;
                     mMap.clear();
-                    for(PhotoGroup p:mGroup){
-                        p.marker = mMap.addMarker(new MarkerOptions().position(p.getCenter()).title(String.valueOf(p.size())));
+                    for(PhotoGroup group:mGroup){
+                        MarkerOptions ops = new MarkerOptions().position(group.getCenter());
+                        ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(group.size())));
+                        group.marker = mMap.addMarker(ops);
                     }
                 }
             }

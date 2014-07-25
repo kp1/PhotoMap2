@@ -3,6 +3,7 @@ package net.mmho.photomap2;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -18,8 +19,7 @@ public class PhotoGroup implements Parcelable{
 
         @Override
         public PhotoGroup createFromParcel(Parcel in) {
-            final PhotoGroup g = new PhotoGroup(in);
-            return g;
+            return new PhotoGroup(in);
         }
 
         @Override
@@ -82,6 +82,17 @@ public class PhotoGroup implements Parcelable{
     public void writeToParcel(Parcel out, int flags) {
         out.writeList(id_list);
         area.writeToParcel(out,0);
+    }
 
+    static public float getMarkerColor(int size){
+        if(size>=100){
+            return BitmapDescriptorFactory.HUE_RED;
+        }
+        else if(size>=10){
+            return BitmapDescriptorFactory.HUE_ROSE;
+        }
+        else{
+            return BitmapDescriptorFactory.HUE_ORANGE;
+        }
     }
 }
