@@ -23,7 +23,7 @@
            android:layout_alignParentRight="true"
            android:paddingLeft="4dp"
            android:paddingRight="4dp"
-           android:background="@drawable/badge_base">
+           android:background="@drawable/badge">
            <TextView
                android:id="@+id/count"
                android:layout_height="wrap_content"
