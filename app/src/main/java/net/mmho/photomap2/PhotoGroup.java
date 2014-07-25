@@ -85,14 +85,19 @@ public class PhotoGroup implements Parcelable{
     }
 
     static public float getMarkerColor(int size){
+        float color;
         if(size>=100){
-            return BitmapDescriptorFactory.HUE_RED;
+            color = BitmapDescriptorFactory.HUE_RED;
         }
         else if(size>=10){
-            return BitmapDescriptorFactory.HUE_ROSE;
+            color = BitmapDescriptorFactory.HUE_ROSE;
+        }
+        else if(size>1){
+            color = BitmapDescriptorFactory.HUE_ORANGE;
         }
         else{
-            return BitmapDescriptorFactory.HUE_ORANGE;
+            color = BitmapDescriptorFactory.HUE_GREEN;
         }
+        return color;
     }
 }
