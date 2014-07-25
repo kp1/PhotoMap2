@@ -6,9 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 
 import java.util.List;
 
@@ -46,8 +44,6 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         }
         else{
             v = inflater.inflate(resource,null);
-            final int width= ((GridView)parent).getColumnWidth();
-            v.setLayoutParams(new AbsListView.LayoutParams(width, width));
             holder = new ViewHolder();
             holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
