@@ -1,7 +1,7 @@
 package net.mmho.photomap2;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -11,6 +11,7 @@ public class ThumbnailActivity extends FragmentActivity {
     private final static String TAG="ThumbnailActivity";
     private final static String TAG_THUMBNAIL="thumbnail";
     public static final String EXTRA_GROUP = "thumbnail_group";
+    private ThumbnailFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +23,7 @@ public class ThumbnailActivity extends FragmentActivity {
             finish();
         }
 
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_THUMBNAIL);
+        fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentByTag(TAG_THUMBNAIL);
         if(fragment==null){
             fragment = new ThumbnailFragment();
             fragment.setArguments(bundle);
@@ -31,5 +32,12 @@ public class ThumbnailActivity extends FragmentActivity {
             fragmentTransaction.commit();
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bundle b = data.getExtras();
+        if(b!=null) fragment.setPosition(b.getInt(PhotoViewActivity.EXTRA_POSITION));
     }
 }
