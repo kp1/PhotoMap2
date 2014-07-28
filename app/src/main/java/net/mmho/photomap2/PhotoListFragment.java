@@ -13,8 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.GridView;
 
 public class PhotoListFragment extends Fragment {
 
@@ -38,7 +38,7 @@ public class PhotoListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.activity_photo_list,container,false);
-        AbsListView list = (AbsListView)parent.findViewById(R.id.list);
+        GridView list = (GridView)parent.findViewById(R.id.list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
         return parent;

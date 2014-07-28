@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.GridView;
 
 public class ThumbnailFragment extends Fragment {
 
@@ -26,7 +26,7 @@ public class ThumbnailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.activity_thumbnail,container,false);
-        AbsListView list = (AbsListView)parent.findViewById(R.id.thumbnail_grid);
+        GridView list = (GridView)parent.findViewById(R.id.thumbnail_grid);
         list.setAdapter(adapter);
         list.setOnItemClickListener(clickListener);
         return parent;
