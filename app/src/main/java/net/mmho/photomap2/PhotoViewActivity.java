@@ -1,17 +1,19 @@
 package net.mmho.photomap2;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 public class PhotoViewActivity extends FragmentActivity {
 
     private static final String TAG = "PhotoViewActivity";
-    private static final String TAG_PHOTO_VIEW="photo_view";
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
+
+    private PhotoGroup group;
+    private int position;
+    private PhotoViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,14 +24,17 @@ public class PhotoViewActivity extends FragmentActivity {
             finish();
         }
 
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_PHOTO_VIEW);
-        if(fragment==null){
-            fragment = new PhotoViewFragment();
-            fragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(android.R.id.content,fragment,TAG_PHOTO_VIEW);
-            fragmentTransaction.commit();
-        }
+        setContentView(R.layout.fragment_photo_view);
+
+        group = bundle.getParcelable(EXTRA_GROUP);
+
+        group = bundle.getParcelable(PhotoViewActivity.EXTRA_GROUP);
+        position = bundle.getInt(PhotoViewActivity.EXTRA_POSITION);
+        adapter = new PhotoViewAdapter(getSupportFragmentManager(),group);
+
+        ViewPager pager = (ViewPager)findViewById(R.id.photo_pager);
+        pager.setAdapter(adapter);
+        pager.setCurrentItem(position);
 
     }
 }

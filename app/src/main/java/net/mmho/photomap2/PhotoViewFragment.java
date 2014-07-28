@@ -5,33 +5,25 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterViewFlipper;
 
 public class PhotoViewFragment extends Fragment {
 
-    private PhotoGroup group;
-    private int position;
-    private PhotoViewAdapter adapter;
+    public static final String EXTRA_IMAGE_ID = "image_id";
+    private long image_id;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-
-        Bundle bundle = getArguments();
-        group = bundle.getParcelable(PhotoViewActivity.EXTRA_GROUP);
-        position = bundle.getInt(PhotoViewActivity.EXTRA_POSITION);
-        adapter = new PhotoViewAdapter(getActivity().getApplicationContext(),
-                R.layout.photo_view,group.getIDList(),getLoaderManager(),0);
+        Bundle b = getArguments();
+        image_id = b.getLong(EXTRA_IMAGE_ID);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View parent = inflater.inflate(R.layout.fragment_photo_view,container,false);
-        AdapterViewFlipper flipper = (AdapterViewFlipper)parent.findViewById(R.id.photo_flipper);
-        flipper.setAdapter(adapter);
-        flipper.setDisplayedChild(position);
-
-        return parent;
+    public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.photo_view,container,false);
+        PhotoImageView image = (PhotoImageView)v.findViewById(R.id.photo_view);
+        image.startLoading(getActivity().getSupportLoaderManager(),(int)image_id,image_id);
+        return v;
     }
 }

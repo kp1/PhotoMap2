@@ -1,53 +1,33 @@
 package net.mmho.photomap2;
 
-import android.content.Context;
-import android.support.v4.app.LoaderManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.util.Log;
 
-import java.util.List;
+public class PhotoViewAdapter extends FragmentPagerAdapter {
 
-public class PhotoViewAdapter extends ArrayAdapter<Long>{
+    private static final String TAG = "PhotoViewAdapter";
+    private PhotoGroup group;
 
-    private int resource;
-    private LayoutInflater inflater;
-
-    LoaderManager manager;
-    int loader_id;
-
-    public PhotoViewAdapter(Context context, int resource, List<Long> objects,LoaderManager manager,int loader_id_base) {
-        super(context, resource, objects);
-        this.resource = resource;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.manager = manager;
-        loader_id = loader_id_base;
+    public PhotoViewAdapter(FragmentManager fm,PhotoGroup group) {
+        super(fm);
+        this.group = group;
     }
 
-    static class ViewHolder{
-        PhotoImageView image;
-    }
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v;
-        ViewHolder holder;
-        int id;
-        if(convertView!=null){
-            v = convertView;
-            holder = (ViewHolder) v.getTag();
-            id = (Integer)v.getTag(R.id.photo_view);
-        }
-        else{
-            v = inflater.inflate(resource,null);
-            holder = new ViewHolder();
-            holder.image = (PhotoImageView) v.findViewById(R.id.photo_view);
-            id = loader_id++;
-            v.setTag(R.id.photo_view,id);
-        }
+    public Fragment getItem(int i) {
+        if(BuildConfig.DEBUG) Log.d(TAG, "getItem:"+i);
+        Fragment f = new PhotoViewFragment();
+        Bundle b = new Bundle();
+        b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID,group.getID(i));
+        f.setArguments(b);
+        return f;
+    }
 
-        holder.image.startLoading(manager,id,getItem(position));
-
-        return v;
+    @Override
+    public int getCount() {
+        return group.getIDList().size();
     }
 }
