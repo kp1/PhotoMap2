@@ -4,9 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <stroke android:width="2dp"
-        android:color="@android:color/holo_green_light"/>
+    <!--<stroke android:width="2dp"
+        android:color="#99CC00"/> -->
     <corners android:radius="5dp"/>
-    <solid android:color="@android:color/holo_green_dark"/>
+    <solid android:color="#669900"/>
 
 </shape>
