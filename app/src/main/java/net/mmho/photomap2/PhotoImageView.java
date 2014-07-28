@@ -38,7 +38,7 @@ public class PhotoImageView extends ImageView{
             this.image_id = image_id;
             Bundle b = new Bundle();
             b.putLong(EXTRA_IMAGE,image_id);
-            manager.destroyLoader(loader_id);
+//            manager.destroyLoader(loader_id);
             manager.restartLoader(loader_id,b,loaderCallbacks);
         }
         else{

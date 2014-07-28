@@ -19,6 +19,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
     private static final String TAG = "PhotoImageLoader";
     private long image_id;
     private Context context;
+    private Bitmap bitmap;
 
     public PhotoImageLoader(Context context, long image_id) {
         super(context);
@@ -50,9 +51,32 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
     }
 
     @Override
+    public void deliverResult(Bitmap data) {
+        bitmap = data;
+        if(isStarted()) {
+            super.deliverResult(data);
+        }
+    }
+
+    @Override
     protected void onStartLoading() {
-        if(takeContentChanged()){
+        if(bitmap!=null){
+            deliverResult(bitmap);
+        }
+        if(takeContentChanged() || bitmap==null){
             forceLoad();
         }
+    }
+
+    @Override
+    protected void onStopLoading() {
+        cancelLoad();
+    }
+
+    @Override
+    protected void onReset() {
+        super.onReset();
+        onStopLoading();
+        bitmap = null;
     }
 }
