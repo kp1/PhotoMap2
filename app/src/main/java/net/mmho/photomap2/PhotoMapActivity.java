@@ -4,7 +4,6 @@ package net.mmho.photomap2;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -12,7 +11,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-
 
 public class PhotoMapActivity extends FragmentActivity {
     final public static String EXTRA_GROUP="group";
@@ -30,16 +28,15 @@ public class PhotoMapActivity extends FragmentActivity {
         PhotoMapFragment fragment = (PhotoMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
         Bundle bundle = getIntent().getExtras();
-        PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
-        if(group!=null){
+        final PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
+        if(group!=null) {
+            //noinspection ConstantConditions
             fragment.getView().post(new Runnable() {
                 @Override
                 public void run() {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),1.2),0));
-
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(), 1.2), 0));
                 }
             });
-
         }
         else if(savedInstanceState==null) loadPreference();
 
