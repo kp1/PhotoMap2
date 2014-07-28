@@ -1,11 +1,11 @@
 package net.mmho.photomap2;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
-public class PhotoListActivity extends Activity{
+public class PhotoListActivity extends FragmentActivity {
 
     final static String TAG_LIST="list";
     @Override
@@ -14,10 +14,10 @@ public class PhotoListActivity extends Activity{
 
         setContentView(R.layout.activity_photo_list);
 
-        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_LIST);
         if(fragment==null){
             fragment = new PhotoListFragment();
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(android.R.id.content,fragment,TAG_LIST);
             fragmentTransaction.commit();
         }

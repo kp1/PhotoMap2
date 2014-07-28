@@ -1,12 +1,12 @@
 package net.mmho.photomap2;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
-public class ThumbnailActivity extends Activity {
+public class ThumbnailActivity extends FragmentActivity {
 
     private final static String TAG="ThumbnailActivity";
     private final static String TAG_THUMBNAIL="thumbnail";
@@ -22,11 +22,11 @@ public class ThumbnailActivity extends Activity {
             finish();
         }
 
-        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_THUMBNAIL);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_THUMBNAIL);
         if(fragment==null){
             fragment = new ThumbnailFragment();
             fragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(android.R.id.content,fragment,TAG_THUMBNAIL);
             fragmentTransaction.commit();
         }

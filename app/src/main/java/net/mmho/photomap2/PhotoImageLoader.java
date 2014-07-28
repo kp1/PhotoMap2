@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.content.AsyncTaskLoader;
 import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import java.io.FileNotFoundException;

@@ -1,12 +1,12 @@
 package net.mmho.photomap2;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
-public class PhotoViewActivity extends Activity {
+public class PhotoViewActivity extends FragmentActivity {
 
     private static final String TAG = "PhotoViewActivity";
     private static final String TAG_PHOTO_VIEW="photo_view";
@@ -22,11 +22,11 @@ public class PhotoViewActivity extends Activity {
             finish();
         }
 
-        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_PHOTO_VIEW);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_PHOTO_VIEW);
         if(fragment==null){
             fragment = new PhotoViewFragment();
             fragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(android.R.id.content,fragment,TAG_PHOTO_VIEW);
             fragmentTransaction.commit();
         }

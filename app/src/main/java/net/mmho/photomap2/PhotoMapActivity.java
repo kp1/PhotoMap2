@@ -1,9 +1,9 @@
 package net.mmho.photomap2;
 
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -13,7 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 
-public class PhotoMapActivity extends Activity {
+public class PhotoMapActivity extends FragmentActivity {
     final public static String EXTRA_GROUP="group";
 
 	final private static String TAG="MapActivity";
@@ -26,12 +26,12 @@ public class PhotoMapActivity extends Activity {
 		
 		setContentView(R.layout.activity_photo_map);
 
-        PhotoMapFragment f = (PhotoMapFragment)getFragmentManager().findFragmentById(R.id.map);
+        PhotoMapFragment f = (PhotoMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
         mMap = f.getMap();
         Bundle bundle = getIntent().getExtras();
         PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
         if(group!=null){
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),20),0));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(), 20), 0));
         }
         else if(savedInstanceState==null) loadPreference();
 
