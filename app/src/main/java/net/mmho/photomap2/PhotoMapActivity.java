@@ -4,6 +4,7 @@ package net.mmho.photomap2;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Menu;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,23 +21,29 @@ public class PhotoMapActivity extends FragmentActivity {
 
 	private GoogleMap mMap;
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.activity_photo_map);
 
-        PhotoMapFragment f = (PhotoMapFragment)getSupportFragmentManager().findFragmentById(R.id.map);
-        mMap = f.getMap();
+        PhotoMapFragment fragment = (PhotoMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mMap = fragment.getMap();
         Bundle bundle = getIntent().getExtras();
         PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
         if(group!=null){
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(), 20), 0));
+            fragment.getView().post(new Runnable() {
+                @Override
+                public void run() {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),1.2),0));
+
+                }
+            });
+
         }
         else if(savedInstanceState==null) loadPreference();
 
 	}
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -51,11 +58,11 @@ public class PhotoMapActivity extends FragmentActivity {
 	}
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
-        double lat_distance = (bounds.southwest.latitude - bounds.northeast.latitude)*(percentile/2);
-        double lng_distance = (bounds.southwest.longitude - bounds.northeast.longitude)*(percentile/2);
-        LatLng northeast = new LatLng(bounds.northeast.latitude-lat_distance,bounds.northeast.longitude-lng_distance);
-        LatLng southwest = new LatLng(bounds.southwest.latitude+lat_distance,bounds.southwest.longitude+lng_distance);
-        return new LatLngBounds(northeast,southwest);
+        double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
+        double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
+        LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
+        LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
+        return new LatLngBounds(southwest,northeast);
     }
 
     private void loadPreference(){
