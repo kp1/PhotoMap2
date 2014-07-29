@@ -4,6 +4,4 @@
     <string name="app_name">PhotoMap2</string>
     <string name="title_activity_photo_map">Map</string>
     <string name="action_settings">Setting</string>
-    <string name="google_maps_key">release_key</string>
-
 </resources>
