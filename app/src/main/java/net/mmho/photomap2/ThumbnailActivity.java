@@ -37,7 +37,9 @@ public class ThumbnailActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bundle b = data.getExtras();
-        if(b!=null) fragment.setPosition(b.getInt(PhotoViewActivity.EXTRA_POSITION));
+        if(data!=null) {
+            Bundle b = data.getExtras();
+            if (b != null) fragment.setPosition(b.getInt(PhotoViewActivity.EXTRA_POSITION));
+        }
     }
 }

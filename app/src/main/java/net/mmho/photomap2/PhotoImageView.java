@@ -14,6 +14,7 @@ public class PhotoImageView extends ImageView{
 
     private static final String TAG = "PhotoImageView";
     private static final String EXTRA_IMAGE = "image";
+    private static final String EXTRA_WIDTH = "width";
     private long image_id;
 
     public PhotoImageView(Context context) {
@@ -33,13 +34,18 @@ public class PhotoImageView extends ImageView{
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
     }
 
-    public void startLoading(LoaderManager manager,int loader_id,long image_id){
-        if(this.image_id!=image_id){
-            this.image_id = image_id;
-            Bundle b = new Bundle();
-            b.putLong(EXTRA_IMAGE,image_id);
-//            manager.destroyLoader(loader_id);
-            manager.restartLoader(loader_id,b,loaderCallbacks);
+    public void startLoading(final LoaderManager manager, final int loader_id, long id){
+        if(image_id!=id){
+            image_id = id;
+            post(new Runnable() {
+                @Override
+                public void run() {
+                    Bundle b = new Bundle();
+                    b.putLong(EXTRA_IMAGE, image_id);
+                    b.putInt(EXTRA_WIDTH,Math.min(getWidth(),getHeight()));
+                    manager.restartLoader(loader_id, b, loaderCallbacks);
+                }
+            });
         }
         else{
             if(BuildConfig.DEBUG) Log.d(TAG, "image #"+image_id+" is already loading.");
@@ -49,7 +55,7 @@ public class PhotoImageView extends ImageView{
         new LoaderManager.LoaderCallbacks<Bitmap>() {
             @Override
             public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
-                return new PhotoImageLoader(getContext(),args.getLong(EXTRA_IMAGE));
+                return new PhotoImageLoader(getContext(),args.getLong(EXTRA_IMAGE),args.getInt(EXTRA_WIDTH));
             }
 
             @Override

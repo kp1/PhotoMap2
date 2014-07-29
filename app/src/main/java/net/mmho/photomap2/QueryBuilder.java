@@ -9,6 +9,7 @@ public class QueryBuilder {
     final static String LATITUDE = MediaStore.Images.ImageColumns.LATITUDE;
     final static String LONGITUDE = MediaStore.Images.ImageColumns.LONGITUDE;
     final static String DATE_TAKEN = MediaStore.Images.ImageColumns.DATE_TAKEN;
+    final static String IMAGE_ID = MediaStore.Images.ImageColumns._ID;
     final static String BETWEEN = " BETWEEN ";
     final static String AND = " AND ";
     final static String OR = " OR ";
@@ -26,6 +27,10 @@ public class QueryBuilder {
         }
         return b.toString();
 
+    }
+
+    static String createQuery(long id){
+        return IMAGE_ID+IS+id;
     }
 
     static String createQuery(){
