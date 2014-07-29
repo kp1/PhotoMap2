@@ -17,12 +17,14 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
     private Context context;
     private Bitmap bitmap;
     private int width;
+    private boolean thumbnail;
 
-    public PhotoImageLoader(Context context, long image_id,int width) {
+    public PhotoImageLoader(Context context, long image_id,int width,boolean thumbnail) {
         super(context);
         this.image_id = image_id;
         this.context = context;
         this.width = width;
+        this.thumbnail = thumbnail;
         onContentChanged();
     }
 
@@ -40,26 +42,34 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
         Bitmap bmp = null;
 
+        if(thumbnail){
+            bmp = MediaStore.Images.Thumbnails.getThumbnail(getContext().getContentResolver(),image_id,
+                    MediaStore.Images.Thumbnails.MINI_KIND,null);
+        }
+
         if (c.getColumnCount() > 0) {
             c.moveToFirst();
-            String path = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
-
-            BitmapFactory.Options option = new BitmapFactory.Options();
-
-            // get only size
-            option.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path,option);
-
             int orientation = c.getInt(c.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION));
 
-            int s = Math.max(option.outHeight,option.outWidth) /width+1;
-            int scale = 1;
-            while (scale < s) scale *= 2;
+            if(!thumbnail) {
+                BitmapFactory.Options option = new BitmapFactory.Options();
+                String path = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
 
-            option.inSampleSize = scale;
-            option.inJustDecodeBounds = false;
-            bmp = BitmapFactory.decodeFile(path, option);
-            if (orientation != 0) {
+                // get only size
+                option.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(path, option);
+
+
+                int s = Math.max(option.outHeight, option.outWidth) / width + 1;
+                int scale = 1;
+                while (scale < s) scale *= 2;
+
+                option.inSampleSize = scale;
+                option.inJustDecodeBounds = false;
+                bmp = BitmapFactory.decodeFile(path, option);
+            }
+
+            if (bmp!=null && orientation != 0) {
                 Matrix matrix = new Matrix();
                 matrix.setRotate(orientation);
                 bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);

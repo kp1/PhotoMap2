@@ -55,7 +55,7 @@ public class PhotoImageView extends ImageView{
         new LoaderManager.LoaderCallbacks<Bitmap>() {
             @Override
             public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
-                return new PhotoImageLoader(getContext(),args.getLong(EXTRA_IMAGE),args.getInt(EXTRA_WIDTH));
+                return new PhotoImageLoader(getContext(),args.getLong(EXTRA_IMAGE),args.getInt(EXTRA_WIDTH),false);
             }
 
             @Override

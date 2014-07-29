@@ -52,7 +52,7 @@ public class ThumbnailImageView extends ImageView{
         new LoaderManager.LoaderCallbacks<Bitmap>() {
             @Override
             public Loader<Bitmap> onCreateLoader(int id, Bundle args) {
-                return new ThumbnailLoader(getContext(),args.getLong(EXTRA_ID));
+                return new PhotoImageLoader(getContext(),args.getLong(EXTRA_ID),0,true);
             }
 
             @Override
