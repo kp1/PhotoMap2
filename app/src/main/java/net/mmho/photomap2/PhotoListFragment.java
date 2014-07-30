@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -80,6 +82,28 @@ public class PhotoListFragment extends Fragment {
                 }
             };
 
+    private final Handler handle = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+            case PhotoGroupList.MSGCODE_GROUP:
+                Bundle b = msg.getData();
+                int position = b.getInt(PhotoGroupList.EXTRA_INDEX);
+                PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
+                Log.d(TAG,"("+position+")"+g.toString());
+
+                if(adapter.getCount()<=position){
+                    adapter.add(g);
+                }
+                else{
+                    adapter.notifyDataSetChanged();
+                }
+
+                break;
+            }
+        }
+    };
+
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -108,13 +132,12 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance);
+            adapter.clear();
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance,handle);
         }
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-            adapter.clear();
-            adapter.addAll(data);
         }
 
         @Override

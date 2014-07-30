@@ -109,7 +109,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                return new PhotoGroupListLoader(getActivity().getApplicationContext(),new PhotoGroupList(photoCursor),getPartitionDistance(mapBounds));
+                return new PhotoGroupListLoader(getActivity().getApplicationContext(),new PhotoGroupList(photoCursor),getPartitionDistance(mapBounds),null);
             }
 
             @Override

@@ -1,12 +1,18 @@
 package net.mmho.photomap2;
 
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup> {
+    public final static String EXTRA_GROUP="group";
+    public static final String EXTRA_INDEX = "index";
+    public static final int MSGCODE_GROUP = 0;
     final PhotoCursor mCursor;
     private float distance;
 
@@ -14,26 +20,35 @@ public class PhotoGroupList extends ArrayList<PhotoGroup> {
         mCursor = c;
     }
 
-    PhotoGroupList exec(float distance){
-        this.clear();
+    PhotoGroupList exec(float distance,Handler handler){
+        clear();
         this.distance = distance;
         if(!mCursor.moveToFirst()) return this;
 
         do{
-            int i;
-            for(i=0;i<this.size();i++){
+            int i,index;
+            for(i=0;i<size();i++){
                 LatLng p = mCursor.getLocation();
-                LatLng c = this.get(i).getCenter();
+                LatLng c = get(i).getCenter();
                 float[] d = new float[3];
                 Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
                 if(d[0]<distance){
-                    this.get(i).append(p,mCursor.getID());
+                    get(i).append(p,mCursor.getID());
                     break;
                 }
             }
             if(i==this.size()){
                 PhotoGroup g = new PhotoGroup(mCursor.getLocation(), mCursor.getID());
-                this.add(g);
+                add(g);
+            }
+            if(handler!=null){
+                Bundle b = new Bundle();
+                b.putInt(EXTRA_INDEX,i);
+                b.putParcelable(EXTRA_GROUP,get(i));
+                Message message = new Message();
+                message.setData(b);
+                message.what = MSGCODE_GROUP;
+                handler.sendMessage(message);
             }
         }while(mCursor.moveToNext());
         return this;
