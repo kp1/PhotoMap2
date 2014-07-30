@@ -32,8 +32,6 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if(BuildConfig.DEBUG) Log.d(TAG, "getView:" + position);
-
         View v;
         ViewHolder holder;
         int id;

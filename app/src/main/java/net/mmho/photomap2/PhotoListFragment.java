@@ -74,7 +74,6 @@ public class PhotoListFragment extends Fragment {
             new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    if(BuildConfig.DEBUG) Log.d(TAG,"onItemClick:"+position);
                     Intent i = new Intent(getActivity(),ThumbnailActivity.class);
                     i.putExtra(ThumbnailActivity.EXTRA_GROUP,mGroup.get(position));
                     startActivity(i);

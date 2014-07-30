@@ -76,9 +76,6 @@ public class PhotoCardLayout extends RelativeLayout{
             manager.destroyLoader(loader_id*2+1);
             manager.restartLoader(loader_id*2+1, b,this.loaderCallbacks);
         }
-        else{
-            if(BuildConfig.DEBUG) Log.d(TAG,"already loading.");
-        }
     }
 
     private LoaderManager.LoaderCallbacks<List<Address>> loaderCallbacks
@@ -94,10 +91,6 @@ public class PhotoCardLayout extends RelativeLayout{
             Address address;
             if(data!=null && data.size()>0) {
                 address = data.get(0);
-                if (BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
-                for (Address a : data) {
-                    if (BuildConfig.DEBUG) Log.d(TAG, a.toString());
-                }
                 StringBuilder builder = new StringBuilder();
                 if (address.getMaxAddressLineIndex() > 0) {
                     builder.append(address.getAddressLine(1));

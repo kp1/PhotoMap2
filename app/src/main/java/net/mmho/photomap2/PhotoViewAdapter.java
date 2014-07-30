@@ -18,7 +18,6 @@ public class PhotoViewAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        if(BuildConfig.DEBUG) Log.d(TAG, "getItem:"+i);
         Fragment f = new PhotoViewFragment();
         Bundle b = new Bundle();
         b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID,group.getID(i));

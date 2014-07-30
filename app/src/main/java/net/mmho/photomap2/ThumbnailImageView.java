@@ -36,9 +36,6 @@ public class ThumbnailImageView extends ImageView{
             b.putLong(EXTRA_ID, image_id);
             manager.restartLoader(loader_id, b,this.loaderCallbacks);
         }
-        else{
-            if(BuildConfig.DEBUG)Log.d(TAG,"image #"+image_id+" is already loading.");
-        }
     }
 
     @Override

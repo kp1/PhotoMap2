@@ -28,9 +28,6 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        if(BuildConfig.DEBUG) Log.d(TAG,"getView:"+position);
-
         View v;
         int id;
         if(convertView!=null){
