@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.app.LoaderManager;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup> {
     final PhotoCursor mCursor;
-    static float distance = 0;
+    private float distance;
 
     PhotoGroupList(PhotoCursor c){
         mCursor = c;

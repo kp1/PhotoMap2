@@ -1,6 +1,7 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v4.content.AsyncTaskLoader;
 
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
@@ -8,9 +9,9 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     private PhotoGroupList list;
     private float distance;
 
-    public PhotoGroupListLoader(Context context,PhotoCursor cursor,float distance) {
+    public PhotoGroupListLoader(Context context,PhotoGroupList list,float distance) {
         super(context);
-        list = new PhotoGroupList(cursor);
+        this.list = list;
         this.distance = distance;
         onContentChanged();
     }

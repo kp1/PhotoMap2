@@ -95,6 +95,7 @@ public class PhotoListFragment extends Fragment {
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
             mCursor = new PhotoCursor(data);
+            mGroup = new PhotoGroupList(mCursor);
             getLoaderManager().initLoader(1, null, photoGroupListLoaderCallbacks);
         }
 
@@ -108,7 +109,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,distance);
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance);
         }
 
         @Override
