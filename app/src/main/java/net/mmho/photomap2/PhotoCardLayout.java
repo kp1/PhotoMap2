@@ -63,19 +63,16 @@ public class PhotoCardLayout extends RelativeLayout{
         };
 
     public void setData(PhotoGroup g, int loader_id, LoaderManager manager){
-        if(group==null || !group.equals(g)) {
-            group = g;
+        group = g;
 
-            count.setText(String.format("%2d",g.size()));
+        count.setText(String.format("%2d",g.size()));
 
-            thumbnail.startLoading(manager,loader_id*2,g.getID(0));
+        thumbnail.startLoading(manager,loader_id*2,g.getID(0));
 
-            Bundle b = new Bundle();
-            description.setText(g.toString());
-            b.putParcelable(EXTRA_LOCATION, g.getCenter());
-            manager.destroyLoader(loader_id*2+1);
-            manager.restartLoader(loader_id*2+1, b,this.loaderCallbacks);
-        }
+        Bundle b = new Bundle();
+        description.setText(g.toString());
+        b.putParcelable(EXTRA_LOCATION, g.getCenter());
+        manager.restartLoader(loader_id*2+1, b,this.loaderCallbacks);
     }
 
     private LoaderManager.LoaderCallbacks<List<Address>> loaderCallbacks

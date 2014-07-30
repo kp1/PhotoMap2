@@ -90,15 +90,11 @@ public class PhotoListFragment extends Fragment {
                 Bundle b = msg.getData();
                 int position = b.getInt(PhotoGroupList.EXTRA_INDEX);
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
-                Log.d(TAG,"("+position+")"+g.toString());
 
                 if(adapter.getCount()<=position){
                     adapter.add(g);
+                    adapter.notifyDataSetInvalidated();
                 }
-                else{
-                    adapter.notifyDataSetChanged();
-                }
-
                 break;
             }
         }
