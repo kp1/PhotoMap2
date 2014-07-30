@@ -21,12 +21,12 @@ public class ThumbnailFragment extends Fragment {
 
         Bundle bundle = getArguments();
         group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.fragment_thumbnail,group.getIDList(),getLoaderManager(),0);
+        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group.getIDList(),getLoaderManager(),0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View parent = inflater.inflate(R.layout.activity_thumbnail,container,false);
+        View parent = inflater.inflate(R.layout.fragment_thumbnail,container,false);
         list = (GridView)parent.findViewById(R.id.thumbnail_grid);
         list.setAdapter(adapter);
         list.setOnItemClickListener(clickListener);

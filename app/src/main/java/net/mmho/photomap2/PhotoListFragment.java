@@ -31,13 +31,13 @@ public class PhotoListFragment extends Fragment {
         setRetainInstance(true);
 
         mGroup = new PhotoGroupList(null);
-        adapter= new PhotoListAdapter(getActivity(), R.layout.fragment_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
         getLoaderManager().initLoader(0,null,photoCursorCallbacks);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View parent = inflater.inflate(R.layout.activity_photo_list,container,false);
+        View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
         GridView list = (GridView)parent.findViewById(R.id.list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
