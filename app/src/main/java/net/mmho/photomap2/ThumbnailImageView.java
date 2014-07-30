@@ -34,7 +34,6 @@ public class ThumbnailImageView extends ImageView{
             this.image_id = image_id;
             Bundle b = new Bundle();
             b.putLong(EXTRA_ID, image_id);
-//            manager.destroyLoader(loader_id);
             manager.restartLoader(loader_id, b,this.loaderCallbacks);
         }
         else{

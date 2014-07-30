@@ -7,6 +7,8 @@ import android.provider.MediaStore;
 import com.google.android.gms.maps.model.LatLng;
 
 public class PhotoCursor extends CursorWrapper {
+
+    private Cursor mCursor;
     final public static String[] projection = new String[]{
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.DATA,
@@ -19,6 +21,7 @@ public class PhotoCursor extends CursorWrapper {
 
     public PhotoCursor(Cursor cursor) {
         super(cursor);
+        mCursor = cursor;
     }
 
     long getID(){

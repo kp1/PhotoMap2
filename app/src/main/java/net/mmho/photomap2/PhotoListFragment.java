@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.SeekBar;
 
 public class PhotoListFragment extends Fragment {
 
@@ -23,6 +24,7 @@ public class PhotoListFragment extends Fragment {
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
+    private float distance;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -33,17 +35,40 @@ public class PhotoListFragment extends Fragment {
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
         getLoaderManager().initLoader(0,null,photoCursorCallbacks);
+        distance = DistanceUtil.toDistance(DistanceUtil.initialIndex());
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
         GridView list = (GridView)parent.findViewById(R.id.list);
+        SeekBar bar = (SeekBar)parent.findViewById(R.id.distance);
+        bar.setOnSeekBarChangeListener(onSeekBarChangeListener);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
         return parent;
 
     }
+
+    SeekBar.OnSeekBarChangeListener onSeekBarChangeListener =
+            new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    distance = DistanceUtil.toDistance(progress);
+                    getLoaderManager().restartLoader(1,null,photoGroupListLoaderCallbacks);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            };
 
     AdapterView.OnItemClickListener onItemClickListener=
             new AdapterView.OnItemClickListener() {
@@ -83,7 +108,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,4000);
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,distance);
         }
 
         @Override

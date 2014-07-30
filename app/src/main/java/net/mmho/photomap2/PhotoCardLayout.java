@@ -68,7 +68,6 @@ public class PhotoCardLayout extends RelativeLayout{
 
             count.setText(String.format("%2d",g.size()));
 
-            thumbnail.setImageBitmap(null);
             thumbnail.startLoading(manager,loader_id*2,g.getID(0));
 
             Bundle b = new Bundle();
@@ -93,7 +92,7 @@ public class PhotoCardLayout extends RelativeLayout{
         @Override
         public void onLoadFinished(Loader<List<Address>> loader, List<Address> data) {
             Address address;
-            if(data!=null) {
+            if(data!=null && data.size()>0) {
                 address = data.get(0);
                 if (BuildConfig.DEBUG) Log.d(TAG, "count:" + data.size());
                 for (Address a : data) {
