@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -14,6 +15,8 @@ public class PhotoGroup implements Parcelable{
     public Marker marker;
     private LatLngBounds area;
     private ArrayList<Long> id_list = new ArrayList<Long>();
+
+    public Address address;
 
     public final static Parcelable.Creator<PhotoGroup> CREATOR = new Parcelable.Creator<PhotoGroup>(){
 
@@ -31,6 +34,7 @@ public class PhotoGroup implements Parcelable{
     PhotoGroup(Parcel in){
         in.readList(id_list, null);
         area = LatLngBounds.CREATOR.createFromParcel(in);
+        address = null;
     }
 
     PhotoGroup(LatLng p, long id){
@@ -38,6 +42,7 @@ public class PhotoGroup implements Parcelable{
         b.include(p);
         area = b.build();
         id_list.add(id);
+        address = null;
     }
 
     public LatLng getCenter(){
@@ -49,7 +54,7 @@ public class PhotoGroup implements Parcelable{
 
     public String toString() {
         LatLng c = area.getCenter();
-        return String.format("% 8.5f , % 8.5f",c.latitude,c.longitude);
+        return String.format("% 8.5f , % 8.5f", c.latitude, c.longitude);
     }
 
     public int size(){
@@ -67,6 +72,7 @@ public class PhotoGroup implements Parcelable{
     void append(LatLng point,long id){
         area = area.including(point);
         id_list.add(id);
+        address = null;
     }
 
     public boolean equals(PhotoGroup g) {
@@ -100,4 +106,5 @@ public class PhotoGroup implements Parcelable{
         }
         return color;
     }
+
 }

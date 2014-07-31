@@ -70,9 +70,27 @@ public class PhotoCardLayout extends RelativeLayout{
         thumbnail.startLoading(manager,loader_id*2,g.getID(0));
 
         Bundle b = new Bundle();
-        description.setText(g.toString());
-        b.putParcelable(EXTRA_LOCATION, g.getCenter());
-        manager.restartLoader(loader_id*2+1, b,this.loaderCallbacks);
+
+        Address address = g.address;
+        if(address==null) {
+            description.setText(g.toString());
+            b.putParcelable(EXTRA_LOCATION, g.getCenter());
+            manager.restartLoader(loader_id * 2 + 1, b,loaderCallbacks);
+        }
+        else{
+            description.setText(addressToDescription(address));
+        }
+    }
+
+    private String addressToDescription(Address address){
+        StringBuilder builder = new StringBuilder();
+        if (address.getMaxAddressLineIndex() > 0) {
+            builder.append(address.getAddressLine(1));
+        } else {
+            builder.append(address.getAddressLine(0));
+
+        }
+        return new String(builder);
     }
 
     private LoaderManager.LoaderCallbacks<List<Address>> loaderCallbacks
@@ -85,17 +103,9 @@ public class PhotoCardLayout extends RelativeLayout{
 
         @Override
         public void onLoadFinished(Loader<List<Address>> loader, List<Address> data) {
-            Address address;
             if(data!=null && data.size()>0) {
-                address = data.get(0);
-                StringBuilder builder = new StringBuilder();
-                if (address.getMaxAddressLineIndex() > 0) {
-                    builder.append(address.getAddressLine(1));
-                } else {
-                    builder.append(address.getAddressLine(0));
-
-                }
-                description.setText(new String(builder));
+                group.address = data.get(0);
+                description.setText(addressToDescription(data.get(0)));
             }
         }
 
