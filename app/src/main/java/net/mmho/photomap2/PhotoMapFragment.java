@@ -94,6 +94,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoCursor = new PhotoCursor(cursor);
+                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 getLoaderManager().restartLoader(PHOTO_GROUP_LOADER,null,photoGroupListLoaderCallbacks);
             }
 
