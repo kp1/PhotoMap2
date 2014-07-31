@@ -23,6 +23,7 @@ public class PhotoListFragment extends Fragment {
 
     private static final String TAG = "PhotoListFragment";
     private static final int ADAPTER_LOADER_ID = 1000;
+    private static final java.lang.String EXTRA_DISTANCE = "distance";
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
@@ -58,7 +59,8 @@ public class PhotoListFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     distance = DistanceUtil.toDistance(progress);
-                    getLoaderManager().restartLoader(1,null,photoGroupListLoaderCallbacks);
+                    getLoaderManager().destroyLoader(1);
+                    getLoaderManager().restartLoader(1, null, photoGroupListLoaderCallbacks);
                 }
 
                 @Override
@@ -86,15 +88,15 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
-            case PhotoGroupList.MSGCODE_GROUP:
+            case PhotoGroupList.MESSAGE_RESTART:
+                adapter.clear();
+                break;
+            case PhotoGroupList.MESSAGE_ADD:
                 Bundle b = msg.getData();
                 int position = b.getInt(PhotoGroupList.EXTRA_INDEX);
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
-
-                if(adapter.getCount()<=position){
-                    adapter.add(g);
-                    adapter.notifyDataSetInvalidated();
-                }
+                adapter.add(g);
+                adapter.notifyDataSetInvalidated();
                 break;
             }
         }
@@ -112,15 +114,14 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if(BuildConfig.DEBUG) Log.d(TAG,"onLoadFinished()");
             mCursor = new PhotoCursor(data);
             mGroup = new PhotoGroupList(mCursor);
-            getLoaderManager().initLoader(1, null, photoGroupListLoaderCallbacks);
+            getLoaderManager().destroyLoader(1);
+            getLoaderManager().restartLoader(1, null, photoGroupListLoaderCallbacks);
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            adapter.clear();
         }
     };
 
@@ -128,7 +129,6 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            adapter.clear();
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance,handle);
         }
 

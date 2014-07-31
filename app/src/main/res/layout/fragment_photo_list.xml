@@ -24,6 +24,6 @@
             android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:progress="3"
-            android:max="9"/>
+            android:max="7"/>
     </FrameLayout>
 </RelativeLayout>
