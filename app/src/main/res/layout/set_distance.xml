@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/distance_frame"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:background="#DDDDDD"
+    android:layout_margin="10dp"
+    android:padding="10dp">
+    <SeekBar
+        android:id="@+id/distance"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:progress="3"
+        android:max="7"/>
+</FrameLayout>

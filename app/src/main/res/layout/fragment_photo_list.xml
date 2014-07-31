@@ -10,20 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <FrameLayout
-        android:id="@+id/frame"
+    <include layout="@layout/set_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="#DDDDDD"
-        android:layout_margin="10dp"
-        android:padding="10dp">
-        <SeekBar
-            android:id="@+id/distance"
-            android:layout_width="400dp"
-            android:layout_height="wrap_content"
-            android:progress="3"
-            android:max="7"/>
-    </FrameLayout>
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

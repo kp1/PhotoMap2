@@ -23,7 +23,6 @@ public class PhotoListFragment extends Fragment {
 
     private static final String TAG = "PhotoListFragment";
     private static final int ADAPTER_LOADER_ID = 1000;
-    private static final java.lang.String EXTRA_DISTANCE = "distance";
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
@@ -93,7 +92,6 @@ public class PhotoListFragment extends Fragment {
                 break;
             case PhotoGroupList.MESSAGE_ADD:
                 Bundle b = msg.getData();
-                int position = b.getInt(PhotoGroupList.EXTRA_INDEX);
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
                 adapter.notifyDataSetInvalidated();
@@ -115,7 +113,6 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             mCursor = new PhotoCursor(data);
-            mGroup = new PhotoGroupList(mCursor);
             getLoaderManager().destroyLoader(1);
             getLoaderManager().restartLoader(1, null, photoGroupListLoaderCallbacks);
         }
@@ -129,6 +126,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+            mGroup = new PhotoGroupList(mCursor);
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance,handle);
         }
 

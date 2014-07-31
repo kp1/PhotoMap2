@@ -31,6 +31,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
             list.exec(distance, handler, signal);
         }
         catch (OperationCanceledException e){
+            // do nothing
         }
         signal = null;
         return list;
@@ -60,13 +61,6 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     protected void onReset() {
         if(signal!=null){
             signal.cancel();
-            while(signal!=null){
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            };
         }
         super.onReset();
     }
