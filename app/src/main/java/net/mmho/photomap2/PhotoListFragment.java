@@ -2,7 +2,6 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,14 +18,15 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SeekBar;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.List;
-
 public class PhotoListFragment extends Fragment {
 
     private static final String TAG = "PhotoListFragment";
+    private static final int CURSOR_LOADER_ID = 0;
+    private static final int GROUPING_LOADER_ID = 1;
+    private static final int GEOCODE_LOADER_ID = 2;
+
     private static final int ADAPTER_LOADER_ID = 1000;
+
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
@@ -41,7 +40,7 @@ public class PhotoListFragment extends Fragment {
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
-        getLoaderManager().initLoader(0,null,photoCursorCallbacks);
+        getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
         distance = DistanceUtil.toDistance(DistanceUtil.initialIndex());
 
     }
@@ -63,8 +62,9 @@ public class PhotoListFragment extends Fragment {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     distance = DistanceUtil.toDistance(progress);
-                    getLoaderManager().destroyLoader(1);
-                    getLoaderManager().restartLoader(1, null, photoGroupListLoaderCallbacks);
+                    getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
+                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
                 }
 
                 @Override
@@ -88,7 +88,7 @@ public class PhotoListFragment extends Fragment {
                 }
             };
 
-    private final Handler handle = new Handler(){
+    private final Handler groupingHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
@@ -105,6 +105,14 @@ public class PhotoListFragment extends Fragment {
         }
     };
 
+    private final Handler geocodeHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            adapter.notifyDataSetChanged();
+        }
+    };
+
+
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -118,8 +126,8 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             mCursor = new PhotoCursor(data);
-            getLoaderManager().destroyLoader(1);
-            getLoaderManager().restartLoader(1, null, photoGroupListLoaderCallbacks);
+            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
         }
 
         @Override
@@ -132,12 +140,12 @@ public class PhotoListFragment extends Fragment {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             mGroup = new PhotoGroupList(mCursor);
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance,handle);
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance, groupingHandler);
         }
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-                getLoaderManager().restartLoader(100, null, geocodeLoaderCallbacks);
+                getLoaderManager().restartLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
         }
 
         @Override
@@ -150,13 +158,11 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<Integer>() {
         @Override
         public Loader<Integer> onCreateLoader(int i, Bundle bundle) {
-            Log.d(TAG,"geocodeLoaderCallbacks.onCreateLoader()");
-            return new GeocodeLoader(getActivity().getApplicationContext(),mGroup);
+            return new GeocodeLoader(getActivity().getApplicationContext(),mGroup,geocodeHandler);
         }
 
         @Override
         public void onLoadFinished(Loader<Integer> listLoader, Integer success) {
-            Log.d(TAG,"geocodeLoaderCallbacks.onLoadFinished()");
             if(success>0) adapter.notifyDataSetChanged();
         }
 

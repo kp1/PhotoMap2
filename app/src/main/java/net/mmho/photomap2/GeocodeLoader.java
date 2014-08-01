@@ -3,6 +3,7 @@ package net.mmho.photomap2;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Handler;
 import android.support.v4.content.AsyncTaskLoader;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -14,10 +15,12 @@ public class GeocodeLoader extends AsyncTaskLoader<Integer> {
 
     private static final int ADDRESS_MAX_RESULTS = 3;
     private PhotoGroupList list;
+    private Handler handler;
 
-    public GeocodeLoader(Context context,PhotoGroupList list) {
+    public GeocodeLoader(Context context,PhotoGroupList list,Handler handler) {
         super(context);
         this.list = list;
+        this.handler = handler;
         onContentChanged();
     }
 
@@ -26,6 +29,7 @@ public class GeocodeLoader extends AsyncTaskLoader<Integer> {
         Geocoder g = new Geocoder(getContext());
         int success = 0;
         for(PhotoGroup group:list) {
+            if(isReset()) break;
             LatLng location = group.getCenter();
             List<Address> addresses;
             try {
@@ -33,6 +37,9 @@ public class GeocodeLoader extends AsyncTaskLoader<Integer> {
                 if(addresses!=null && addresses.size()>0){
                     group.address = addresses.get(0);
                     success++;
+                    if(handler!=null){
+                        handler.sendEmptyMessage(0);
+                    }
                 }
             } catch (IOException e) {
                 // do nothing
@@ -46,5 +53,11 @@ public class GeocodeLoader extends AsyncTaskLoader<Integer> {
         if(takeContentChanged()){
             forceLoad();
         }
+    }
+
+    @Override
+    protected void onReset() {
+        super.onReset();
+
     }
 }
