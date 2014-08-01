@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,10 +114,15 @@ public class PhotoListFragment extends Fragment {
     };
 
 
+    private void showProgress(boolean show){
+        ((ActionBarActivity)getActivity()).setSupportProgressBarIndeterminate(show);
+    }
+
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            showProgress(true);
             String q = QueryBuilder.createQuery();  // all list
             String o = QueryBuilder.sortDate();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -132,6 +138,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
+            showProgress(false);
         }
     };
 
@@ -139,6 +146,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+            showProgress(true);
             mGroup = new PhotoGroupList(mCursor);
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance, groupingHandler);
         }
@@ -150,7 +158,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
-
+            showProgress(false);
         }
     };
 
@@ -164,11 +172,12 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Integer> listLoader, Integer success) {
             if(success>0) adapter.notifyDataSetChanged();
+            showProgress(false);
         }
 
         @Override
         public void onLoaderReset(Loader<Integer> listLoader) {
-
+            showProgress(false);
         }
     };
 
