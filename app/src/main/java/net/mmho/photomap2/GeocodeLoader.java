@@ -10,30 +10,36 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.util.List;
 
-public class GeocodeLoader extends AsyncTaskLoader<List<Address>> {
+public class GeocodeLoader extends AsyncTaskLoader<Integer> {
 
     private static final int ADDRESS_MAX_RESULTS = 3;
-    LatLng location;
-    List<Address> addresses;
+    private PhotoGroupList list;
 
-    public GeocodeLoader(Context context,LatLng location) {
+    public GeocodeLoader(Context context,PhotoGroupList list) {
         super(context);
-        addresses = null;
-        this.location = location;
+        this.list = list;
         onContentChanged();
     }
 
     @Override
-    public List<Address> loadInBackground() {
+    public Integer loadInBackground() {
         Geocoder g = new Geocoder(getContext());
-
-        try {
-            addresses = g.getFromLocation(location.latitude,location.longitude,ADDRESS_MAX_RESULTS);
-        } catch (IOException e) {
-            return null;
+        int success = 0;
+        for(PhotoGroup group:list) {
+            LatLng location = group.getCenter();
+            List<Address> addresses;
+            try {
+                addresses = g.getFromLocation(location.latitude, location.longitude, ADDRESS_MAX_RESULTS);
+                if(addresses!=null && addresses.size()>0){
+                    group.address = addresses.get(0);
+                    success++;
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
         }
-        return addresses;
-    };
+        return success;
+    }
 
     @Override
     protected void onStartLoading() {

@@ -3,9 +3,7 @@ package net.mmho.photomap2;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
-import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -13,14 +11,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PhotoCardLayout extends RelativeLayout{
 
     private static final String TAG = "PhotoCardLayout";
-    public static final String EXTRA_LOCATION = "location";
 
     private ThumbnailImageView thumbnail;
     private TextView title;
@@ -67,52 +63,39 @@ public class PhotoCardLayout extends RelativeLayout{
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(manager,loader_id*2,g.getID(0));
-
-        Bundle b = new Bundle();
+        thumbnail.startLoading(manager,loader_id,g.getID(0));
+        description.setText(g.toString());
 
         Address address = g.address;
         if(address==null) {
-            description.setText(g.toString());
-            b.putParcelable(EXTRA_LOCATION, g.getCenter());
-            manager.restartLoader(loader_id * 2 + 1, b,loaderCallbacks);
+            title.setText(R.string.loading);
         }
         else{
-            description.setText(addressToDescription(address));
+            title.setText(addressToDescription(address));
         }
+
     }
 
     private String addressToDescription(Address address){
         StringBuilder builder = new StringBuilder();
-        if (address.getMaxAddressLineIndex() > 0) {
-            builder.append(address.getAddressLine(1));
-        } else {
-            builder.append(address.getAddressLine(0));
+        final String separator = getContext().getString(R.string.address_separator);
+        // TODO: change address order with Language setting.
 
+        if(address.getAdminArea()!=null){
+            builder.append(address.getAdminArea());
+            builder.append(separator);
         }
+        if(address.getSubAdminArea()!=null){
+            builder.append(address.getSubAdminArea());
+            builder.append(separator);
+        }
+        if(address.getLocality()!=null){
+            builder.append(address.getLocality());
+        }
+        if(builder.length()==0){
+            builder.append((address.getFeatureName()));
+        }
+
         return new String(builder);
     }
-
-    private LoaderManager.LoaderCallbacks<List<Address>> loaderCallbacks
-            = new LoaderManager.LoaderCallbacks<List<Address>>() {
-
-        @Override
-        public Loader<List<Address>> onCreateLoader(int id, Bundle args) {
-            return new GeocodeLoader(getContext(), (LatLng) args.getParcelable(EXTRA_LOCATION));
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<Address>> loader, List<Address> data) {
-            if(data!=null && data.size()>0) {
-                group.address = data.get(0);
-                description.setText(addressToDescription(data.get(0)));
-            }
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<Address>> loader) {
-
-        }
-    };
-
 }

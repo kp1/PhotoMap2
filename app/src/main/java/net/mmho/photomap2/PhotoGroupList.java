@@ -13,13 +13,13 @@ import java.util.ArrayList;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public final static String EXTRA_GROUP="group";
-    public static final String EXTRA_INDEX = "index";
     public static final int MESSAGE_RESTART = 0;
     public static final int MESSAGE_ADD = 1;
     final PhotoCursor mCursor;
     private float distance;
 
     PhotoGroupList(PhotoCursor c){
+        clear();
         mCursor = c;
     }
 

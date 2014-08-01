@@ -2,6 +2,7 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SeekBar;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 public class PhotoListFragment extends Fragment {
 
@@ -94,7 +99,7 @@ public class PhotoListFragment extends Fragment {
                 Bundle b = msg.getData();
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
-                adapter.notifyDataSetInvalidated();
+                adapter.notifyDataSetChanged();
                 break;
             }
         }
@@ -132,6 +137,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+                getLoaderManager().restartLoader(100, null, geocodeLoaderCallbacks);
         }
 
         @Override
@@ -139,4 +145,25 @@ public class PhotoListFragment extends Fragment {
 
         }
     };
+
+    private final LoaderManager.LoaderCallbacks<Integer> geocodeLoaderCallbacks =
+    new LoaderManager.LoaderCallbacks<Integer>() {
+        @Override
+        public Loader<Integer> onCreateLoader(int i, Bundle bundle) {
+            Log.d(TAG,"geocodeLoaderCallbacks.onCreateLoader()");
+            return new GeocodeLoader(getActivity().getApplicationContext(),mGroup);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Integer> listLoader, Integer success) {
+            Log.d(TAG,"geocodeLoaderCallbacks.onLoadFinished()");
+            if(success>0) adapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Integer> listLoader) {
+
+        }
+    };
+
 }
