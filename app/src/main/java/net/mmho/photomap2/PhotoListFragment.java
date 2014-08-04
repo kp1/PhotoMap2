@@ -151,7 +151,7 @@ public class PhotoListFragment extends Fragment {
 
 
     private void showProgress(boolean show){
-        ((ActionBarActivity)getActivity()).setSupportProgressBarIndeterminate(show);
+        ((ActionBarActivity)getActivity()).setSupportProgressBarIndeterminateVisibility(show);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
