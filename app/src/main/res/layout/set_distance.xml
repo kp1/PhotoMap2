@@ -3,9 +3,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/distance_frame"
     android:layout_width="wrap_content" android:layout_height="wrap_content"
-    android:background="#DDDDDD"
+    android:background="@drawable/hover_background"
     android:layout_margin="10dp"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:visibility="gone">
     <SeekBar
         android:id="@+id/distance"
         android:layout_width="400dp"

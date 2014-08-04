@@ -12,10 +12,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.SeekBar;
 
@@ -32,6 +35,7 @@ public class PhotoListFragment extends Fragment {
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
     private float distance;
+    private FrameLayout frame;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,14 +53,46 @@ public class PhotoListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
+
+        // photo list
         GridView list = (GridView)parent.findViewById(R.id.list);
-        SeekBar bar = (SeekBar)parent.findViewById(R.id.distance);
-        bar.setOnSeekBarChangeListener(onSeekBarChangeListener);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
+        list.setOnScrollListener(onScrollListener);
+
+        // distance seek bar
+        SeekBar bar = (SeekBar)parent.findViewById(R.id.distance);
+        bar.setOnSeekBarChangeListener(onSeekBarChangeListener);
+        frame = (FrameLayout)parent.findViewById(R.id.distance_frame);
         return parent;
 
     }
+
+
+    Handler distanceHandler = new Handler();
+
+    Runnable hideDistanceFrame =
+    new Runnable() {
+        @Override
+        public void run() {
+            frame.setVisibility(View.GONE);
+        }
+    };
+
+
+    AbsListView.OnScrollListener onScrollListener =
+            new AbsListView.OnScrollListener() {
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    distanceHandler.removeCallbacks(hideDistanceFrame);
+                    frame.setVisibility(View.VISIBLE);
+                    distanceHandler.postDelayed(hideDistanceFrame,2000);
+                }
+
+                @Override
+                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                }
+            };
 
     SeekBar.OnSeekBarChangeListener onSeekBarChangeListener =
             new SeekBar.OnSeekBarChangeListener() {
