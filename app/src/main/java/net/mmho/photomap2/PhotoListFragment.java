@@ -11,16 +11,18 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.SpinnerAdapter;
 
 public class PhotoListFragment extends Fragment {
 
@@ -34,8 +36,8 @@ public class PhotoListFragment extends Fragment {
     private PhotoCursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
+    private DistanceAdapter distanceAdapter = null;
     private float distance;
-    private FrameLayout frame;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,9 +47,7 @@ public class PhotoListFragment extends Fragment {
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
-        getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-        distance = DistanceUtil.toDistance(DistanceUtil.initialIndex());
-
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
     }
 
     @Override
@@ -58,60 +58,21 @@ public class PhotoListFragment extends Fragment {
         GridView list = (GridView)parent.findViewById(R.id.list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
-        list.setOnScrollListener(onScrollListener);
 
-        // distance seek bar
-        SeekBar bar = (SeekBar)parent.findViewById(R.id.distance);
-        bar.setOnSeekBarChangeListener(onSeekBarChangeListener);
-        frame = (FrameLayout)parent.findViewById(R.id.distance_frame);
+
         return parent;
 
     }
 
-
-    Handler distanceHandler = new Handler();
-
-    Runnable hideDistanceFrame =
-    new Runnable() {
-        @Override
-        public void run() {
-            frame.setVisibility(View.GONE);
-        }
-    };
-
-
-    AbsListView.OnScrollListener onScrollListener =
-            new AbsListView.OnScrollListener() {
+    ActionBar.OnNavigationListener onNavigationListener =
+            new ActionBar.OnNavigationListener() {
                 @Override
-                public void onScrollStateChanged(AbsListView view, int scrollState) {
-                    distanceHandler.removeCallbacks(hideDistanceFrame);
-                    frame.setVisibility(View.VISIBLE);
-                    distanceHandler.postDelayed(hideDistanceFrame,2000);
-                }
-
-                @Override
-                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                }
-            };
-
-    SeekBar.OnSeekBarChangeListener onSeekBarChangeListener =
-            new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    distance = DistanceUtil.toDistance(progress);
+                public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+                    distance = (float)itemId;
                     getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
                     getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                     getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
+                    return true;
                 }
             };
 
@@ -167,9 +128,19 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            Log.d(TAG, "onLoadFinished");
             mCursor = new PhotoCursor(data);
-            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+            if(distanceAdapter==null) {
+                distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
+                ActionBar bar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+                bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
+                bar.setSelectedNavigationItem(DistanceAdapter.initial());
+            }
+            else{
+                getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+            }
+
         }
 
         @Override
