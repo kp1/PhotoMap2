@@ -14,7 +14,7 @@ public class DistanceAdapter extends ArrayAdapter<CharSequence>{
         "10,000km",
     };
 
-    private static final long[] distance={
+    private static final float[] distance={
             50,
             500,
             5*1000,
@@ -37,8 +37,7 @@ public class DistanceAdapter extends ArrayAdapter<CharSequence>{
         return String.format("%8s",label[position]);
     }
 
-    @Override
-    public long getItemId(int position) {
+    static public float getDistance(int position){
         return distance[position];
     }
 

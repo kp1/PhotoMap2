@@ -18,11 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
-import android.widget.SpinnerAdapter;
 
 public class PhotoListFragment extends Fragment {
 
@@ -33,11 +29,10 @@ public class PhotoListFragment extends Fragment {
 
     private static final int ADAPTER_LOADER_ID = 1000;
 
-    private PhotoCursor mCursor;
+    private Cursor mCursor;
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
-    private DistanceAdapter distanceAdapter = null;
-    private float distance;
+    private int distance_index;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +42,7 @@ public class PhotoListFragment extends Fragment {
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        distance_index = DistanceAdapter.initial();
     }
 
     @Override
@@ -59,19 +54,38 @@ public class PhotoListFragment extends Fragment {
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
 
+        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
+        ActionBar bar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
+        bar.setSelectedNavigationItem(distance_index);
 
         return parent;
 
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"onActivityCreated()");
+        getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null) getLoaderManager().initLoader(GROUPING_LOADER_ID,null,photoGroupListLoaderCallbacks);
+        if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null) getLoaderManager().initLoader(GEOCODE_LOADER_ID,null,geocodeLoaderCallbacks);
     }
 
     ActionBar.OnNavigationListener onNavigationListener =
             new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                    distance = (float)itemId;
-                    getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
-                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+                    Log.d(TAG,"onNavigationItemSelected()");
+                    if(itemPosition!=distance_index) {
+                        Log.d(TAG,"restart loader.");
+                        distance_index = itemPosition;
+                        Bundle b = new Bundle();
+                        b.putFloat("distance",DistanceAdapter.getDistance(distance_index));
+                        getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
+                        getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                        getLoaderManager().restartLoader(GROUPING_LOADER_ID, b, photoGroupListLoaderCallbacks);
+                    }
                     return true;
                 }
             };
@@ -128,19 +142,13 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            Log.d(TAG, "onLoadFinished");
-            mCursor = new PhotoCursor(data);
-            if(distanceAdapter==null) {
-                distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
-                ActionBar bar = ((ActionBarActivity) getActivity()).getSupportActionBar();
-                bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
-                bar.setSelectedNavigationItem(DistanceAdapter.initial());
-            }
-            else{
+            if(mCursor==null || !mCursor.equals(data)) {
+                mCursor = data;
+                Bundle b = new Bundle();
+                b.putFloat("distance", DistanceAdapter.getDistance(distance_index));
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+                getLoaderManager().restartLoader(GROUPING_LOADER_ID, b, photoGroupListLoaderCallbacks);
             }
-
         }
 
         @Override
@@ -153,14 +161,18 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+            Log.d(TAG,"onCreateLoader(group):");
             showProgress(true);
             mGroup = new PhotoGroupList(mCursor);
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,distance, groupingHandler);
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,args.getFloat("distance"), groupingHandler);
         }
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-                getLoaderManager().restartLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
+            Log.d(TAG,"onLoadFinished()");
+            Bundle b = new Bundle();
+            getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
+            getLoaderManager().restartLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
         }
 
         @Override
@@ -173,6 +185,8 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<Integer>() {
         @Override
         public Loader<Integer> onCreateLoader(int i, Bundle bundle) {
+            Log.d(TAG,"onCreateLoader(geo):"+mGroup.get(0).getCenter());
+
             return new GeocodeLoader(getActivity().getApplicationContext(),mGroup,geocodeHandler);
         }
 

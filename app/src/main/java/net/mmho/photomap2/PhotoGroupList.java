@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CancellationSignal;
@@ -15,10 +16,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public final static String EXTRA_GROUP="group";
     public static final int MESSAGE_RESTART = 0;
     public static final int MESSAGE_ADD = 1;
-    final PhotoCursor mCursor;
+    final Cursor mCursor;
     private float distance;
 
-    PhotoGroupList(PhotoCursor c){
+    PhotoGroupList(Cursor c){
         clear();
         mCursor = c;
     }
@@ -38,17 +39,17 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             int i;
             for(i=0;i<this.size();i++){
                 if(signal!=null)signal.throwIfCanceled();
-                LatLng p = mCursor.getLocation();
+                LatLng p = PhotoCursor.getLocation(mCursor);
                 LatLng c = get(i).getCenter();
                 float[] d = new float[3];
                 Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
                 if(d[0]<distance){
-                    get(i).append(p,mCursor.getID());
+                    get(i).append(p,PhotoCursor.getID(mCursor));
                     break;
                 }
             }
             if(i==this.size()){
-                PhotoGroup g = new PhotoGroup(mCursor.getLocation(), mCursor.getID());
+                PhotoGroup g = new PhotoGroup(PhotoCursor.getLocation(mCursor),PhotoCursor.getID(mCursor));
                 add(g);
                 if(handler!=null){
                     Bundle b = new Bundle();
