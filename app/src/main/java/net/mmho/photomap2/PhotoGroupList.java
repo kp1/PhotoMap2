@@ -18,15 +18,21 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_ADD = 1;
     final Cursor mCursor;
     private float distance;
+    private boolean finished;
 
     PhotoGroupList(Cursor c){
         clear();
         mCursor = c;
+        distance = 0;
+        finished = false;
     }
 
     public PhotoGroupList exec(float distance,Handler handler,CancellationSignal signal){
         clear();
+
+        finished = false;
         this.distance = distance;
+
         if(!mCursor.moveToFirst()) return this;
 
         if(handler!=null){
@@ -61,6 +67,9 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 }
             }
         }while(mCursor.moveToNext());
+
+        finished = true;
+
         return this;
     }
 
@@ -72,7 +81,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         return true;
     }
 
-    float getDistance(){
+    public boolean getFinished(){
+        return finished;
+    }
+    public float getDistance(){
         return distance;
     }
 

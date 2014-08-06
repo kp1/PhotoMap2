@@ -39,7 +39,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     @Override
     protected void onStartLoading() {
-        if(list.getDistance()==distance){
+        if(list.getFinished() && list.getDistance()==distance){
             deliverResult(list);
         }
         if(takeContentChanged()){

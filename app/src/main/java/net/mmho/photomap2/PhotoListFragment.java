@@ -170,7 +170,6 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            Log.d(TAG,"onCreateLoader(group):");
             showProgress(true);
             mGroup = new PhotoGroupList(mCursor);
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,args.getFloat("distance"), groupingHandler);
@@ -192,8 +191,6 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<Integer>() {
         @Override
         public Loader<Integer> onCreateLoader(int i, Bundle bundle) {
-            Log.d(TAG,"onCreateLoader(geo):"+mGroup.get(0).getCenter());
-
             return new GeocodeLoader(getActivity().getApplicationContext(),mGroup,geocodeHandler);
         }
 
