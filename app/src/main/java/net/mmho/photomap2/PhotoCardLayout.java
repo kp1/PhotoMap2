@@ -68,7 +68,7 @@ public class PhotoCardLayout extends RelativeLayout{
 
         Address address = g.address;
         if(address==null) {
-            title.setText(R.string.loading);
+//            title.setText(R.string.loading);
         }
         else{
             title.setText(addressToDescription(address));

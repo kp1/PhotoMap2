@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,6 +21,7 @@ public class ThumbnailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         Bundle bundle = getArguments();
         group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
@@ -36,6 +40,23 @@ public class ThumbnailFragment extends Fragment {
     public void setPosition(int position){
         list.setSelection(position);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.thumbnail_manu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.map:
+                Intent i = new Intent(getActivity(),PhotoMapActivity.class);
+                i.putExtra(PhotoMapActivity.EXTRA_GROUP,group);
+                startActivity(i);
+                break;
+        }
+        return true;
     }
 
     AdapterView.OnItemClickListener clickListener =

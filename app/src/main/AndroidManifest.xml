@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhotoMapActivity"/>
+        <activity android:name=".PhotoMapActivity" android:launchMode="singleTop"/>
         <activity android:name=".ThumbnailActivity"/>
         <activity android:name=".PhotoViewActivity"/>
         <!--<activity android:name=".PhotoListActivity"/>-->
