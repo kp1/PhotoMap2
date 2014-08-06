@@ -72,7 +72,9 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
             if (bmp!=null && orientation != 0) {
                 Matrix matrix = new Matrix();
                 matrix.setRotate(orientation);
+                Bitmap oldBmp = bmp;
                 bmp = Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, false);
+                oldBmp.recycle();
             }
         }
         c.close();
