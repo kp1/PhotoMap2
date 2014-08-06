@@ -62,6 +62,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
         if(signal!=null){
             signal.cancel();
         }
+        list = null;
         super.onReset();
     }
 }

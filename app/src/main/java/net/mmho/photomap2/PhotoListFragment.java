@@ -42,7 +42,12 @@ public class PhotoListFragment extends Fragment {
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
-        distance_index = DistanceAdapter.initial();
+        if(savedInstanceState!=null) {
+            distance_index = savedInstanceState.getInt("DISTANCE");
+        }
+        else{
+            distance_index = DistanceAdapter.initial();
+        }
     }
 
     @Override
@@ -64,9 +69,14 @@ public class PhotoListFragment extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("DISTANCE",distance_index);
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated()");
         getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
         if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null) getLoaderManager().initLoader(GROUPING_LOADER_ID,null,photoGroupListLoaderCallbacks);
         if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null) getLoaderManager().initLoader(GEOCODE_LOADER_ID,null,geocodeLoaderCallbacks);
@@ -76,7 +86,6 @@ public class PhotoListFragment extends Fragment {
             new ActionBar.OnNavigationListener() {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                    Log.d(TAG,"onNavigationItemSelected()");
                     if(itemPosition!=distance_index) {
                         Log.d(TAG,"restart loader.");
                         distance_index = itemPosition;
@@ -169,8 +178,6 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-            Log.d(TAG,"onLoadFinished()");
-            Bundle b = new Bundle();
             getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
             getLoaderManager().restartLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
         }
