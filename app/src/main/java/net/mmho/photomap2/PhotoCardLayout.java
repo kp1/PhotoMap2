@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.location.Address;
 import android.support.v4.app.LoaderManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -64,19 +63,35 @@ public class PhotoCardLayout extends RelativeLayout{
         count.setText(String.format("%2d",g.size()));
 
         thumbnail.startLoading(manager,loader_id,g.getID(0));
-        description.setText(g.toString());
 
         Address address = g.address;
         if(address==null) {
-//            title.setText(R.string.loading);
+            title.setText(R.string.loading);
+            description.setText(g.toString());
         }
         else{
-            title.setText(addressToDescription(address));
+            title.setText(addressToTitle(address));
+            description.setText(addressToDescription(address));
         }
 
     }
 
+    private String removePostalCode(String source){
+        return source.replaceFirst("〒[0-9¥-]*","");
+    }
+
     private String addressToDescription(Address address){
+        String description;
+        if(address.getMaxAddressLineIndex()>0){
+            description = address.getAddressLine(1);
+        }
+        else{
+            description = address.getAddressLine(0);
+        }
+        return removePostalCode(description);
+    }
+
+    private String addressToTitle(Address address){
         StringBuilder builder = new StringBuilder();
         final String separator = getContext().getString(R.string.address_separator);
         // TODO: change address order with Language setting.
