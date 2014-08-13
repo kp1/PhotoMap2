@@ -41,8 +41,12 @@ public class QueryBuilder {
         return LATITUDE+IS+NULL+OR+LONGITUDE+IS+NULL;
     }
 
-    static String sortDate(){
+    static String sortDateNewest(){
         return DATE_TAKEN+" DESC";
+    }
+
+    static String sortDateOldest() {
+        return DATE_TAKEN+" ASC";
     }
 
 }

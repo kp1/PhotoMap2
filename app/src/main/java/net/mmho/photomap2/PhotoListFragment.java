@@ -15,6 +15,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -33,12 +36,14 @@ public class PhotoListFragment extends Fragment {
     private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
     private int distance_index;
+    private boolean newest = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         mGroup = new PhotoGroupList(null);
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
@@ -47,6 +52,41 @@ public class PhotoListFragment extends Fragment {
         }
         else{
             distance_index = DistanceAdapter.initial();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.photo_list_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+        case R.id.oldest:
+            newest = false;
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+            break;
+        case R.id.newest:
+            newest = true;
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+            break;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if(newest){
+            menu.getItem(0).setEnabled(false);
+            menu.getItem(1).setEnabled(true);
+        }
+        else{
+            menu.getItem(0).setEnabled(true);
+            menu.getItem(1).setEnabled(false);
         }
     }
 
@@ -144,7 +184,7 @@ public class PhotoListFragment extends Fragment {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             showProgress(true);
             String q = QueryBuilder.createQuery();  // all list
-            String o = QueryBuilder.sortDate();
+            String o = newest?QueryBuilder.sortDateNewest():QueryBuilder.sortDateOldest();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
             return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,o);
         }
