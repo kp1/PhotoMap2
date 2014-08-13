@@ -15,7 +15,7 @@ public class PhotoImageView extends ImageView{
     private static final String TAG = "PhotoImageView";
     private static final String EXTRA_IMAGE = "image";
     private static final String EXTRA_WIDTH = "width";
-    private long image_id;
+    private long image_id = -1;
 
     public PhotoImageView(Context context) {
         super(context);
@@ -46,9 +46,6 @@ public class PhotoImageView extends ImageView{
                     manager.restartLoader(loader_id, b, loaderCallbacks);
                 }
             });
-        }
-        else{
-            if(BuildConfig.DEBUG) Log.d(TAG, "image #"+image_id+" is already loading.");
         }
     }
     LoaderManager.LoaderCallbacks<Bitmap> loaderCallbacks =
