@@ -11,6 +11,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -43,6 +45,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         mMap = getMap();
         mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
         mMap.setOnMarkerClickListener(photoGroupClickListener);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
         getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
     }
 
@@ -51,9 +54,31 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public void onCameraChange(CameraPosition position) {
                 if(BuildConfig.DEBUG)Log.d(TAG,position.toString());
-                getLoaderManager().restartLoader(0, null,photoListLoaderCallback);
+                if(position.zoom>16 || position.zoom<3){
+                    float zoom = position.zoom>16?16:3;
+                    mMap.setOnCameraChangeListener(null);
+                    CameraUpdate cameraUpdate =
+                            CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(position.target,zoom));
+                    mMap.animateCamera(cameraUpdate, cancelableCallback);
+                    return;
+                }
+                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
+                getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null,photoListLoaderCallback);
             }
         };
+
+    GoogleMap.CancelableCallback cancelableCallback =
+            new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+                }
+
+                @Override
+                public void onCancel() {
+                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+                }
+            };
 
     GoogleMap.OnMarkerClickListener photoGroupClickListener =
         new GoogleMap.OnMarkerClickListener() {
@@ -85,6 +110,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
                 mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                Log.d(TAG,"onCreateLoader:cursor:"+mapBounds.toString());
                 String q = QueryBuilder.createQuery(mapBounds);
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, null);
@@ -94,12 +120,12 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoCursor = cursor;
-                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 getLoaderManager().restartLoader(PHOTO_GROUP_LOADER,null,photoGroupListLoaderCallbacks);
             }
 
             @Override
             public void onLoaderReset(Loader<Cursor> objectLoader) {
+                Log.d(TAG,"onLoaderReset");
                 photoCursor = null;
                 getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 mGroup.clear();
@@ -110,6 +136,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+                Log.d(TAG,"onCreateLoader:group");
                 return new PhotoGroupListLoader(getActivity().getApplicationContext(),new PhotoGroupList(photoCursor),getPartitionDistance(mapBounds),null);
             }
 
