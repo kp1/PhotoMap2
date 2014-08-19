@@ -9,7 +9,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".PhotoListActivity"
-            android:label="@string/title_activity_photo_map" >
+            android:label="@string/title_activity_photo_map"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -17,10 +18,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhotoMapActivity" android:launchMode="singleTop"/>
-        <activity android:name=".ThumbnailActivity"/>
-        <activity android:name=".PhotoViewActivity"/>
-        <!--<activity android:name=".PhotoListActivity"/>-->
+        <activity android:name=".PhotoMapActivity"
+            android:parentActivityName=".PhotoListActivity"/>
+        <activity android:name=".ThumbnailActivity"
+            android:parentActivityName=".PhotoListActivity"/>
+        <activity android:name=".PhotoViewActivity"
+            android:parentActivityName=".PhotoListActivity"/>
+
 
         <meta-data
             android:name="com.google.android.gms.version"
