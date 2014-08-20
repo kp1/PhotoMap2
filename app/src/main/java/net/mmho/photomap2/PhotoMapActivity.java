@@ -32,24 +32,26 @@ public class PhotoMapActivity extends Activity {
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.activity_photo_map);
 
         PhotoMapFragment fragment = (PhotoMapFragment) getFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
 
-        final CameraUpdate update = handleIntent(getIntent());
+        if(savedInstanceState==null){
+            final CameraUpdate update = handleIntent(getIntent());
 
-        if(update!=null) {
-            //noinspection ConstantConditions
-            fragment.getView().post(new Runnable() {
-                @Override
-                public void run() {
-                    mMap.moveCamera(update);
-                }
-            });
+            if (update != null) {
+                //noinspection ConstantConditions
+                fragment.getView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.moveCamera(update);
+                    }
+                });
+            }
+            else loadPreference();
         }
-        else if(savedInstanceState==null) loadPreference();
 	}
 
     @Override
