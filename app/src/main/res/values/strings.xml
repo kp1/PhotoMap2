@@ -10,4 +10,5 @@
     <string name="oldest">oldest first</string>
     <string name="newest">newest first</string>
     <string name="no_search_query">Not support search location.</string>
+    <string name="no_position_data">This image has no position data.</string>
 </resources>

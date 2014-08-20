@@ -3,11 +3,12 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 
 public class PhotoMapActivity extends FragmentActivity {
     final public static String EXTRA_GROUP="group";
-    final private static float DEFAULT_ZOOM = 10;
+    final private static float DEFAULT_ZOOM = 14;
 
 	final private static String TAG="MapActivity";
 
@@ -79,6 +80,21 @@ public class PhotoMapActivity extends FragmentActivity {
                 if (matcher.groupCount() >= 4) zoom = Integer.parseInt(matcher.group(4));
                 return CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude),zoom);
             }
+        }
+        else if(Intent.ACTION_SEND.equals(intent.getAction())){
+            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            final String[] projection = new String[]{
+                    MediaStore.Images.Media.LATITUDE,
+                    MediaStore.Images.Media.LONGITUDE,
+            };
+            Cursor c = MediaStore.Images.Media.query(getContentResolver(),uri,projection,QueryBuilder.createQuery(),null,null);
+            if(c.getCount()==0){
+                Toast.makeText(this,getString(R.string.no_position_data),Toast.LENGTH_LONG).show();
+                finish();
+            }
+            c.moveToFirst();
+            LatLng position = PhotoCursor.getLocation(c);
+            return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
         }
         else{
             Bundle bundle = intent.getExtras();

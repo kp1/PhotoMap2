@@ -25,6 +25,12 @@
                 <data android:scheme="geo" />
                 <category android:name="android.intent.category.default"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <data android:mimeType="image/jpeg"/>
+                <data android:mimeType="image/jpg"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
             </activity>
         <activity android:name=".ThumbnailActivity"
             android:parentActivityName=".PhotoListActivity"/>
