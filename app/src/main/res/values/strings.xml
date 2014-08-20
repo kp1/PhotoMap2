@@ -9,4 +9,5 @@
     <string name="display_on_map">show map</string>
     <string name="oldest">oldest first</string>
     <string name="newest">newest first</string>
+    <string name="no_search_query">Not support search location.</string>
 </resources>
