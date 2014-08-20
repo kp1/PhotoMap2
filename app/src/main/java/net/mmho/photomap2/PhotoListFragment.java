@@ -126,7 +126,6 @@ public class PhotoListFragment extends Fragment {
                 @Override
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
                     if(itemPosition!=distance_index) {
-                        Log.d(TAG,"restart loader.");
                         distance_index = itemPosition;
                         Bundle b = new Bundle();
                         b.putFloat("distance",DistanceAdapter.getDistance(distance_index));
@@ -173,15 +172,10 @@ public class PhotoListFragment extends Fragment {
     };
 
 
-    private void showProgress(boolean show){
-        getActivity().setProgressBarIndeterminateVisibility(show);
-    }
-
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            showProgress(true);
             String q = QueryBuilder.createQuery();  // all list
             String o = newest?QueryBuilder.sortDateNewest():QueryBuilder.sortDateOldest();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -201,7 +195,6 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            showProgress(false);
         }
     };
 
@@ -209,7 +202,6 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            showProgress(true);
             mGroup = new PhotoGroupList(mCursor);
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,args.getFloat("distance"), groupingHandler);
         }
@@ -222,7 +214,6 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
-            showProgress(false);
         }
     };
 
@@ -236,12 +227,10 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Integer> listLoader, Integer success) {
             if(success>0) adapter.notifyDataSetChanged();
-            showProgress(false);
         }
 
         @Override
         public void onLoaderReset(Loader<Integer> listLoader) {
-            showProgress(false);
         }
     };
 

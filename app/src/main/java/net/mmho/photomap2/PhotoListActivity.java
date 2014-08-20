@@ -12,7 +12,6 @@ public class PhotoListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         setContentView(R.layout.activity_photo_list);

@@ -9,7 +9,6 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".PhotoListActivity"
-            android:label="@string/title_activity_photo_map"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
