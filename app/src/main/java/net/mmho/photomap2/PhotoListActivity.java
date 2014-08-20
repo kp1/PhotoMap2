@@ -2,6 +2,8 @@ package net.mmho.photomap2;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Window;
 
@@ -16,6 +18,12 @@ public class PhotoListActivity extends Activity {
 
         setContentView(R.layout.activity_photo_list);
 
-        setProgress(0);
+        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
+        if(fragment==null){
+            fragment = new PhotoListFragment();
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.add(android.R.id.content,fragment,TAG_LIST);
+            fragmentTransaction.commit();
+        }
     }
 }
