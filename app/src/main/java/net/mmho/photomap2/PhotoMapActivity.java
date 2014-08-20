@@ -1,13 +1,13 @@
 package net.mmho.photomap2;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PhotoMapActivity extends FragmentActivity {
+public class PhotoMapActivity extends Activity {
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 14;
 
