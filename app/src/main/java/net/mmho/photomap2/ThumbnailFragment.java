@@ -54,9 +54,9 @@ public class ThumbnailFragment extends Fragment {
                 Intent i = new Intent(getActivity(),PhotoMapActivity.class);
                 i.putExtra(PhotoMapActivity.EXTRA_GROUP,group);
                 startActivity(i);
-                break;
+                return true;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     AdapterView.OnItemClickListener clickListener =
