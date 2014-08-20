@@ -46,6 +46,7 @@ public class PhotoMapActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mMap.moveCamera(update);
+                    CameraPosition position = mMap.getCameraPosition();
                 }
             });
         }
@@ -65,20 +66,18 @@ public class PhotoMapActivity extends FragmentActivity {
                 String position = uri.toString();
                 Pattern pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?z=(\\d+))?");
                 Matcher matcher = pattern.matcher(position);
-                matcher.find();
-                double longitude = 0;
-                double latitude = 0;
-                float zoom = DEFAULT_ZOOM;
+                if(matcher.find() && matcher.groupCount()>=2) {
+                    double latitude = Double.parseDouble(matcher.group(1));
+                    double longitude = Double.parseDouble(matcher.group(2));
+                    float zoom = DEFAULT_ZOOM;
 
-                if (matcher.groupCount() < 2) {
-                    Toast.makeText(this,getString(R.string.no_search_query),Toast.LENGTH_LONG).show();
-                    finish();
-                } else {
-                    latitude = Double.parseDouble(matcher.group(1));
-                    longitude = Double.parseDouble(matcher.group(2));
+                    if (matcher.groupCount() >= 4) zoom = Integer.parseInt(matcher.group(4));
+                    return CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude),zoom);
                 }
-                if (matcher.groupCount() >= 4) zoom = Integer.parseInt(matcher.group(4));
-                return CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude),zoom);
+                else{
+                    Toast.makeText(this, getString(R.string.no_search_query), Toast.LENGTH_LONG).show();
+                    finish();
+                }
             }
         }
         else if(Intent.ACTION_SEND.equals(intent.getAction())){
