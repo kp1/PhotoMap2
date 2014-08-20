@@ -1,21 +1,19 @@
 package net.mmho.photomap2;
 
+import android.app.ActionBar;
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Window;
 
-public class PhotoListActivity extends ActionBarActivity {
+public class PhotoListActivity extends Activity {
 
     final static String TAG_LIST="list";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         setContentView(R.layout.activity_photo_list);
 

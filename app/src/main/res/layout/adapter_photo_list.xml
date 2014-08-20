@@ -62,6 +62,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/abc_ic_menu_moreoverflow_normal_holo_light"/>
+        android:src="@android:drawable/ic_dialog_map"/>
 
 </net.mmho.photomap2.PhotoCardLayout>

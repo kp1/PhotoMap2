@@ -1,10 +1,10 @@
 package net.mmho.photomap2;
 
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Handler;
-import android.support.v4.content.AsyncTaskLoader;
 
 import com.google.android.gms.maps.model.LatLng;
 

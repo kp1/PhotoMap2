@@ -1,17 +1,16 @@
 package net.mmho.photomap2;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class PhotoViewActivity extends FragmentActivity {
+public class PhotoViewActivity extends Activity {
 
     private static final String TAG = "PhotoViewActivity";
     public static final String EXTRA_GROUP = "photo_group";
@@ -28,7 +27,7 @@ public class PhotoViewActivity extends FragmentActivity {
             setContentView(R.layout.fragment_photo_view);
             PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
             int position = bundle.getInt(EXTRA_POSITION);
-            adapter = new PhotoViewAdapter(getSupportFragmentManager(), group);
+            adapter = new PhotoViewAdapter(getFragmentManager(), group);
 
             pager = (ViewPager) findViewById(R.id.photo_pager);
             pager.setAdapter(adapter);

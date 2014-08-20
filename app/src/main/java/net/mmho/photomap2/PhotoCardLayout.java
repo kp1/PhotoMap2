@@ -1,17 +1,15 @@
 package net.mmho.photomap2;
 
+import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
-import android.support.v4.app.LoaderManager;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PhotoCardLayout extends RelativeLayout{
 

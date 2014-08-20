@@ -35,7 +35,7 @@ public class PhotoMapActivity extends FragmentActivity {
 		
 		setContentView(R.layout.activity_photo_map);
 
-        PhotoMapFragment fragment = (PhotoMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        PhotoMapFragment fragment = (PhotoMapFragment) getFragmentManager().findFragmentById(R.id.map);
         mMap = fragment.getMap();
 
         final CameraUpdate update = handleIntent(getIntent());
@@ -46,7 +46,6 @@ public class PhotoMapActivity extends FragmentActivity {
                 @Override
                 public void run() {
                     mMap.moveCamera(update);
-                    CameraPosition position = mMap.getCameraPosition();
                 }
             });
         }

@@ -1,9 +1,9 @@
 package net.mmho.photomap2;
 
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +28,7 @@ public class PhotoViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.photo_view,container,false);
         image = (PhotoImageView)v.findViewById(R.id.photo_view);
-        image.startLoading(getActivity().getSupportLoaderManager(),(int)image_id,image_id);
+        image.startLoading(getActivity().getLoaderManager(),(int)image_id,image_id);
         return v;
     }
 

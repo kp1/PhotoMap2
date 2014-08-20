@@ -1,18 +1,17 @@
 package net.mmho.photomap2;
 
+import android.app.ActionBar;
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -100,7 +99,7 @@ public class PhotoListFragment extends Fragment {
         list.setOnItemClickListener(onItemClickListener);
 
         DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
-        ActionBar bar = ((ActionBarActivity) getActivity()).getSupportActionBar();
+        ActionBar bar = getActivity().getActionBar();
         bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
         bar.setSelectedNavigationItem(distance_index);
 
@@ -175,7 +174,7 @@ public class PhotoListFragment extends Fragment {
 
 
     private void showProgress(boolean show){
-        ((ActionBarActivity)getActivity()).setSupportProgressBarIndeterminateVisibility(show);
+        getActivity().setProgressBarIndeterminateVisibility(show);
     }
 
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =

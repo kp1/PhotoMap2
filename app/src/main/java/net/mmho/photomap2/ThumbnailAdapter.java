@@ -1,7 +1,7 @@
 package net.mmho.photomap2;
 
+import android.app.LoaderManager;
 import android.content.Context;
-import android.support.v4.app.LoaderManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
