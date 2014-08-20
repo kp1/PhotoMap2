@@ -108,8 +108,9 @@ public class PhotoMapFragment extends MapFragment {
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
                 mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                 String q = QueryBuilder.createQuery(mapBounds);
+                String o = QueryBuilder.sortDateNewest();
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, null);
+                return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, o);
 
             }
 
