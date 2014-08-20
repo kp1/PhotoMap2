@@ -29,4 +29,9 @@ public class PhotoViewAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return group.getIDList().size();
     }
+
+    public long getItemID(int i){
+        return group.getID(i);
+    }
+
 }
