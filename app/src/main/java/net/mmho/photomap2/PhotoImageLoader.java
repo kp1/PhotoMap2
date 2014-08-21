@@ -108,6 +108,10 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
     protected void onReset() {
         super.onReset();
         onStopLoading();
+
+
+
+
         bitmap = null;
     }
 }

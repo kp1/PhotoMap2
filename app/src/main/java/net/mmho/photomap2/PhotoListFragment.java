@@ -116,9 +116,13 @@ public class PhotoListFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null) getLoaderManager().initLoader(GROUPING_LOADER_ID,null,photoGroupListLoaderCallbacks);
-        if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null) getLoaderManager().initLoader(GEOCODE_LOADER_ID,null,geocodeLoaderCallbacks);
+        if(mCursor==null || mCursor.isClosed())
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        else getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
+            getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+        if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null)
+            getLoaderManager().initLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
     }
 
     ActionBar.OnNavigationListener onNavigationListener =
@@ -195,6 +199,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
+            Log.d(TAG,"onLoaderReset()");
         }
     };
 
@@ -214,6 +219,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
+            mGroup = null;
         }
     };
 
