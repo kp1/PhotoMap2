@@ -200,6 +200,7 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             Log.d(TAG,"onLoaderReset()");
+            mCursor = null;
         }
     };
 
