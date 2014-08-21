@@ -2,15 +2,21 @@ package net.mmho.photomap2;
 
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,34 +31,75 @@ public class PhotoMapActivity extends Activity {
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 14;
 
-	final private static String TAG="MapActivity";
+	private static final String TAG="MapActivity";
+    private static final String TAG_MAP = "map";
 
-	private GoogleMap mMap;
+    private GoogleMap mMap = null;
+    private Dialog dialog = null;
+    boolean savedInstance = false;
+
+
+    private final Handler cancelHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            finish();
+        }
+    };
+
+    private final DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            cancelHandler.sendEmptyMessage(0);
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume()");
+        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if(result == ConnectionResult.SUCCESS){
+
+            setContentView(R.layout.activity_photo_map);
+            PhotoMapFragment fragment = (PhotoMapFragment) getFragmentManager().findFragmentById(R.id.map);
+            mMap = fragment.getMap();
+
+            if(!savedInstance) {
+                final CameraUpdate update = handleIntent(getIntent());
+
+                if (update != null) {
+                    //noinspection ConstantConditions
+                    fragment.getView().post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMap.moveCamera(update);
+                        }
+                    });
+                } else loadPreference();
+            }
+        }
+        else if(GooglePlayServicesUtil.isUserRecoverableError(result)){
+            dialog = GooglePlayServicesUtil.getErrorDialog(result,this,1,onCancelListener);
+            dialog.show();
+        }
+        else{
+            finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(dialog!=null && dialog.isShowing()) dialog.dismiss();
+    }
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		setContentView(R.layout.activity_photo_map);
-
-        PhotoMapFragment fragment = (PhotoMapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mMap = fragment.getMap();
-
-        if(savedInstanceState==null){
-            final CameraUpdate update = handleIntent(getIntent());
-
-            if (update != null) {
-                //noinspection ConstantConditions
-                fragment.getView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.moveCamera(update);
-                    }
-                });
-            }
-            else loadPreference();
-        }
+        savedInstance = savedInstanceState != null;
+        Log.d(TAG,"onCreate()");
 	}
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -61,6 +108,7 @@ public class PhotoMapActivity extends Activity {
     }
 
     private CameraUpdate handleIntent(Intent intent){
+        Log.d(TAG,intent.toString());
         if(Intent.ACTION_VIEW.equals(intent.getAction())){
             Uri uri = intent.getData();
             if(uri.getScheme().equals("geo")) {
@@ -126,6 +174,7 @@ public class PhotoMapActivity extends Activity {
     }
 
     private void savePreference(){
+        if(mMap==null) return;
         CameraPosition pos = mMap.getCameraPosition();
         SharedPreferences pref = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor e = pref.edit();
