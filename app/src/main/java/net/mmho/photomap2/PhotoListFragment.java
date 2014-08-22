@@ -116,9 +116,7 @@ public class PhotoListFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(mCursor==null || mCursor.isClosed())
-            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-        else getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
         if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
             getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
         if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null)
@@ -131,11 +129,14 @@ public class PhotoListFragment extends Fragment {
                 public boolean onNavigationItemSelected(int itemPosition, long itemId) {
                     if(itemPosition!=distance_index) {
                         distance_index = itemPosition;
-                        Bundle b = new Bundle();
-                        b.putFloat("distance",DistanceAdapter.getDistance(distance_index));
-                        getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
-                        getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                        getLoaderManager().restartLoader(GROUPING_LOADER_ID, b, photoGroupListLoaderCallbacks);
+                        if(mCursor==null || mCursor.isClosed()) {
+                            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+                        }
+                        else {
+                            getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
+                            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+                        }
                     }
                     return true;
                 }
@@ -190,17 +191,13 @@ public class PhotoListFragment extends Fragment {
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
                 mCursor = data;
-                Bundle b = new Bundle();
-                b.putFloat("distance", DistanceAdapter.getDistance(distance_index));
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                getLoaderManager().restartLoader(GROUPING_LOADER_ID, b, photoGroupListLoaderCallbacks);
+                getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
             }
         }
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
-            Log.d(TAG,"onLoaderReset()");
-            mCursor = null;
         }
     };
 
@@ -208,8 +205,8 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            mGroup = new PhotoGroupList(mCursor);
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mGroup,args.getFloat("distance"), groupingHandler);
+            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,
+                    DistanceAdapter.getDistance(distance_index), groupingHandler);
         }
 
         @Override
@@ -220,7 +217,6 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
-            mGroup = null;
         }
     };
 

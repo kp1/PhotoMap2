@@ -6,7 +6,7 @@ import android.provider.MediaStore;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class PhotoCursor{
+public class PhotoCursor extends CursorWrapper{
 
     final public static String[] projection = new String[]{
             MediaStore.Images.Media._ID,
@@ -18,13 +18,17 @@ public class PhotoCursor{
             MediaStore.Images.Media.ORIENTATION,
     };
 
-    static long getID(Cursor c){
-        return c.getLong(c.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+    public PhotoCursor(Cursor cursor) {
+        super(cursor);
     }
 
-    static LatLng getLocation(Cursor c){
-        float latitude = c.getFloat(c.getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE));
-        float longitude = c.getFloat(c.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE));
+    long getID(){
+        return getLong(getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+    }
+
+    LatLng getLocation(){
+        float latitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE));
+        float longitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE));
         return new LatLng(latitude,longitude);
     }
 

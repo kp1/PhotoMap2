@@ -135,13 +135,14 @@ public class PhotoMapActivity extends Activity {
                     MediaStore.Images.Media.LATITUDE,
                     MediaStore.Images.Media.LONGITUDE,
             };
-            Cursor c = MediaStore.Images.Media.query(getContentResolver(),uri,projection,QueryBuilder.createQuery(),null,null);
+            PhotoCursor c = new PhotoCursor(MediaStore.Images.Media.query(getContentResolver(),uri,projection,QueryBuilder.createQuery(),null,null));
             if(c.getCount()==0){
                 Toast.makeText(this,getString(R.string.no_position_data),Toast.LENGTH_LONG).show();
                 finish();
             }
             c.moveToFirst();
-            LatLng position = PhotoCursor.getLocation(c);
+            LatLng position = c.getLocation();
+            c.close();
             return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
         }
         else{

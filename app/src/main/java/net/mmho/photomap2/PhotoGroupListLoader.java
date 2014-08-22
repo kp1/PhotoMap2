@@ -2,6 +2,7 @@ package net.mmho.photomap2;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.OperationCanceledException;
@@ -15,9 +16,9 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     private Handler handler;
     private CancellationSignal signal;
 
-    public PhotoGroupListLoader(Context context,PhotoGroupList list,float distance,Handler handler) {
+    public PhotoGroupListLoader(Context context,Cursor cursor,float distance,Handler handler) {
         super(context);
-        this.list = list;
+        this.list = new PhotoGroupList(new PhotoCursor(cursor));
         this.distance = distance;
         this.handler = handler;
         signal = null;

@@ -16,13 +16,13 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public final static String EXTRA_GROUP="group";
     public static final int MESSAGE_RESTART = 0;
     public static final int MESSAGE_ADD = 1;
-    final Cursor mCursor;
+    final PhotoCursor mCursor;
     private float distance;
     private boolean finished;
 
-    PhotoGroupList(Cursor c){
+    PhotoGroupList(PhotoCursor cursor){
         clear();
-        mCursor = c;
+        mCursor = cursor;
         distance = 0;
         finished = false;
     }
@@ -45,17 +45,17 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             int i;
             for(i=0;i<this.size();i++){
                 if(signal!=null)signal.throwIfCanceled();
-                LatLng p = PhotoCursor.getLocation(mCursor);
+                LatLng p = mCursor.getLocation();
                 LatLng c = get(i).getCenter();
                 float[] d = new float[3];
                 Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
                 if(d[0]<distance){
-                    get(i).append(p,PhotoCursor.getID(mCursor));
+                    get(i).append(p,mCursor.getID());
                     break;
                 }
             }
             if(i==this.size()){
-                PhotoGroup g = new PhotoGroup(PhotoCursor.getLocation(mCursor),PhotoCursor.getID(mCursor));
+                PhotoGroup g = new PhotoGroup(mCursor.getLocation(),mCursor.getID());
                 add(g);
                 if(handler!=null){
                     Bundle b = new Bundle();

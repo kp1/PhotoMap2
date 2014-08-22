@@ -117,7 +117,8 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoCursor = cursor;
-                getLoaderManager().restartLoader(PHOTO_GROUP_LOADER,null,photoGroupListLoaderCallbacks);
+                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
+                getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
             }
 
             @Override
@@ -132,7 +133,8 @@ public class PhotoMapFragment extends MapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                return new PhotoGroupListLoader(getActivity().getApplicationContext(),new PhotoGroupList(photoCursor),getPartitionDistance(mapBounds),null);
+                return new PhotoGroupListLoader(getActivity().getApplicationContext(),
+                        photoCursor,getPartitionDistance(mapBounds),null);
             }
 
             @Override
