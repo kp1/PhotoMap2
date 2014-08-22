@@ -68,47 +68,10 @@ public class PhotoCardLayout extends RelativeLayout{
             description.setText(g.toString());
         }
         else{
-            title.setText(addressToTitle(address));
-            description.setText(addressToDescription(address));
+            title.setText(AddressUtil.getTitle(address, getContext()));
+            description.setText(AddressUtil.getDescription(address));
         }
 
     }
 
-    private String removePostalCode(String source){
-        return source.replaceFirst("〒[0-9¥-]*","");
-    }
-
-    private String addressToDescription(Address address){
-        String description;
-        if(address.getMaxAddressLineIndex()>0){
-            description = address.getAddressLine(1);
-        }
-        else{
-            description = address.getAddressLine(0);
-        }
-        return removePostalCode(description);
-    }
-
-    private String addressToTitle(Address address){
-        StringBuilder builder = new StringBuilder();
-        final String separator = getContext().getString(R.string.address_separator);
-        // TODO: change address order with Language setting.
-
-        if(address.getAdminArea()!=null){
-            builder.append(address.getAdminArea());
-            builder.append(separator);
-        }
-        if(address.getSubAdminArea()!=null){
-            builder.append(address.getSubAdminArea());
-            builder.append(separator);
-        }
-        if(address.getLocality()!=null){
-            builder.append(address.getLocality());
-        }
-        if(builder.length()==0){
-            builder.append((address.getFeatureName()));
-        }
-
-        return new String(builder);
-    }
 }

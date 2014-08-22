@@ -34,7 +34,12 @@ public class PhotoGroup implements Parcelable{
     PhotoGroup(Parcel in){
         in.readList(id_list, null);
         area = LatLngBounds.CREATOR.createFromParcel(in);
-        address = null;
+        try {
+            address = Address.CREATOR.createFromParcel(in);
+        }
+        catch (NullPointerException e){
+            address = null;
+        }
     }
 
     PhotoGroup(LatLng p, long id){
@@ -88,6 +93,7 @@ public class PhotoGroup implements Parcelable{
     public void writeToParcel(Parcel out, int flags) {
         out.writeList(id_list);
         area.writeToParcel(out,0);
+        if(address!=null)address.writeToParcel(out,0);
     }
 
     static public float getMarkerColor(int size){

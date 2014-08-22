@@ -28,6 +28,15 @@ public class ThumbnailFragment extends Fragment {
         adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group.getIDList(),getLoaderManager(),0);
     }
 
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(group.address!=null){
+            getActivity().setTitle(AddressUtil.getTitle(group.address, getActivity()));
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment_thumbnail,container,false);
