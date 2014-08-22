@@ -134,7 +134,7 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
                 return new PhotoGroupListLoader(getActivity().getApplicationContext(),
-                        photoCursor,getPartitionDistance(mapBounds),null);
+                        photoCursor,getPartitionDistance(mapBounds),false,null);
             }
 
             @Override

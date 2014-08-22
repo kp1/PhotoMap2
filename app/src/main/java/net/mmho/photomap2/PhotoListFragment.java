@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,10 +23,8 @@ import android.widget.GridView;
 
 public class PhotoListFragment extends Fragment {
 
-    private static final String TAG = "PhotoListFragment";
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
-    private static final int GEOCODE_LOADER_ID = 2;
 
     private static final int ADAPTER_LOADER_ID = 1000;
 
@@ -119,8 +116,6 @@ public class PhotoListFragment extends Fragment {
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
         if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
             getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-        if(getLoaderManager().getLoader(GEOCODE_LOADER_ID)!=null)
-            getLoaderManager().initLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
     }
 
     ActionBar.OnNavigationListener onNavigationListener =
@@ -133,7 +128,6 @@ public class PhotoListFragment extends Fragment {
                             getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
                         }
                         else {
-                            getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
                             getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                             getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
                         }
@@ -152,7 +146,7 @@ public class PhotoListFragment extends Fragment {
                 }
             };
 
-    private final Handler groupingHandler = new Handler(){
+    private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
@@ -165,17 +159,12 @@ public class PhotoListFragment extends Fragment {
                 adapter.add(g);
                 adapter.notifyDataSetChanged();
                 break;
+            case PhotoGroupList.MESSAGE_ADDRESS:
+                adapter.notifyDataSetChanged();
+                break;
             }
         }
     };
-
-    private final Handler geocodeHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            adapter.notifyDataSetChanged();
-        }
-    };
-
 
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -206,35 +195,15 @@ public class PhotoListFragment extends Fragment {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,
-                    DistanceAdapter.getDistance(distance_index), groupingHandler);
+                    DistanceAdapter.getDistance(distance_index),true, handler);
         }
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-            getLoaderManager().destroyLoader(GEOCODE_LOADER_ID);
-            getLoaderManager().restartLoader(GEOCODE_LOADER_ID, null, geocodeLoaderCallbacks);
         }
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
         }
     };
-
-    private final LoaderManager.LoaderCallbacks<Integer> geocodeLoaderCallbacks =
-    new LoaderManager.LoaderCallbacks<Integer>() {
-        @Override
-        public Loader<Integer> onCreateLoader(int i, Bundle bundle) {
-            return new GeocodeLoader(getActivity().getApplicationContext(),mGroup,geocodeHandler);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Integer> listLoader, Integer success) {
-            if(success>0) adapter.notifyDataSetChanged();
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Integer> listLoader) {
-        }
-    };
-
 }

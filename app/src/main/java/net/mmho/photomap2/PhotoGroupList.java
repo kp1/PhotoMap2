@@ -1,21 +1,26 @@
 package net.mmho.photomap2;
 
-import android.database.Cursor;
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public final static String EXTRA_GROUP="group";
     public static final int MESSAGE_RESTART = 0;
     public static final int MESSAGE_ADD = 1;
+    public static final int MESSAGE_ADDRESS = 2;
+    private static final int ADDRESS_MAX_RESULTS = 1;
     final PhotoCursor mCursor;
     private float distance;
     private boolean finished;
@@ -27,7 +32,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         finished = false;
     }
 
-    public PhotoGroupList exec(float distance,Handler handler,CancellationSignal signal){
+    public PhotoGroupList exec(float distance,boolean geocode,Context context,Handler handler,CancellationSignal signal){
         clear();
 
         finished = false;
@@ -67,6 +72,28 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 }
             }
         }while(mCursor.moveToNext());
+
+        if(!geocode){
+            finished = true;
+            return this;
+        }
+
+        Geocoder g = new Geocoder(context);
+        for(PhotoGroup group:this){
+            if(signal!=null)signal.throwIfCanceled();
+            LatLng location = group.getCenter();
+            List<Address> addresses;
+            try {
+                addresses = g.getFromLocation(location.latitude, location.longitude, ADDRESS_MAX_RESULTS);
+                if(addresses!=null && addresses.size()>0){
+                    group.address = addresses.get(0);
+                    if(handler!=null) handler.sendEmptyMessage(MESSAGE_ADDRESS);
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
+
+        }
 
         finished = true;
 

@@ -6,22 +6,23 @@ import android.database.Cursor;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.OperationCanceledException;
-import android.util.Log;
 
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
-    private static final String TAG = "PhotoGroupListLoader";
     private PhotoGroupList list;
     private float distance;
     private Handler handler;
     private CancellationSignal signal;
+    private boolean geocode;
 
-    public PhotoGroupListLoader(Context context,Cursor cursor,float distance,Handler handler) {
+    public PhotoGroupListLoader(Context context,Cursor cursor,float distance,boolean geocode,Handler handler) {
         super(context);
         this.list = new PhotoGroupList(new PhotoCursor(cursor));
         this.distance = distance;
+        this.geocode = geocode;
         this.handler = handler;
         signal = null;
+
         onContentChanged();
     }
 
@@ -29,7 +30,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     public PhotoGroupList loadInBackground() {
         signal = new CancellationSignal();
         try {
-            list.exec(distance, handler, signal);
+            list.exec(distance,geocode,getContext(), handler, signal);
         }
         catch (OperationCanceledException e){
             // do nothing
@@ -46,11 +47,6 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
         else if(takeContentChanged()){
             forceLoad();
         }
-    }
-
-    @Override
-    public boolean cancelLoad() {
-        return super.cancelLoad();
     }
 
     @Override
