@@ -9,6 +9,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,11 +22,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class PhotoMapFragment extends MapFragment {
-	final static String TAG="CustomMapFragment";
 	final static int PARTITION_RATIO = 6;
     final static int PHOTO_CURSOR_LOADER = 0;
     final static int PHOTO_GROUP_LOADER = 1;
+
+    final public static String EXTRA_GROUP="group";
+    final private static float DEFAULT_ZOOM = 14;
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -37,15 +43,80 @@ public class PhotoMapFragment extends MapFragment {
 		setRetainInstance(true);
 	}
 
+    private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
+        double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
+        double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
+        LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
+        LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
+        return new LatLngBounds(southwest,northeast);
+    }
+
+    private CameraUpdate handleIntent(Intent intent){
+        if(Intent.ACTION_VIEW.equals(intent.getAction())){
+            Uri uri = intent.getData();
+            if(uri.getScheme().equals("geo")) {
+                String position = uri.toString();
+                Pattern pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?z=(\\d+))?");
+                Matcher matcher = pattern.matcher(position);
+                if(matcher.find() && matcher.groupCount()>=2) {
+                    double latitude = Double.parseDouble(matcher.group(1));
+                    double longitude = Double.parseDouble(matcher.group(2));
+                    float zoom = DEFAULT_ZOOM;
+
+                    if (matcher.groupCount() >= 4) zoom = Integer.parseInt(matcher.group(4));
+                    return CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude),zoom);
+                }
+                else{
+                    Toast.makeText(getActivity(),getString(R.string.no_search_query), Toast.LENGTH_LONG).show();
+                    getActivity().finish();
+                }
+            }
+        }
+        else if(Intent.ACTION_SEND.equals(intent.getAction())){
+            Uri uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            final String[] projection = new String[]{
+                    MediaStore.Images.Media.LATITUDE,
+                    MediaStore.Images.Media.LONGITUDE,
+            };
+            PhotoCursor c = new PhotoCursor(MediaStore.Images.Media.query(getActivity().getContentResolver(),uri,projection,QueryBuilder.createQuery(),null,null));
+            if(c.getCount()==0){
+                Toast.makeText(getActivity(),getString(R.string.no_position_data),Toast.LENGTH_LONG).show();
+                getActivity().finish();
+            }
+            c.moveToFirst();
+            LatLng position = c.getLocation();
+            c.close();
+            return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
+        }
+        else{
+            Bundle bundle = intent.getExtras();
+            PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
+            if(group!=null) return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(), 1.2), 0);
+        }
+        return null;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mMap = getMap();
-        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-        mMap.setOnMarkerClickListener(photoGroupClickListener);
-        mMap.getUiSettings().setZoomControlsEnabled(false);
-        getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+        if(mMap==null){
+            mMap = getMap();
+            Intent intent = getActivity().getIntent();
+            final CameraUpdate update = handleIntent(intent);
+            if(getView()!=null) {
+                getView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mMap.moveCamera(update);
+                    }
+                });
+            }
+            mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+            mMap.setOnMarkerClickListener(photoGroupClickListener);
+            mMap.getUiSettings().setZoomControlsEnabled(false);
+            getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+        }
     }
 
     GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
@@ -117,15 +188,17 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoCursor = cursor;
-                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
+                if(photoCursor.getCount()!=0) {
+                    getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
+                    getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
+                }
+                else{
+                    mMap.clear();
+                }
             }
 
             @Override
             public void onLoaderReset(Loader<Cursor> objectLoader) {
-                photoCursor = null;
-                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                mGroup.clear();
             }
         };
 

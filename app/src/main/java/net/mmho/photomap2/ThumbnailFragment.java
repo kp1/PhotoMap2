@@ -61,7 +61,7 @@ public class ThumbnailFragment extends Fragment {
         switch(item.getItemId()){
             case R.id.map:
                 Intent i = new Intent(getActivity(),PhotoMapActivity.class);
-                i.putExtra(PhotoMapActivity.EXTRA_GROUP,group);
+                i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
                 startActivity(i);
                 return true;
         }

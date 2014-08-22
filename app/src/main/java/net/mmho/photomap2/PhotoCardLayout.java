@@ -50,7 +50,7 @@ public class PhotoCardLayout extends RelativeLayout{
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getContext(),PhotoMapActivity.class);
-                i.putExtra(PhotoMapActivity.EXTRA_GROUP,group);
+                i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
                 getContext().startActivity(i);
             }
         };
