@@ -8,11 +8,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.util.Log;
 
 public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
-    private static final String TAG = "PhotoImageLoader";
     private long image_id;
     private Context context;
     private Bitmap bitmap;
@@ -47,7 +45,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
                     MediaStore.Images.Thumbnails.MINI_KIND,null);
         }
 
-        if (c.getColumnCount() > 0) {
+        if (c.getCount() > 0) {
             c.moveToFirst();
             int orientation = c.getInt(c.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION));
 
