@@ -95,8 +95,10 @@ public class PhotoListFragment extends Fragment {
 
         DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item);
         ActionBar bar = getActivity().getActionBar();
-        bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
-        bar.setSelectedNavigationItem(distance_index);
+        if(bar!=null) {
+            bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
+            bar.setSelectedNavigationItem(distance_index);
+        }
 
         return parent;
 
