@@ -29,7 +29,6 @@ public class PhotoListFragment extends Fragment {
     private static final int ADAPTER_LOADER_ID = 1000;
 
     private Cursor mCursor;
-    private PhotoGroupList mGroup;
     private  PhotoListAdapter adapter;
     private int distance_index;
     private boolean newest = true;
@@ -41,8 +40,7 @@ public class PhotoListFragment extends Fragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        mGroup = new PhotoGroupList(null);
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,mGroup,getLoaderManager(),ADAPTER_LOADER_ID);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new PhotoGroupList(null),getLoaderManager(),ADAPTER_LOADER_ID);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
         }
@@ -141,7 +139,7 @@ public class PhotoListFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Intent i = new Intent(getActivity(),ThumbnailActivity.class);
-                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,mGroup.get(position));
+                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,adapter.getItem(position));
                     startActivity(i);
                 }
             };
