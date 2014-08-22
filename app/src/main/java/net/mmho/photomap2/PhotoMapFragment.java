@@ -181,7 +181,7 @@ public class PhotoMapFragment extends MapFragment {
                 String q = QueryBuilder.createQuery(mapBounds);
                 String o = QueryBuilder.sortDateNewest();
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                return new CursorLoader(getActivity().getApplicationContext(),uri, PhotoCursor.projection, q, null, o);
+                return new CursorLoader(getActivity(),uri, PhotoCursor.projection, q, null, o);
 
             }
 
@@ -206,7 +206,7 @@ public class PhotoMapFragment extends MapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                return new PhotoGroupListLoader(getActivity().getApplicationContext(),
+                return new PhotoGroupListLoader(getActivity(),
                         photoCursor,getPartitionDistance(mapBounds),false,null);
             }
 

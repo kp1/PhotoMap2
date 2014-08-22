@@ -93,7 +93,7 @@ public class PhotoListFragment extends Fragment {
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
 
-        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
+        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item);
         ActionBar bar = getActivity().getActionBar();
         bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
         bar.setSelectedNavigationItem(distance_index);
@@ -171,7 +171,7 @@ public class PhotoListFragment extends Fragment {
             String q = QueryBuilder.createQuery();  // all list
             String o = newest?QueryBuilder.sortDateNewest():QueryBuilder.sortDateOldest();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            return new CursorLoader(getActivity().getApplicationContext(),uri,PhotoCursor.projection,q,null,o);
+            return new CursorLoader(getActivity(),uri,PhotoCursor.projection,q,null,o);
         }
 
         @Override
@@ -192,7 +192,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            return new PhotoGroupListLoader(getActivity().getApplicationContext(),mCursor,
+            return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }
 
