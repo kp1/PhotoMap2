@@ -170,8 +170,6 @@ public class PhotoListFragment extends Fragment {
                 adapter.clear();
                 break;
             case PhotoGroupList.MESSAGE_ADD:
-                progress++;
-                setProgress(progress*PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 Bundle b = msg.getData();
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
@@ -225,11 +223,12 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+            endProgress();
         }
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
-            endProgress();
+
         }
     };
 }
