@@ -8,7 +8,10 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
+import android.view.Window;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -37,6 +40,7 @@ public class PhotoMapFragment extends MapFragment {
     private LatLngBounds mapBounds;
     private Cursor photoCursor;
     private PhotoGroupList mGroup;
+    private int progress;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -173,6 +177,32 @@ public class PhotoMapFragment extends MapFragment {
         return d[0]/PARTITION_RATIO;
     }
 
+    private void setProgress(int progress){
+        getActivity().setProgress(progress);
+        getActivity().setProgressBarVisibility(true);
+    }
+
+    private void endProgress(){
+        getActivity().setProgress(Window.PROGRESS_END);
+        getActivity().setProgressBarVisibility(false);
+    }
+
+    final private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what){
+                case PhotoGroupList.MESSAGE_RESTART:
+                    progress = 0;
+                    break;
+                case PhotoGroupList.MESSAGE_ADD:
+                case PhotoGroupList.MESSAGE_APPEND:
+                    progress++;
+                    setProgress(progress * Window.PROGRESS_END/photoCursor.getCount());
+                    break;
+            }
+        }
+    };
+
     LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
@@ -207,11 +237,12 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
                 return new PhotoGroupListLoader(getActivity(),
-                        photoCursor,getPartitionDistance(mapBounds),false,null);
+                        photoCursor,getPartitionDistance(mapBounds),false,handler);
             }
 
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+                endProgress();
                 if(mGroup==null || !mGroup.equals(data)){
                     mGroup = data;
                     mMap.clear();

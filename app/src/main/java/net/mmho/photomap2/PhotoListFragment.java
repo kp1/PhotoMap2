@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -32,7 +33,8 @@ public class PhotoListFragment extends Fragment {
     private  PhotoListAdapter adapter;
     private int distance_index;
     private boolean newest = true;
-    int progress = 0;
+    private int progress;
+    private int geo_progress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,7 +96,7 @@ public class PhotoListFragment extends Fragment {
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
 
-        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity(), android.R.layout.simple_spinner_dropdown_item);
+        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
         ActionBar bar = getActivity().getActionBar();
         if(bar!=null) {
             bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
@@ -147,19 +149,21 @@ public class PhotoListFragment extends Fragment {
                 }
             };
 
-    private void setProgress(int percent){
-        getActivity().setProgress(percent*100);
+    private void setProgress(int progress){
+        getActivity().setProgress(progress);
         getActivity().setProgressBarVisibility(true);
     }
 
     private void endProgress(){
-        getActivity().setProgress(100*100);
+        getActivity().setProgress(Window.PROGRESS_END);
         getActivity().setProgressBarVisibility(false);
     }
+
 
     private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            final int PROGRESS_GROUPING_RATIO=8000;
             switch (msg.what){
             case PhotoGroupList.MESSAGE_RESTART:
                 setProgress(0);
@@ -167,16 +171,19 @@ public class PhotoListFragment extends Fragment {
                 break;
             case PhotoGroupList.MESSAGE_ADD:
                 progress++;
-                setProgress(progress*100/mCursor.getCount());
+                setProgress(progress*PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 Bundle b = msg.getData();
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
                 adapter.notifyDataSetChanged();
             case PhotoGroupList.MESSAGE_APPEND:
                 progress++;
-                setProgress(progress * 100 / mCursor.getCount());
+                setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
+                geo_progress++;
+                setProgress(PROGRESS_GROUPING_RATIO+
+                        geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/adapter.getCount());
                 adapter.notifyDataSetChanged();
                 break;
             }
@@ -211,7 +218,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            progress = 0;
+            progress = geo_progress = 0;
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }
