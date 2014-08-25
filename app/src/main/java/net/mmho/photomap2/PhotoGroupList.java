@@ -52,12 +52,18 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             for(i=0;i<this.size();i++){
                 if(signal!=null)signal.throwIfCanceled();
                 LatLng p = mCursor.getLocation();
-                LatLng c = get(i).getCenter();
-                float[] d = new float[3];
-                Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
-                if(d[0]<distance){
-                    get(i).append(p,mCursor.getID());
-                    if(handler!=null){
+                boolean contains = get(i).getArea().contains(p);
+                if(!contains) {
+                    LatLng c = get(i).getCenter();
+                    float[] d = new float[3];
+                    Location.distanceBetween(p.latitude, p.longitude, c.latitude, c.longitude, d);
+                    if (d[0] < distance) {
+                        contains = true;
+                    }
+                }
+                if(contains){
+                    get(i).append(p, mCursor.getID());
+                    if (handler != null) {
                         handler.sendEmptyMessage(MESSAGE_APPEND);
                     }
                     break;
