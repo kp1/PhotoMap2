@@ -18,8 +18,9 @@ import java.util.List;
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public final static String EXTRA_GROUP="group";
     public static final int MESSAGE_RESTART = 0;
-    public static final int MESSAGE_ADD = 1;
-    public static final int MESSAGE_ADDRESS = 2;
+    public static final int MESSAGE_ADD=1;
+    public static final int MESSAGE_APPEND = 2;
+    public static final int MESSAGE_ADDRESS = 3;
     private static final int ADDRESS_MAX_RESULTS = 1;
     final PhotoCursor mCursor;
     private float distance;
@@ -56,6 +57,9 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 Location.distanceBetween(p.latitude,p.longitude,c.latitude,c.longitude,d);
                 if(d[0]<distance){
                     get(i).append(p,mCursor.getID());
+                    if(handler!=null){
+                        handler.sendEmptyMessage(MESSAGE_APPEND);
+                    }
                     break;
                 }
             }

@@ -14,9 +14,12 @@ public class PhotoListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        requestWindowFeature(Window.FEATURE_PROGRESS);
 
-        setContentView(R.layout.activity_photo_list);
+        ActionBar bar = getActionBar();
+        if(bar!=null) bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+//        setContentView(R.layout.activity_photo_list);
 
         Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
         if(fragment==null){

@@ -4,6 +4,7 @@
     <style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
         <item name="android:spinnerItemStyle">@style/SpinnerItemStyle</item>
         <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemStyle</item>
+        <item name="android:progressBarStyleHorizontal">@style/ActionBarProgressStyleHorizontal</item>
     </style>
 
     <style name="SpinnerItemStyle" parent="android:style/Widget.Holo.Light.TextView.SpinnerItem">
@@ -11,6 +12,9 @@
     </style>
     <style name="SpinnerDropDownItemStyle" parent="android:style/Widget.Holo.Light.DropDownItem">
         <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="ActionBarProgressStyleHorizontal" parent="android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:layout_alignParentBottom">true</item>
     </style>
 
 </resources>

@@ -32,6 +32,7 @@ public class PhotoListFragment extends Fragment {
     private  PhotoListAdapter adapter;
     private int distance_index;
     private boolean newest = true;
+    int progress = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,18 +147,34 @@ public class PhotoListFragment extends Fragment {
                 }
             };
 
+    private void setProgress(int percent){
+        getActivity().setProgress(percent*100);
+        getActivity().setProgressBarVisibility(true);
+    }
+
+    private void endProgress(){
+        getActivity().setProgress(100*100);
+        getActivity().setProgressBarVisibility(false);
+    }
+
     private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what){
             case PhotoGroupList.MESSAGE_RESTART:
+                setProgress(0);
                 adapter.clear();
                 break;
             case PhotoGroupList.MESSAGE_ADD:
+                progress++;
+                setProgress(progress*100/mCursor.getCount());
                 Bundle b = msg.getData();
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
                 adapter.notifyDataSetChanged();
+            case PhotoGroupList.MESSAGE_APPEND:
+                progress++;
+                setProgress(progress * 100 / mCursor.getCount());
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
                 adapter.notifyDataSetChanged();
@@ -194,6 +211,7 @@ public class PhotoListFragment extends Fragment {
     new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+            progress = 0;
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }
@@ -204,6 +222,7 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onLoaderReset(Loader<PhotoGroupList> loader) {
+            endProgress();
         }
     };
 }
