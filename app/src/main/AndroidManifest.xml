@@ -18,8 +18,7 @@
         </activity>
 
         <activity android:name=".PhotoMapActivity"
-            android:parentActivityName=".PhotoListActivity"
-            android:theme="@style/AppTheme.ActionBarTranslucent">
+            android:parentActivityName=".PhotoListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <data android:scheme="geo" />
