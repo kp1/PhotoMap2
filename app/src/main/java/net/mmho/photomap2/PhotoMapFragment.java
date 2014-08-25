@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.app.ActionBar;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ public class PhotoMapFragment extends MapFragment {
 
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 14;
+    private static final String TAG = "PhotoMapFragment";
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -118,10 +121,41 @@ public class PhotoMapFragment extends MapFragment {
             }
             mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             mMap.setOnMarkerClickListener(photoGroupClickListener);
+            mMap.setOnMapClickListener(photoMapClickListener);
             mMap.getUiSettings().setZoomControlsEnabled(false);
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
     }
+
+    private void showActionBar(){
+        ActionBar bar = getActivity().getActionBar();
+        if(bar!=null) bar.show();
+    }
+
+    private void hideActionBar(){
+        final int HIDE_DELAY = 3*1000;  // 3sec
+        final ActionBar bar = getActivity().getActionBar();
+        if(bar!=null){
+            Handler h = new Handler();
+            h.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    bar.hide();
+                }
+            },HIDE_DELAY);
+        }
+
+
+    }
+
+    GoogleMap.OnMapClickListener photoMapClickListener =
+        new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                showActionBar();
+                hideActionBar();
+            }
+        };
 
     GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
@@ -135,6 +169,7 @@ public class PhotoMapFragment extends MapFragment {
                     mMap.animateCamera(cameraUpdate, cancelableCallback);
                     return;
                 }
+                showActionBar();
                 getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null,photoListLoaderCallback);
             }
@@ -224,6 +259,7 @@ public class PhotoMapFragment extends MapFragment {
                 }
                 else{
                     mMap.clear();
+                    hideActionBar();
                 }
             }
 
@@ -243,6 +279,7 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
                 endProgress();
+                hideActionBar();
                 if(mGroup==null || !mGroup.equals(data)){
                     mGroup = data;
                     mMap.clear();
