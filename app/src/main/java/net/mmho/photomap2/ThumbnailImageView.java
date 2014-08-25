@@ -4,14 +4,13 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 public class ThumbnailImageView extends ImageView{
 
-    private static final String TAG = "ThumbnailImageView";
     private static final java.lang.String EXTRA_ID = "thumbnail_id";
     private long image_id = -1;
 
@@ -30,7 +29,14 @@ public class ThumbnailImageView extends ImageView{
     public void startLoading(LoaderManager manager,int loader_id,long image_id){
 
         if(image_id!=this.image_id) {
-            setImageBitmap(null);
+            BitmapDrawable drawable = (BitmapDrawable) getDrawable();
+            if(drawable!=null){
+                Bitmap bitmap = drawable.getBitmap();
+                if(bitmap!=null){
+                    bitmap.recycle();
+                    setImageBitmap(null);
+                }
+            }
             this.image_id = image_id;
             Bundle b = new Bundle();
             b.putLong(EXTRA_ID, image_id);
