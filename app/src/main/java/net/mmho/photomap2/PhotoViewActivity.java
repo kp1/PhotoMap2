@@ -46,18 +46,29 @@ public class PhotoViewActivity extends Activity {
         return true;
     }
 
+    private void setUri(Intent intent){
+        final long image_id = adapter.getItemID(pager.getCurrentItem());
+        final Uri uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                String.valueOf(image_id));
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("image/jpeg");
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra(Intent.EXTRA_STREAM,uri);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()){
         case R.id.share:
-            final long image_id = adapter.getItemID(pager.getCurrentItem());
-            final Uri uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                   String.valueOf(image_id));
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("image/jpg");
-            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            intent.putExtra(Intent.EXTRA_STREAM,uri);
+            intent = new Intent();
+            setUri(intent);
             startActivity(Intent.createChooser(intent,null));
+            return true;
+        case R.id.map:
+            intent = new Intent(this,PhotoMapActivity.class);
+            setUri(intent);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
