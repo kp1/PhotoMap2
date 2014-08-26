@@ -6,13 +6,15 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -36,7 +38,7 @@ public class PhotoMapFragment extends MapFragment {
     final static int PHOTO_GROUP_LOADER = 1;
 
     final public static String EXTRA_GROUP="group";
-    final private static float DEFAULT_ZOOM = 14;
+    final private static float DEFAULT_ZOOM = 15;
     private static final String TAG = "PhotoMapFragment";
 
     private GoogleMap mMap;
@@ -44,6 +46,7 @@ public class PhotoMapFragment extends MapFragment {
     private Cursor photoCursor;
     private PhotoGroupList mGroup;
     private int progress;
+    private MarkerOptions sharedMarker;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -58,7 +61,19 @@ public class PhotoMapFragment extends MapFragment {
         return new LatLngBounds(southwest,northeast);
     }
 
+    private Bitmap createBitMap(int resource){
+        int height = getResources().getDimensionPixelSize(R.dimen.marker_height);
+        int width = getResources().getDimensionPixelSize(R.dimen.marker_width);
+        Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Drawable shape = getResources().getDrawable(resource);
+        shape.setBounds(0,0,bitmap.getWidth(),bitmap.getHeight());
+        shape.draw(canvas);
+        return bitmap;
+    }
+
     private CameraUpdate handleIntent(Intent intent){
+        sharedMarker =null;
         if(Intent.ACTION_VIEW.equals(intent.getAction())){
             Uri uri = intent.getData();
             if(uri.getScheme().equals("geo")) {
@@ -93,6 +108,9 @@ public class PhotoMapFragment extends MapFragment {
             c.moveToFirst();
             LatLng position = c.getLocation();
             c.close();
+            sharedMarker = new MarkerOptions();
+            sharedMarker.icon(BitmapDescriptorFactory.fromBitmap(createBitMap(R.drawable.dot)))
+                    .position(position);
             return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
         }
         else{
@@ -259,6 +277,7 @@ public class PhotoMapFragment extends MapFragment {
                 }
                 else{
                     mMap.clear();
+                    if(sharedMarker !=null)mMap.addMarker(sharedMarker);
                     hideActionBar();
                 }
             }
@@ -288,6 +307,7 @@ public class PhotoMapFragment extends MapFragment {
                         ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(group.size())));
                         group.marker = mMap.addMarker(ops);
                     }
+                    if(sharedMarker !=null)mMap.addMarker(sharedMarker);
                 }
             }
 
