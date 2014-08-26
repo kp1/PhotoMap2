@@ -5,8 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -45,13 +49,30 @@ public class PhotoCardLayout extends RelativeLayout{
         count = (TextView)findViewById(R.id.count);
     }
 
-    OnClickListener onClickListener =
-        new OnClickListener() {
+    private void moveMap(){
+        Intent i = new Intent(getContext(),PhotoMapActivity.class);
+        i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
+        getContext().startActivity(i);
+    }
+    final ImageView.OnClickListener onClickListener =
+        new ImageView.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(getContext(),PhotoMapActivity.class);
-                i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
-                getContext().startActivity(i);
+                PopupMenu popup = new PopupMenu(getContext(),v);
+                popup.setOnMenuItemClickListener(popupClickListener);
+                popup.inflate(R.menu.photo_list_popup_menu);
+                popup.show();
+            }
+        };
+
+    final PopupMenu.OnMenuItemClickListener popupClickListener =
+        new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                // ToDo: switching by item id
+                Log.d(TAG,"selected:"+item.getItemId());
+                moveMap();
+                return true;
             }
         };
 

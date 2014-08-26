@@ -277,7 +277,7 @@ public class PhotoMapFragment extends MapFragment {
                 }
                 else{
                     mMap.clear();
-                    if(sharedMarker !=null)mMap.addMarker(sharedMarker);
+                    if(sharedMarker!=null)mMap.addMarker(sharedMarker);
                     hideActionBar();
                 }
             }
