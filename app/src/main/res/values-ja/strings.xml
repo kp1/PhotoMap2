@@ -10,4 +10,5 @@
     <string name="no_search_query">検索には対応していません</string>
     <string name="no_position_data">位置情報がありません</string>
     <string name="share">共有</string>
+    <string name="search_map">地名で検索</string>
 </resources>

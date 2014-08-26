@@ -2,6 +2,9 @@ package net.mmho.photomap2;
 
 import android.app.ActionBar;
 import android.app.LoaderManager;
+import android.app.SearchManager;
+import android.app.SearchableInfo;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -15,7 +18,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -46,12 +55,43 @@ public class PhotoMapFragment extends MapFragment {
     private Cursor photoCursor;
     private PhotoGroupList mGroup;
     private int progress;
+    private boolean searching = false;
     private MarkerOptions sharedMarker;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+        setHasOptionsMenu(true);
 	}
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.photo_map_menu,menu);
+
+        SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setOnFocusChangeListener(onFocusChangeListener);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+    }
+
+    final private SearchView.OnFocusChangeListener onFocusChangeListener =
+            new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    Log.d(TAG,"focused:"+hasFocus);
+                }
+            };
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+        case R.id.search:
+            Log.d(TAG, "searching");
+            searching = true;
+            return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
         double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
@@ -158,6 +198,7 @@ public class PhotoMapFragment extends MapFragment {
             h.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if(searching) return;
                     bar.hide();
                 }
             },HIDE_DELAY);

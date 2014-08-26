@@ -30,12 +30,23 @@
                 <data android:mimeType="image/jpg"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchResultActivity"/>
             </activity>
         <activity android:name=".ThumbnailActivity"
             android:parentActivityName=".PhotoListActivity"/>
         <activity android:name=".PhotoViewActivity"
             android:parentActivityName=".PhotoListActivity"/>
-
+        <activity android:name=".SearchResultActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
