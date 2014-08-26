@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,8 +14,6 @@ import android.widget.TextView;
 
 
 public class PhotoCardLayout extends RelativeLayout{
-
-    private static final String TAG = "PhotoCardLayout";
 
     private ThumbnailImageView thumbnail;
     private TextView title;
@@ -69,10 +65,13 @@ public class PhotoCardLayout extends RelativeLayout{
         new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                // ToDo: switching by item id
-                Log.d(TAG,"selected:"+item.getItemId());
-                moveMap();
-                return true;
+                switch (item.getItemId()){
+                case R.id.map:
+                    moveMap();
+                    return true;
+                default:
+                    return false;
+                }
             }
         };
 

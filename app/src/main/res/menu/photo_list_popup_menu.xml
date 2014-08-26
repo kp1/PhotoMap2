@@ -2,7 +2,7 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:name="@+id/map"
+        android:id="@+id/map"
         android:title="@string/display_on_map"
     />
 </menu>
