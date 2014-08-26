@@ -3,7 +3,6 @@ package net.mmho.photomap2;
 import android.app.ActionBar;
 import android.app.LoaderManager;
 import android.app.SearchManager;
-import android.app.SearchableInfo;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -18,11 +17,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -48,7 +45,6 @@ public class PhotoMapFragment extends MapFragment {
 
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 15;
-    private static final String TAG = "PhotoMapFragment";
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -70,28 +66,25 @@ public class PhotoMapFragment extends MapFragment {
 
         SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
-        searchView.setOnFocusChangeListener(onFocusChangeListener);
+        menu.findItem(R.id.search).setOnActionExpandListener(actionExpandListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
     }
 
-    final private SearchView.OnFocusChangeListener onFocusChangeListener =
-            new View.OnFocusChangeListener() {
+    final private MenuItem.OnActionExpandListener actionExpandListener =
+            new MenuItem.OnActionExpandListener() {
                 @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    Log.d(TAG,"focused:"+hasFocus);
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    searching = true;
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    searching = false;
+                    hideActionBar();
+                    return true;
                 }
             };
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-        case R.id.search:
-            Log.d(TAG, "searching");
-            searching = true;
-            return false;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
         double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
