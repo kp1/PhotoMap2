@@ -8,7 +8,9 @@ import android.content.Loader;
 import android.location.Address;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -18,7 +20,6 @@ import java.util.List;
 public class SearchActivity extends ListActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
     private static final String TAG = "SearchResultActivity";
 
-    private List<Address> addresses;
     private ArrayAdapter<Address> adapter;
     private String location;
 
@@ -49,6 +50,19 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
         }
     }
 
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        Address address = adapter.getItem(position);
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("location",addressToPosition(address));
+        intent.putExtras(bundle);
+        setResult(RESULT_OK,intent);
+        finish();
+
+    }
+
+    // LoaderManager
     private LatLng addressToPosition(Address address){
         return new LatLng(address.getLatitude(),address.getLongitude());
     }
@@ -75,8 +89,7 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
             finish();
         }
         else {
-            addresses = data;
-            adapter = new AddressListAdapter(this, android.R.layout.simple_list_item_2, addresses);
+            adapter = new AddressListAdapter(this, android.R.layout.simple_list_item_2, data);
             setListAdapter(adapter);
         }
     }
