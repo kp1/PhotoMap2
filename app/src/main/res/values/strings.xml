@@ -11,4 +11,5 @@
     <string name="no_position_data">This image has no position data.</string>
     <string name="share">Share image</string>
     <string name="search_map">search location</string>
+    <string name="location_not_found">%1$s was not found.</string>
 </resources>

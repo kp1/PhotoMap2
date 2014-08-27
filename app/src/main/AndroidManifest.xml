@@ -32,13 +32,13 @@
             </intent-filter>
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".SearchResultActivity"/>
+                android:value=".SearchActivity"/>
             </activity>
         <activity android:name=".ThumbnailActivity"
             android:parentActivityName=".PhotoListActivity"/>
         <activity android:name=".PhotoViewActivity"
             android:parentActivityName=".PhotoListActivity"/>
-        <activity android:name=".SearchResultActivity">
+        <activity android:name=".SearchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>

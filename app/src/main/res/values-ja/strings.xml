@@ -11,4 +11,5 @@
     <string name="no_position_data">位置情報がありません</string>
     <string name="share">共有</string>
     <string name="search_map">地名で検索</string>
+    <string name="location_not_found">%1$sは見つかりませんでした</string>
 </resources>

@@ -1,6 +1,7 @@
 package net.mmho.photomap2;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -45,6 +47,7 @@ public class PhotoMapFragment extends MapFragment {
 
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 15;
+    private static final String TAG = "PhotoMapFragment";
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -53,6 +56,7 @@ public class PhotoMapFragment extends MapFragment {
     private int progress;
     private boolean searching = false;
     private MarkerOptions sharedMarker;
+    private MenuItem searchMenuItem;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -61,12 +65,26 @@ public class PhotoMapFragment extends MapFragment {
 	}
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG,"onActivityResult():"+resultCode);
+        switch(resultCode){
+        case Activity.RESULT_OK:
+            LatLng position = data.getExtras().getParcelable("location");
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM));
+            break;
+        }
+    }
+
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.photo_map_menu,menu);
 
         SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
-        menu.findItem(R.id.search).setOnActionExpandListener(actionExpandListener);
+        searchView.setOnQueryTextListener(onQueryTextListener);
+        searchMenuItem = menu.findItem(R.id.search);
+        searchMenuItem.setOnActionExpandListener(actionExpandListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
     }
 
@@ -83,6 +101,25 @@ public class PhotoMapFragment extends MapFragment {
                     searching = false;
                     hideActionBar();
                     return true;
+                }
+            };
+
+    final private SearchView.OnQueryTextListener onQueryTextListener =
+            new SearchView.OnQueryTextListener(){
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    searchMenuItem.collapseActionView();
+                    Intent intent = new Intent(getActivity(),SearchActivity.class);
+                    intent.setAction(Intent.ACTION_SEARCH);
+                    intent.putExtra(SearchManager.QUERY,query);
+                    startActivityForResult(intent,0);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
                 }
             };
 
