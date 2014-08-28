@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.location.Address;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -18,8 +17,6 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.List;
 
 public class SearchActivity extends ListActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
-    private static final String TAG = "SearchResultActivity";
-
     private ArrayAdapter<Address> adapter;
     private String location;
 
@@ -39,7 +36,7 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
     private void handleIntent(Intent intent) {
         if(Intent.ACTION_SEARCH.equals(intent.getAction())){
             location = intent.getStringExtra(SearchManager.QUERY);
-            Log.d(TAG, location);
+            setTitle(getString(R.string.search_title,location));
             Bundle bundle = new Bundle();
             bundle.putString("location",location);
             getLoaderManager().initLoader(0,bundle,this);

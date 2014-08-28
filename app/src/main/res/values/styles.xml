@@ -4,4 +4,8 @@
     <style name="AppTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
     </style>
 
+    <style name="AppTheme.Dialog" parent="@android:style/Theme.Holo.Light.Dialog">
+        <item name="android:textAppearanceListItem">@android:style/TextAppearance.Holo.Medium</item>
+    </style>
+
 </resources>

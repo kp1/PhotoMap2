@@ -38,7 +38,9 @@
             android:parentActivityName=".PhotoListActivity"/>
         <activity android:name=".PhotoViewActivity"
             android:parentActivityName=".PhotoListActivity"/>
-        <activity android:name=".SearchActivity">
+        <activity
+            android:name=".SearchActivity"
+            android:theme="@style/AppTheme.Dialog">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>

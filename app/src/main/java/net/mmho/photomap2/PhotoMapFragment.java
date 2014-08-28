@@ -104,16 +104,14 @@ public class PhotoMapFragment extends MapFragment {
                 }
             };
 
+
     final private SearchView.OnQueryTextListener onQueryTextListener =
             new SearchView.OnQueryTextListener(){
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     searchMenuItem.collapseActionView();
-                    Intent intent = new Intent(getActivity(),SearchActivity.class);
-                    intent.setAction(Intent.ACTION_SEARCH);
-                    intent.putExtra(SearchManager.QUERY,query);
-                    startActivityForResult(intent,0);
+                    requestQuery(query);
                     return true;
                 }
 
@@ -122,6 +120,13 @@ public class PhotoMapFragment extends MapFragment {
                     return false;
                 }
             };
+
+    private void requestQuery(String query){
+        Intent intent = new Intent(getActivity(),SearchActivity.class);
+        intent.setAction(Intent.ACTION_SEARCH);
+        intent.putExtra(SearchManager.QUERY,query);
+        startActivityForResult(intent,0);
+    }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
         double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
@@ -148,19 +153,23 @@ public class PhotoMapFragment extends MapFragment {
             Uri uri = intent.getData();
             if(uri.getScheme().equals("geo")) {
                 String position = uri.toString();
-                Pattern pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?z=(\\d+))?");
+                Pattern pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?([zq])=(.*))?");
                 Matcher matcher = pattern.matcher(position);
                 if(matcher.find() && matcher.groupCount()>=2) {
                     double latitude = Double.parseDouble(matcher.group(1));
                     double longitude = Double.parseDouble(matcher.group(2));
                     float zoom = DEFAULT_ZOOM;
 
-                    if (matcher.groupCount() >= 4) zoom = Integer.parseInt(matcher.group(4));
+                    if (matcher.groupCount() == 5){
+                        if(matcher.group(4).equals("z")) {
+                            zoom = Integer.parseInt(matcher.group(5));
+                        }
+                        else if(matcher.group(4).equals("q")){
+                            requestQuery(matcher.group(5));
+                            return null;
+                        }
+                    }
                     return CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude),zoom);
-                }
-                else{
-                    Toast.makeText(getActivity(),getString(R.string.no_search_query), Toast.LENGTH_LONG).show();
-                    getActivity().finish();
                 }
             }
         }
@@ -199,7 +208,7 @@ public class PhotoMapFragment extends MapFragment {
             mMap = getMap();
             Intent intent = getActivity().getIntent();
             final CameraUpdate update = handleIntent(intent);
-            if(getView()!=null) {
+            if(update!=null && getView()!=null) {
                 getView().post(new Runnable() {
                     @Override
                     public void run() {
