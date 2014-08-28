@@ -26,13 +26,16 @@ public class PhotoViewActivity extends Activity {
         if(bundle!=null) {
             setContentView(R.layout.fragment_photo_view);
             PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
-            if(group.address!=null) setTitle(AddressUtil.getTitle(group.address,this));
+            if(group.address!=null){
+                setTitle(AddressUtil.getTitle(group.address,this));
+            }
             int position = bundle.getInt(EXTRA_POSITION);
             adapter = new PhotoViewAdapter(getFragmentManager(), group);
 
             pager = (ViewPager) findViewById(R.id.photo_pager);
             pager.setAdapter(adapter);
             pager.setCurrentItem(position);
+            pager.setPageMargin(30);
 
         }
         else {

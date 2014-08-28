@@ -143,9 +143,17 @@ public class PhotoListFragment extends Fragment {
             new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent i = new Intent(getActivity(),ThumbnailActivity.class);
-                    i.putExtra(ThumbnailActivity.EXTRA_GROUP,adapter.getItem(position));
-                    startActivity(i);
+                    PhotoGroup group = adapter.getItem(position);
+                    Intent intent;
+                    if(group.size()==1){
+                        intent = new Intent(getActivity(),PhotoViewActivity.class);
+                        intent.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                    }
+                    else {
+                        intent = new Intent(getActivity(), ThumbnailActivity.class);
+                        intent.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
+                    }
+                    startActivity(intent);
                 }
             };
 

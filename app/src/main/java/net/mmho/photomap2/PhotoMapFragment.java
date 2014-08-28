@@ -292,9 +292,16 @@ public class PhotoMapFragment extends MapFragment {
             public boolean onMarkerClick(Marker marker) {
                 for(PhotoGroup group:mGroup){
                     if(group.marker.equals(marker)){
-                        Intent i = new Intent(getActivity(),ThumbnailActivity.class);
-                        i.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
-                        startActivity(i);
+                        Intent intent;
+                        if(group.size()==1){
+                            intent = new Intent(getActivity(),PhotoViewActivity.class);
+                            intent.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                        }
+                        else{
+                            intent = new Intent(getActivity(),ThumbnailActivity.class);
+                            intent.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
+                        }
+                        startActivity(intent);
                         break;
                     }
                 }
