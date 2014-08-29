@@ -7,10 +7,11 @@
     <string name="display_on_map">display on map</string>
     <string name="oldest">oldest first</string>
     <string name="newest">newest first</string>
-    <string name="no_search_query">Not support search location.</string>
     <string name="no_position_data">This image has no position data.</string>
     <string name="share">Share image</string>
     <string name="search_map">search location</string>
     <string name="location_not_found">%1$s was not found.</string>
     <string name="search_title">%1$s is …</string>
+    <string name="show_map">show map</string>
+    <string name="hide_map">hide map</string>
 </resources>

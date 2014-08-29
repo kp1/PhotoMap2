@@ -7,10 +7,11 @@
     <string name="display_on_map">地図で表示</string>
     <string name="oldest">古い順</string>
     <string name="newest">新しい順</string>
-    <string name="no_search_query">検索には対応していません</string>
     <string name="no_position_data">位置情報がありません</string>
     <string name="share">共有</string>
     <string name="search_map">地名で検索</string>
     <string name="location_not_found">%1$sは見つかりませんでした</string>
     <string name="search_title">%1$s は …</string>
+    <string name="show_map">地図を表示</string>
+    <string name="hide_map">地図を隠す</string>
 </resources>

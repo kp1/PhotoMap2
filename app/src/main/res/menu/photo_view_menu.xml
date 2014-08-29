@@ -14,4 +14,14 @@
         android:title="@string/display_on_map"
         android:showAsAction="ifRoom"
     />
+    <item
+        android:id="@+id/show_map"
+        android:title="@string/show_map"
+        android:visible="false"
+        />
+    <item
+        android:id="@+id/hide_map"
+        android:title="@string/hide_map"
+        android:visible="false"
+        />
 </menu>
