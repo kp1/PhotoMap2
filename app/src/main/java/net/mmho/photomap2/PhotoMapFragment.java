@@ -54,9 +54,9 @@ public class PhotoMapFragment extends MapFragment {
     private Cursor photoCursor;
     private PhotoGroupList mGroup;
     private int progress;
-    private boolean searching = false;
     private MarkerOptions sharedMarker;
     private MenuItem searchMenuItem;
+    private ActionBar mActionBar;
 
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -92,14 +92,13 @@ public class PhotoMapFragment extends MapFragment {
             new MenuItem.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
-                    searching = true;
+                    showActionBar(false);
                     return true;
                 }
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    searching = false;
-                    hideActionBar();
+                    hideActionBarDelayed(HIDE_DELAY);
                     return true;
                 }
             };
@@ -222,36 +221,42 @@ public class PhotoMapFragment extends MapFragment {
             mMap.getUiSettings().setZoomControlsEnabled(false);
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
+
+        mActionBar = getActivity().getActionBar();
+
     }
 
-    private void showActionBar(){
-        ActionBar bar = getActivity().getActionBar();
-        if(bar!=null) bar.show();
+    final long HIDE_DELAY = 3*1000;  // 3sec
+
+    final Handler ab_handler = new Handler();
+    final Runnable runnable= new Runnable() {
+        @Override
+        public void run() {
+            hideActionBar();
+        }
+    };
+
+    private void showActionBar(boolean hide){
+        mActionBar.show();
+        if(!hide)ab_handler.removeCallbacks(runnable);
+        else hideActionBarDelayed(HIDE_DELAY);
     }
 
     private void hideActionBar(){
-        final int HIDE_DELAY = 3*1000;  // 3sec
-        final ActionBar bar = getActivity().getActionBar();
-        if(bar!=null){
-            Handler h = new Handler();
-            h.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(searching) return;
-                    bar.hide();
-                }
-            },HIDE_DELAY);
-        }
+        mActionBar.hide();
+    }
 
-
+    private void hideActionBarDelayed(long delay){
+        ab_handler.removeCallbacks(runnable);
+        ab_handler.postDelayed(runnable,delay);
     }
 
     GoogleMap.OnMapClickListener photoMapClickListener =
         new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                showActionBar();
-                hideActionBar();
+                if(mActionBar.isShowing()) hideActionBar();
+                else showActionBar(true);
             }
         };
 
@@ -267,7 +272,7 @@ public class PhotoMapFragment extends MapFragment {
                     mMap.animateCamera(cameraUpdate, cancelableCallback);
                     return;
                 }
-                showActionBar();
+                showActionBar(false);
                 getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null,photoListLoaderCallback);
             }
@@ -365,7 +370,7 @@ public class PhotoMapFragment extends MapFragment {
                 else{
                     mMap.clear();
                     if(sharedMarker!=null)mMap.addMarker(sharedMarker);
-                    hideActionBar();
+                    hideActionBarDelayed(HIDE_DELAY);
                 }
             }
 
@@ -385,7 +390,7 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
                 endProgress();
-                hideActionBar();
+                hideActionBarDelayed(HIDE_DELAY);
                 if(mGroup==null || !mGroup.equals(data)){
                     mGroup = data;
                     mMap.clear();
