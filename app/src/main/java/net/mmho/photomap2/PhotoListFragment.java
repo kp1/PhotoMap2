@@ -77,14 +77,8 @@ public class PhotoListFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if(newest){
-            menu.getItem(0).setEnabled(false);
-            menu.getItem(1).setEnabled(true);
-        }
-        else{
-            menu.getItem(0).setEnabled(true);
-            menu.getItem(1).setEnabled(false);
-        }
+        menu.findItem(R.id.newest).setEnabled(!newest);
+        menu.findItem(R.id.oldest).setEnabled(newest);
     }
 
     @Override

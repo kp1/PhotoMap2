@@ -75,7 +75,6 @@ public class PhotoMapFragment extends MapFragment {
         }
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.photo_map_menu,menu);
