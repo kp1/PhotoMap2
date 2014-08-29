@@ -20,13 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.GridView;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 public class PhotoListFragment extends Fragment {
+    private String TAG = "PhotoListFragment";
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
-
     private static final int ADAPTER_LOADER_ID = 1000;
 
     private Cursor mCursor;
@@ -35,6 +39,8 @@ public class PhotoListFragment extends Fragment {
     private boolean newest = true;
     private int progress;
     private int geo_progress;
+    private MenuItem search;
+    private GridView list;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,8 +60,38 @@ public class PhotoListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.photo_list_menu,menu);
+        inflater.inflate(R.menu.photo_list_menu, menu);
+
+        search = menu.findItem(R.id.search);
+        SearchView view = (SearchView) search.getActionView();
+        view.setOnQueryTextListener(onQueryTextListener);
+        view.setOnQueryTextFocusChangeListener(onFocusChangeListener);
     }
+
+    final private SearchView.OnQueryTextListener onQueryTextListener =
+            new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    Toast.makeText(getActivity().getApplicationContext(),query,Toast.LENGTH_LONG).show();
+                    Filter filter=((Filterable)list.getAdapter()).getFilter();
+                    filter.filter(query);
+                    search.collapseActionView();
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            };
+
+    final private SearchView.OnFocusChangeListener onFocusChangeListener =
+            new SearchView.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus)search.collapseActionView();
+                }
+            };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -86,9 +122,10 @@ public class PhotoListFragment extends Fragment {
         View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
 
         // photo list
-        GridView list = (GridView)parent.findViewById(R.id.list);
+        list = (GridView)parent.findViewById(R.id.list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(onItemClickListener);
+        list.setTextFilterEnabled(true);
 
         DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
         ActionBar bar = getActivity().getActionBar();
@@ -219,6 +256,7 @@ public class PhotoListFragment extends Fragment {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
+            search.collapseActionView();
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }

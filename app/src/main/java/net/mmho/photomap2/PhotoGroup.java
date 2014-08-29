@@ -57,9 +57,17 @@ public class PhotoGroup implements Parcelable{
         return area;
     }
 
-    public String toString() {
+    public String locationToString() {
         LatLng c = area.getCenter();
         return String.format("% 8.5f , % 8.5f", c.latitude, c.longitude);
+    }
+
+    public String toString(){
+        if(address==null) return "";
+        StringBuilder builder = new StringBuilder();
+        int index = address.getMaxAddressLineIndex();
+        for(int i=0;i<=index;i++) builder.append(address.getAddressLine(i));
+        return builder.toString();
     }
 
     public int size(){

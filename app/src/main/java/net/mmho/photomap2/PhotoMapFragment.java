@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -84,6 +85,7 @@ public class PhotoMapFragment extends MapFragment {
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchMenuItem = menu.findItem(R.id.search);
         searchMenuItem.setOnActionExpandListener(actionExpandListener);
+        searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
     }
 
@@ -116,6 +118,14 @@ public class PhotoMapFragment extends MapFragment {
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     return false;
+                }
+            };
+
+    final private SearchView.OnFocusChangeListener onFocusChangeListener =
+            new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if(!hasFocus) searchMenuItem.collapseActionView();
                 }
             };
 

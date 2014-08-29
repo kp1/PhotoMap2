@@ -44,4 +44,5 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
         return v;
     }
+
 }
