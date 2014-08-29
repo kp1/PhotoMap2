@@ -8,24 +8,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
 public class PhotoViewActivity extends Activity {
 
-    private static final String TAG = "PhotoViewActivity";
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
 
     private PhotoViewAdapter adapter;
     private ViewPager pager;
-    private boolean show_map = false;
     private long HIDE_DELAY=3*1000;
 
     @Override
@@ -70,7 +64,6 @@ public class PhotoViewActivity extends Activity {
     private void showActionBar(boolean hide) {
         ActionBar bar = getActionBar();
         if(bar!=null) bar.show();
-        // show ever if delay is 0.
         if(!hide) handler.removeCallbacks(runnable);
         else hideActionBarDelayed(HIDE_DELAY);
     }
@@ -116,16 +109,6 @@ public class PhotoViewActivity extends Activity {
         return true;
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.show_map).setVisible(!show_map);
-        menu.findItem(R.id.hide_map).setVisible(show_map);
-        if(GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)!=ConnectionResult.SUCCESS){
-            menu.findItem(R.id.show_map).setEnabled(false);
-        }
-        return true;
-    }
-
     private void setUri(Intent intent){
         final long image_id = adapter.getItemID(pager.getCurrentItem());
         final Uri uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -150,12 +133,6 @@ public class PhotoViewActivity extends Activity {
             setUri(intent);
             startActivity(intent);
             return true;
-        case R.id.show_map:
-            show_map = true;
-            break;
-        case R.id.hide_map:
-            show_map = false;
-            break;
         }
         return super.onOptionsItemSelected(item);
     }
