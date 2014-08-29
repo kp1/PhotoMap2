@@ -41,7 +41,7 @@ public class PhotoViewActivity extends Activity {
         requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
 
-        showActionBar();
+        showActionBar(HIDE_DELAY);
         ActionBar bar = getActionBar();
         if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
@@ -67,10 +67,12 @@ public class PhotoViewActivity extends Activity {
         }
     };
 
-    private void showActionBar() {
+    private void showActionBar(long delay) {
         ActionBar bar = getActionBar();
         if(bar!=null) bar.show();
-        hideActionBarDelayed(HIDE_DELAY);
+        // show ever if delay is 0.
+        if(delay==0) handler.removeCallbacks(runnable);
+        else hideActionBarDelayed(delay);
     }
 
     private void hideActionBar(){
@@ -91,7 +93,7 @@ public class PhotoViewActivity extends Activity {
                 @Override
                 public void onMenuVisibilityChanged(boolean isVisible) {
                     if(isVisible){
-                        handler.removeCallbacks(runnable);
+                        showActionBar(0);
                     }
                     else{
                         hideActionBarDelayed(HIDE_DELAY);
@@ -106,7 +108,7 @@ public class PhotoViewActivity extends Activity {
                     ActionBar bar = getActionBar();
                     if(bar!=null){
                         if(bar.isShowing()) hideActionBar();
-                        else showActionBar();
+                        else showActionBar(HIDE_DELAY);
                     }
                 }
             };
