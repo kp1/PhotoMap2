@@ -2,13 +2,13 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
@@ -18,12 +18,17 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private LoaderManager manager;
     private int loader_id;
 
-    public PhotoListAdapter(Context context, int resource, List<PhotoGroup> objects,LoaderManager m,int loader_id_base) {
+    private AddressFilter filter;
+    private ArrayList<PhotoGroup> mOriginalValues;
+    private ArrayList<PhotoGroup> mObjects;
+
+    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LoaderManager m,int loader_id_base) {
         super(context, resource, objects);
         this.resource = resource;
         manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         loader_id = loader_id_base;
+        mObjects = objects;
     }
 
     @Override
@@ -43,6 +48,57 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         ((PhotoCardLayout)v).setData(g, id, manager);
 
         return v;
+    }
+
+    @Override
+    public AddressFilter getFilter() {
+        if(filter==null) filter = new AddressFilter();
+        return filter;
+    }
+
+    public void clear(){
+        super.clear();
+        mOriginalValues = null;
+    }
+
+    private void clearData(){
+        super.clear();
+    }
+
+    private class AddressFilter extends Filter{
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults result = new FilterResults();
+            if(mOriginalValues==null){
+                mOriginalValues = new ArrayList<PhotoGroup>(mObjects);
+            }
+            if(constraint==null || constraint.length()==0){
+                result.count = mOriginalValues.size();
+                result.values = mOriginalValues;
+            }
+            else{
+                ArrayList<PhotoGroup> filtered = new ArrayList<PhotoGroup>();
+                for(PhotoGroup group:mOriginalValues){
+                    if(group.toString().contains(String.format("%s", constraint))){
+                        filtered.add(group);
+                    }
+                }
+                result.count = filtered.size();
+                result.values = filtered;
+            }
+            return result;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            notifyDataSetInvalidated();
+            clearData();
+            ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;
+            addAll(list);
+            notifyDataSetChanged();
+        }
     }
 
 }

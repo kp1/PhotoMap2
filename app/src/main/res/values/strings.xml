@@ -14,4 +14,5 @@
     <string name="search_title">%1$s is …</string>
     <string name="show_map">show map</string>
     <string name="hide_map">hide map</string>
+    <string name="searched_photo">Photos in %1$s</string>
 </resources>

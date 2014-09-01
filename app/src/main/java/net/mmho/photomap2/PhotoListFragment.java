@@ -24,7 +24,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 import android.widget.SearchView;
-import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class PhotoListFragment extends Fragment {
     private String TAG = "PhotoListFragment";
@@ -34,7 +35,7 @@ public class PhotoListFragment extends Fragment {
     private static final int ADAPTER_LOADER_ID = 1000;
 
     private Cursor mCursor;
-    private  PhotoListAdapter adapter;
+    private PhotoListAdapter adapter;
     private int distance_index;
     private boolean newest = true;
     private int progress;
@@ -49,7 +50,7 @@ public class PhotoListFragment extends Fragment {
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new PhotoGroupList(null),getLoaderManager(),ADAPTER_LOADER_ID);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
         }
@@ -72,16 +73,16 @@ public class PhotoListFragment extends Fragment {
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    Toast.makeText(getActivity().getApplicationContext(),query,Toast.LENGTH_LONG).show();
-                    Filter filter=((Filterable)list.getAdapter()).getFilter();
-                    filter.filter(query);
                     search.collapseActionView();
+                    getActivity().setTitle(getString(R.string.searched_photo,query));
                     return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    return false;
+                    Filter filter=((Filterable)list.getAdapter()).getFilter();
+                    filter.filter(newText);
+                    return true;
                 }
             };
 
@@ -212,8 +213,8 @@ public class PhotoListFragment extends Fragment {
                 Bundle b = msg.getData();
                 PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
                 adapter.add(g);
-                adapter.notifyDataSetChanged();
             case PhotoGroupList.MESSAGE_APPEND:
+                adapter.notifyDataSetChanged();
                 progress++;
                 setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 break;
