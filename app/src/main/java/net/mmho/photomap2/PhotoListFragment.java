@@ -42,6 +42,7 @@ public class PhotoListFragment extends Fragment {
     private int geo_progress;
     private MenuItem search;
     private GridView list;
+    private boolean loaded = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,7 @@ public class PhotoListFragment extends Fragment {
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
+            getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
             distance_index = DistanceAdapter.initial();
@@ -64,9 +66,10 @@ public class PhotoListFragment extends Fragment {
         inflater.inflate(R.menu.photo_list_menu, menu);
 
         search = menu.findItem(R.id.search);
-        SearchView view = (SearchView) search.getActionView();
-        view.setOnQueryTextListener(onQueryTextListener);
-        view.setOnQueryTextFocusChangeListener(onFocusChangeListener);
+        SearchView searchView = (SearchView) search.getActionView();
+        searchView.setQueryHint(getString(R.string.search_list));
+        searchView.setOnQueryTextListener(onQueryTextListener);
+        searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
     }
 
     final private SearchView.OnQueryTextListener onQueryTextListener =
@@ -74,7 +77,6 @@ public class PhotoListFragment extends Fragment {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     search.collapseActionView();
-                    getActivity().setTitle(getString(R.string.searched_photo,query));
                     return true;
                 }
 
@@ -82,6 +84,12 @@ public class PhotoListFragment extends Fragment {
                 public boolean onQueryTextChange(String newText) {
                     Filter filter=((Filterable)list.getAdapter()).getFilter();
                     filter.filter(newText);
+                    if(newText!=null && newText.length()>0) {
+                        getActivity().setTitle(getString(R.string.searched_photo, newText));
+                    }
+                    else{
+                        getActivity().setTitle(getString(R.string.app_name));
+                    }
                     return true;
                 }
             };
@@ -90,9 +98,11 @@ public class PhotoListFragment extends Fragment {
             new SearchView.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
-                    if(!hasFocus)search.collapseActionView();
+                    if(!hasFocus) search.collapseActionView();
                 }
             };
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -116,6 +126,7 @@ public class PhotoListFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.newest).setEnabled(!newest);
         menu.findItem(R.id.oldest).setEnabled(newest);
+        menu.findItem(R.id.search).setEnabled(loaded);
     }
 
     @Override
@@ -143,6 +154,7 @@ public class PhotoListFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("DISTANCE",distance_index);
+        outState.putString("title",getActivity().getTitle().toString());
     }
 
     @Override
@@ -258,12 +270,16 @@ public class PhotoListFragment extends Fragment {
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
             search.collapseActionView();
+            loaded = false;
+            getActivity().invalidateOptionsMenu();
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+            loaded = true;
+            getActivity().invalidateOptionsMenu();
             endProgress();
         }
 

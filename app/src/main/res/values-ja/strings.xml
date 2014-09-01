@@ -15,4 +15,5 @@
     <string name="show_map">地図を表示</string>
     <string name="hide_map">地図を隠す</string>
     <string name="searched_photo">%1$sの写真</string>
+    <string name="search_list">住所で検索</string>
 </resources>
