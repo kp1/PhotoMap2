@@ -29,14 +29,7 @@ public class ThumbnailImageView extends ImageView{
     public void startLoading(LoaderManager manager,int loader_id,long image_id){
 
         if(image_id!=this.image_id) {
-            BitmapDrawable drawable = (BitmapDrawable) getDrawable();
-            if(drawable!=null){
-                Bitmap bitmap = drawable.getBitmap();
-                if(bitmap!=null){
-                    bitmap.recycle();
-                    setImageBitmap(null);
-                }
-            }
+            setImageBitmap(null);
             this.image_id = image_id;
             Bundle b = new Bundle();
             b.putLong(EXTRA_ID, image_id);

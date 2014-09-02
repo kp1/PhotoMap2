@@ -64,6 +64,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
                 option.inSampleSize = scale;
                 option.inJustDecodeBounds = false;
+                option.inPreferredConfig = Bitmap.Config.RGB_565;
                 bmp = BitmapFactory.decodeFile(path, option);
             }
 
