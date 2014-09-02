@@ -2,6 +2,8 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,6 @@ import java.util.ArrayList;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
-    private static final String TAG = "PhotoListAdapter";
     private int resource;
     private LayoutInflater inflater;
     private LoaderManager manager;
@@ -22,13 +23,16 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private ArrayList<PhotoGroup> mOriginalValues;
     private ArrayList<PhotoGroup> mObjects;
 
-    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LoaderManager m,int loader_id_base) {
+    private LruCache<Long,Bitmap> mBitmapCache;
+
+    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LoaderManager m,int loader_id_base,LruCache<Long,Bitmap> cache) {
         super(context, resource, objects);
         this.resource = resource;
         manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         loader_id = loader_id_base;
         mObjects = objects;
+        mBitmapCache = cache;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             v.setTag(id);
         }
         PhotoGroup g = getItem(position);
-        ((PhotoCardLayout)v).setData(g, id, manager);
+        ((PhotoCardLayout)v).setData(g, id, manager,mBitmapCache);
 
         return v;
     }

@@ -3,8 +3,10 @@ package net.mmho.photomap2;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.util.AttributeSet;
+import android.util.LruCache;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -75,12 +77,12 @@ public class PhotoCardLayout extends RelativeLayout{
             }
         };
 
-    public void setData(PhotoGroup g, int loader_id, LoaderManager manager){
+    public void setData(PhotoGroup g, int loader_id, LoaderManager manager,LruCache<Long,Bitmap> cache){
         group = g;
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(manager,loader_id,g.getID(0));
+        thumbnail.startLoading(manager,loader_id,g.getID(0),cache);
 
         Address address = g.address;
         if(address==null) {

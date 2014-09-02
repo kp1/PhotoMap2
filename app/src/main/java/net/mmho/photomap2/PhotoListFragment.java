@@ -7,12 +7,14 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,6 +49,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean filtered;
     private String query="";
 
+    private LruCache<Long,Bitmap> mBitmapCache;
+
     public void onBackPressed() {
         if(filtered) resetFilter(true);
         else getActivity().finish();
@@ -60,7 +64,17 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID);
+        final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
+        final int cacheSize = maxMemory/8;
+        Log.d(TAG, "cache size:"+cacheSize);
+        mBitmapCache = new LruCache<Long, Bitmap>(cacheSize){
+            @Override
+            protected int sizeOf(Long key, Bitmap value) {
+                return value.getByteCount()/1024;
+            }
+        };
+
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID,mBitmapCache);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
@@ -192,7 +206,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG,"onActivityCreated():"+savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
         if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
             getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);

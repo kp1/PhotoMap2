@@ -2,7 +2,8 @@ package net.mmho.photomap2;
 
 import android.app.LoaderManager;
 import android.content.Context;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,18 +13,19 @@ import java.util.List;
 
 public class ThumbnailAdapter extends ArrayAdapter<Long>{
 
-    private static final String TAG = "ThumbnailAdapter";
     private int resource;
     private LayoutInflater inflater;
     private LoaderManager manager;
     private int loader_id;
+    private LruCache<Long,Bitmap> mBitmapCache;
 
-    public ThumbnailAdapter(Context c, int resource, List<Long> objects,LoaderManager m,int loader_id_base) {
+    public ThumbnailAdapter(Context c, int resource, List<Long> objects,LoaderManager m,int loader_id_base,LruCache<Long,Bitmap> cache) {
         super(c, resource, objects);
         this.resource = resource;
         manager = m;
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         loader_id = loader_id_base;
+        mBitmapCache = cache;
     }
 
     private class ViewHolder{
@@ -49,7 +51,7 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
             v.setTag(R.id.thumbnail,id);
         }
 
-        holder.thumbnail.startLoading(manager,id,getItem(position));
+        holder.thumbnail.startLoading(manager,id,getItem(position),mBitmapCache);
 
         return v;
     }

@@ -6,6 +6,7 @@ import android.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.LruCache;
 import android.widget.ImageView;
 
 public class ThumbnailImageView extends ImageView{
@@ -13,6 +14,7 @@ public class ThumbnailImageView extends ImageView{
     private static final java.lang.String EXTRA_ID = "thumbnail_id";
     private long image_id = -1;
     private LoaderManager manager;
+    private LruCache<Long,Bitmap> mBitmapCache;
 
     public ThumbnailImageView(Context context) {
         super(context);
@@ -26,12 +28,21 @@ public class ThumbnailImageView extends ImageView{
         super(context, attrs, defStyle);
     }
 
-    public void startLoading(LoaderManager manager,int loader_id,long image_id){
+    public void startLoading(LoaderManager manager,int loader_id,long image_id,LruCache<Long,Bitmap> cache){
 
         if(image_id!=this.image_id) {
-            setImageDrawable(null);
             this.image_id = image_id;
             this.manager = manager;
+            mBitmapCache = cache;
+
+            Bitmap bmp = null;
+            if(mBitmapCache!=null ) bmp = cache.get(image_id);
+            if(bmp!=null){
+                setImageBitmap(bmp);
+                return;
+            }
+
+            setImageDrawable(null);
             Bundle b = new Bundle();
             b.putLong(EXTRA_ID, image_id);
             manager.restartLoader(loader_id, b,this.loaderCallbacks);
@@ -54,6 +65,7 @@ public class ThumbnailImageView extends ImageView{
             @Override
             public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
                 setImageBitmap(data);
+                if(mBitmapCache!=null)mBitmapCache.put(image_id,data);
                 manager.destroyLoader(loader.getId());
             }
 
