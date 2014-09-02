@@ -66,7 +66,11 @@ public class PhotoGroup implements Parcelable{
         if(address==null) return "";
         StringBuilder builder = new StringBuilder();
         int index = address.getMaxAddressLineIndex();
-        for(int i=0;i<=index;i++) builder.append(address.getAddressLine(i));
+        for(int i=0;i<=index;i++) builder.append(address.getAddressLine(i)).append(" ");
+        if(address.getAdminArea()!=null) builder.append(address.getLocality()).append(" ");
+        if(address.getSubAdminArea()!=null) builder.append(address.getSubAdminArea()).append(" ");
+        if(address.getAdminArea()!=null) builder.append(address.getAdminArea()).append(" ");
+        if(address.getCountryCode()!=null) builder.append(address.getCountryCode()).append(" ");
         return builder.toString();
     }
 

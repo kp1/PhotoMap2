@@ -45,6 +45,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private GridView list;
     private boolean loaded = true;
     private boolean filtered;
+    private String query="";
 
     public void onBackPressed() {
         if(filtered) resetFilter();
@@ -101,6 +102,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     filtered = true;
+                    PhotoListFragment.this.query = query;
+                    getActivity().setTitle(getString(R.string.filtered,query));
                     search.collapseActionView();
                     return true;
                 }
@@ -124,9 +127,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
     private void resetFilter(){
+        query = "";
         getActivity().setTitle(getString(R.string.app_name));
         Filter filter=((Filterable)list.getAdapter()).getFilter();
-        filter.filter("");
+        filter.filter(query);
         filtered = false;
     }
 
@@ -186,9 +190,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Log.d(TAG,"onActivityCreated():"+savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
         if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
             getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+        if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
     ActionBar.OnNavigationListener onNavigationListener =

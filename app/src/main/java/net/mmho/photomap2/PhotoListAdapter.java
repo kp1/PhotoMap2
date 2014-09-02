@@ -80,7 +80,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             else{
                 ArrayList<PhotoGroup> filtered = new ArrayList<PhotoGroup>();
                 for(PhotoGroup group:mOriginalValues){
-                    if(group.toString().contains(String.format("%s", constraint))){
+                    if(group.toString().toLowerCase().contains(String.format("%s", constraint.toString().toLowerCase()))){
                         filtered.add(group);
                     }
                 }
