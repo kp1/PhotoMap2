@@ -65,7 +65,7 @@ public class ThumbnailImageView extends ImageView{
             @Override
             public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
                 setImageBitmap(data);
-                if(mBitmapCache!=null)mBitmapCache.put(image_id,data);
+                if(mBitmapCache!=null)mBitmapCache.put(((PhotoImageLoader)loader).getImageId(),data);
                 manager.destroyLoader(loader.getId());
             }
 

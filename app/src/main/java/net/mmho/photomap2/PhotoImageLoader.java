@@ -23,6 +23,10 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
         onContentChanged();
     }
 
+    public long getImageId(){
+        return image_id;
+    }
+
     @Override
     public Bitmap loadInBackground() {
 
