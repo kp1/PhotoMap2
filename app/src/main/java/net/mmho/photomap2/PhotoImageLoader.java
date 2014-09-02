@@ -12,15 +12,12 @@ import android.provider.MediaStore;
 public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
     private long image_id;
-    private Context context;
-    private Bitmap bitmap;
     private int width;
     private boolean thumbnail;
 
     public PhotoImageLoader(Context context, long image_id,int width,boolean thumbnail) {
         super(context);
         this.image_id = image_id;
-        this.context = context;
         this.width = width;
         this.thumbnail = thumbnail;
         onContentChanged();
@@ -35,7 +32,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
                 MediaStore.Images.ImageColumns.DATA,
         };
         final Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Cursor c = MediaStore.Images.Media.query(context.getContentResolver(), uri, projection,
+        Cursor c = MediaStore.Images.Media.query(getContext().getContentResolver(), uri, projection,
                 QueryBuilder.createQuery(image_id), null, null);
 
         Bitmap bmp = null;
@@ -82,7 +79,6 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
     @Override
     public void deliverResult(Bitmap data) {
-        bitmap = data;
         if(isStarted()) {
             super.deliverResult(data);
         }
@@ -90,10 +86,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
     @Override
     protected void onStartLoading() {
-        if(bitmap!=null){
-            deliverResult(bitmap);
-        }
-        if(takeContentChanged() || bitmap==null){
+        if(takeContentChanged()){
             forceLoad();
         }
     }
@@ -107,7 +100,5 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
     protected void onReset() {
         super.onReset();
         onStopLoading();
-        if(bitmap!=null) bitmap.recycle();
-        bitmap = null;
     }
 }

@@ -4,7 +4,6 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.widget.ImageView;
@@ -13,6 +12,7 @@ public class ThumbnailImageView extends ImageView{
 
     private static final java.lang.String EXTRA_ID = "thumbnail_id";
     private long image_id = -1;
+    private LoaderManager manager;
 
     public ThumbnailImageView(Context context) {
         super(context);
@@ -29,11 +29,11 @@ public class ThumbnailImageView extends ImageView{
     public void startLoading(LoaderManager manager,int loader_id,long image_id){
 
         if(image_id!=this.image_id) {
-            setImageBitmap(null);
+            setImageDrawable(null);
             this.image_id = image_id;
+            this.manager = manager;
             Bundle b = new Bundle();
             b.putLong(EXTRA_ID, image_id);
-            manager.destroyLoader(loader_id);
             manager.restartLoader(loader_id, b,this.loaderCallbacks);
         }
     }
@@ -54,6 +54,7 @@ public class ThumbnailImageView extends ImageView{
             @Override
             public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
                 setImageBitmap(data);
+                manager.destroyLoader(loader.getId());
             }
 
             @Override

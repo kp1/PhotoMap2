@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 public class PhotoImageView extends ImageView{
@@ -16,6 +15,7 @@ public class PhotoImageView extends ImageView{
     private static final String EXTRA_IMAGE = "image";
     private static final String EXTRA_WIDTH = "width";
     private long image_id = -1;
+    private LoaderManager manager;
 
     public PhotoImageView(Context context) {
         super(context);
@@ -37,6 +37,7 @@ public class PhotoImageView extends ImageView{
     public void startLoading(final LoaderManager manager, final int loader_id, long id){
         if(image_id!=id){
             image_id = id;
+            this.manager = manager;
             post(new Runnable() {
                 @Override
                 public void run() {
@@ -58,6 +59,7 @@ public class PhotoImageView extends ImageView{
             @Override
             public void onLoadFinished(Loader<Bitmap> loader, Bitmap data) {
                 setImageBitmap(data);
+                manager.destroyLoader(loader.getId());
             }
 
             @Override
