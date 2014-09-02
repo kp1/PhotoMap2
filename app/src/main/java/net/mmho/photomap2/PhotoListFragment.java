@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +28,7 @@ import android.widget.SearchView;
 
 import java.util.ArrayList;
 
-public class PhotoListFragment extends Fragment {
+public class PhotoListFragment extends Fragment implements BackPressedListener{
     private String TAG = "PhotoListFragment";
 
     private static final int CURSOR_LOADER_ID = 0;
@@ -43,6 +44,13 @@ public class PhotoListFragment extends Fragment {
     private MenuItem search;
     private GridView list;
     private boolean loaded = true;
+    private boolean filtered;
+
+    public void onBackPressed() {
+        if(filtered) resetFilter();
+        else getActivity().finish();
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,16 +74,33 @@ public class PhotoListFragment extends Fragment {
         inflater.inflate(R.menu.photo_list_menu, menu);
 
         search = menu.findItem(R.id.search);
+        search.setOnActionExpandListener(onActionExpandListener);
         SearchView searchView = (SearchView) search.getActionView();
         searchView.setQueryHint(getString(R.string.search_list));
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
     }
 
+    final private MenuItem.OnActionExpandListener onActionExpandListener =
+            new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    filtered = false;
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    if(!filtered) resetFilter();
+                    return true;
+                }
+            };
+
     final private SearchView.OnQueryTextListener onQueryTextListener =
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
+                    filtered = true;
                     search.collapseActionView();
                     return true;
                 }
@@ -84,12 +109,6 @@ public class PhotoListFragment extends Fragment {
                 public boolean onQueryTextChange(String newText) {
                     Filter filter=((Filterable)list.getAdapter()).getFilter();
                     filter.filter(newText);
-                    if(newText!=null && newText.length()>0) {
-                        getActivity().setTitle(getString(R.string.searched_photo, newText));
-                    }
-                    else{
-                        getActivity().setTitle(getString(R.string.app_name));
-                    }
                     return true;
                 }
             };
@@ -103,6 +122,13 @@ public class PhotoListFragment extends Fragment {
             };
 
 
+
+    private void resetFilter(){
+        getActivity().setTitle(getString(R.string.app_name));
+        Filter filter=((Filterable)list.getAdapter()).getFilter();
+        filter.filter("");
+        filtered = false;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -269,9 +295,9 @@ public class PhotoListFragment extends Fragment {
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
-            search.collapseActionView();
+            if(search.isActionViewExpanded())search.collapseActionView();
+            resetFilter();
             loaded = false;
-            getActivity().invalidateOptionsMenu();
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
         }
@@ -279,7 +305,6 @@ public class PhotoListFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
             loaded = true;
-            getActivity().invalidateOptionsMenu();
             endProgress();
         }
 

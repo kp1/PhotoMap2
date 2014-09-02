@@ -27,4 +27,15 @@ public class PhotoListActivity extends Activity {
             fragmentTransaction.commit();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
+        if(fragment!=null && fragment instanceof BackPressedListener){
+            ((BackPressedListener) fragment).onBackPressed();
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
 }
