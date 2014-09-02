@@ -36,7 +36,7 @@ public class ThumbnailImageView extends ImageView{
             mBitmapCache = cache;
 
             Bitmap bmp = null;
-            if(mBitmapCache!=null ) bmp = cache.get(image_id);
+            if(cache!=null) bmp = cache.get(image_id);
             if(bmp!=null){
                 setImageBitmap(bmp);
                 return;

@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
@@ -15,9 +14,6 @@ public class PhotoListActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         requestWindowFeature(Window.FEATURE_PROGRESS);
-
-        ActionBar bar = getActionBar();
-        if(bar!=null) bar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
         Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
         if(fragment==null){

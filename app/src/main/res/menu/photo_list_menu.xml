@@ -9,6 +9,12 @@
         android:id="@+id/oldest"
         android:title="@string/oldest"/>
     <item
+        android:id="@+id/distance"
+        android:title="@string/change_distance">
+        <menu>
+        </menu>
+    </item>
+    <item
         android:id="@+id/search"
         android:title="@string/search_map"
         android:icon="@drawable/ic_action_search"

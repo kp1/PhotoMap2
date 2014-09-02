@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -49,8 +50,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean filtered;
     private String query="";
 
-    private LruCache<Long,Bitmap> mBitmapCache;
-
     public void onBackPressed() {
         if(filtered) resetFilter(true);
         else getActivity().finish();
@@ -67,26 +66,33 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
         final int cacheSize = maxMemory/8;
         Log.d(TAG, "cache size:"+cacheSize);
-        mBitmapCache = new LruCache<Long, Bitmap>(cacheSize){
+        LruCache<Long, Bitmap> mBitmapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
-                return value.getByteCount()/1024;
+                return value.getByteCount() / 1024;
             }
         };
 
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID,mBitmapCache);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
-            distance_index = DistanceAdapter.initial();
+            distance_index = DistanceUtils.initial();
         }
     }
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.photo_list_menu, menu);
+
+        SubMenu sub = menu.findItem(R.id.distance).getSubMenu();
+
+        for(int i=0,l=DistanceUtils.size();i<l;i++){
+            sub.add(i+1,Menu.NONE,Menu.NONE,DistanceUtils.pretty(i));
+        }
 
         search = menu.findItem(R.id.search);
         search.setOnActionExpandListener(onActionExpandListener);
@@ -140,10 +146,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
 
-    private void resetFilter(boolean requery){
+    private void resetFilter(boolean reQuery){
         query = "";
         getActivity().setTitle(getString(R.string.app_name));
-        if(requery) {
+        if(reQuery) {
             Filter filter = ((Filterable) list.getAdapter()).getFilter();
             filter.filter(query);
         }
@@ -156,15 +162,30 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         case R.id.oldest:
             newest = false;
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-            break;
+            return true;
         case R.id.newest:
             newest = true;
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-            break;
+            return true;
+        case R.id.distance:
+            return true;
         default:
-            return super.onOptionsItemSelected(item);
+            int id = item.getGroupId();
+            Log.d(TAG,"ID:"+id);
+            if(id==0) return super.onOptionsItemSelected(item);
+            id--;
+            if(id!=distance_index) {
+                distance_index = id;
+                if(mCursor==null || mCursor.isClosed()) {
+                    getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+                }
+                else {
+                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+                }
+            }
+            return true;
         }
-        return true;
     }
 
     @Override
@@ -185,13 +206,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         list.setOnItemClickListener(onItemClickListener);
         list.setTextFilterEnabled(true);
 
-        DistanceAdapter distanceAdapter = new DistanceAdapter(getActivity().getApplicationContext(), android.R.layout.simple_spinner_dropdown_item);
-        ActionBar bar = getActivity().getActionBar();
-        if(bar!=null) {
-            bar.setListNavigationCallbacks(distanceAdapter, onNavigationListener);
-            bar.setSelectedNavigationItem(distance_index);
-        }
-
         return parent;
 
     }
@@ -211,24 +225,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
         if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
-
-    ActionBar.OnNavigationListener onNavigationListener =
-            new ActionBar.OnNavigationListener() {
-                @Override
-                public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-                    if(itemPosition!=distance_index) {
-                        distance_index = itemPosition;
-                        if(mCursor==null || mCursor.isClosed()) {
-                            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-                        }
-                        else {
-                            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-                        }
-                    }
-                    return true;
-                }
-            };
 
     AdapterView.OnItemClickListener onItemClickListener=
             new AdapterView.OnItemClickListener() {
@@ -320,7 +316,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),mCursor,
-                    DistanceAdapter.getDistance(distance_index),true, handler);
+                    DistanceUtils.getDistance(distance_index),true, handler);
         }
 
         @Override
