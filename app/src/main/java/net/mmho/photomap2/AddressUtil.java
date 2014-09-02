@@ -32,13 +32,15 @@ public class AddressUtil {
     }
 
     static public String getDescription(Address address){
-        String description;
-        if(address.getMaxAddressLineIndex()>0){
-            description = address.getAddressLine(1);
+        StringBuilder description = new StringBuilder();
+        if(address.getMaxAddressLineIndex()==0){
+            description.append(address.getAddressLine(0));
         }
         else{
-            description = address.getAddressLine(0);
+            for(int i=1,l=address.getMaxAddressLineIndex();i<=l;i++){
+                description.append(address.getAddressLine(i)).append(" ");
+            }
         }
-        return removePostalCode(description);
+        return removePostalCode(description.toString());
     }
 }
