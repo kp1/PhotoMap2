@@ -93,6 +93,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
+            if(mOriginalValues==null) return;
             notifyDataSetInvalidated();
             clearData();
             ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;

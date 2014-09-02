@@ -48,7 +48,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private String query="";
 
     public void onBackPressed() {
-        if(filtered) resetFilter();
+        if(filtered) resetFilter(true);
         else getActivity().finish();
     }
 
@@ -92,7 +92,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    if(!filtered) resetFilter();
+                    if(!filtered) resetFilter(true);
                     return true;
                 }
             };
@@ -126,11 +126,13 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
 
-    private void resetFilter(){
+    private void resetFilter(boolean requery){
         query = "";
         getActivity().setTitle(getString(R.string.app_name));
-        Filter filter=((Filterable)list.getAdapter()).getFilter();
-        filter.filter(query);
+        if(requery) {
+            Filter filter = ((Filterable) list.getAdapter()).getFilter();
+            filter.filter(query);
+        }
         filtered = false;
     }
 
@@ -302,7 +304,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
             if(search.isActionViewExpanded())search.collapseActionView();
-            resetFilter();
+            resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),mCursor,
                     DistanceAdapter.getDistance(distance_index),true, handler);
