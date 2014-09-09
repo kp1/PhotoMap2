@@ -106,6 +106,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             new MenuItem.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
+                    if(!loaded) return false;
                     filtered = false;
                     return true;
                 }
