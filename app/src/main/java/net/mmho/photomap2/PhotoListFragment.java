@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -13,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +30,6 @@ import android.widget.SearchView;
 import java.util.ArrayList;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
-    private String TAG = "PhotoListFragment";
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
@@ -46,7 +43,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private int geo_progress;
     private MenuItem search;
     private GridView list;
-    private boolean loaded = true;
+    private boolean loaded = false;
     private boolean filtered;
     private String query="";
 
@@ -65,7 +62,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
         final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
         final int cacheSize = maxMemory/8;
-        Log.d(TAG, "cache size:"+cacheSize);
         LruCache<Long, Bitmap> mBitmapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
@@ -100,6 +96,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         searchView.setQueryHint(getString(R.string.search_list));
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
+
     }
 
     final private MenuItem.OnActionExpandListener onActionExpandListener =
@@ -131,8 +128,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
-                    Filter filter=((Filterable)list.getAdapter()).getFilter();
-                    filter.filter(newText);
+                    if(!filtered) {
+                        Filter filter = ((Filterable) list.getAdapter()).getFilter();
+                        filter.filter(newText);
+                    }
                     return true;
                 }
             };
@@ -172,7 +171,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             return true;
         default:
             int id = item.getGroupId();
-            Log.d(TAG,"ID:"+id);
             if(id==0) return super.onOptionsItemSelected(item);
             id--;
             if(id!=distance_index) {
@@ -194,7 +192,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.newest).setEnabled(!newest);
         menu.findItem(R.id.oldest).setEnabled(newest);
-        menu.findItem(R.id.search).setEnabled(loaded);
     }
 
     @Override
@@ -246,11 +243,13 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             };
 
     private void setProgress(int progress){
+        if(getActivity()==null) return;
         getActivity().setProgress(progress);
         getActivity().setProgressBarVisibility(true);
     }
 
     private void endProgress(){
+        if(getActivity()==null) return;
         getActivity().setProgress(Window.PROGRESS_END);
         getActivity().setProgressBarVisibility(false);
     }
@@ -272,7 +271,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             case PhotoGroupList.MESSAGE_APPEND:
                 adapter.notifyDataSetChanged();
                 progress++;
-                setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
+                if(!mCursor.isClosed())setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
                 geo_progress++;
@@ -313,7 +312,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         @Override
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
-            if(search.isActionViewExpanded())search.collapseActionView();
+            if(search!=null) {
+                if (search.isActionViewExpanded()) search.collapseActionView();
+                search.setEnabled(false);
+            }
             resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),mCursor,
@@ -322,6 +324,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+            search.setEnabled(true);
             loaded = true;
             endProgress();
         }
