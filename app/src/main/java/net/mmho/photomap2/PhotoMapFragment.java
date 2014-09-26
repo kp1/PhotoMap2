@@ -335,12 +335,12 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     private void setProgress(int progress){
         getActivity().setProgress(progress);
-        getActivity().setProgressBarVisibility(true);
+        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(true);
     }
 
     private void endProgress(){
         getActivity().setProgress(Window.PROGRESS_END);
-        getActivity().setProgressBarVisibility(false);
+        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(false);
     }
 
     final private Handler handler = new Handler(){

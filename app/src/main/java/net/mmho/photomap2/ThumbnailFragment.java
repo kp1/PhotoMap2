@@ -21,9 +21,6 @@ public class ThumbnailFragment extends Fragment {
     private PhotoGroup group;
     private GridView list;
 
-    private LruCache<Long,Bitmap> mBitMapCache = null;
-    private String TAG="ThumbnailFragment";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,18 +29,17 @@ public class ThumbnailFragment extends Fragment {
 
         final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
         final int cacheSize = maxMemory/8;
-        Log.d(TAG, "cache size:"+cacheSize);
 
-        mBitMapCache = new LruCache<Long, Bitmap>(cacheSize) {
+        LruCache<Long, Bitmap> mBitMapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
-                return value.getByteCount() / 1024;
+                return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
 
         Bundle bundle = getArguments();
         group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group.getIDList(),getLoaderManager(),0,mBitMapCache);
+        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group.getIDList(),getLoaderManager(),0, mBitMapCache);
     }
 
 

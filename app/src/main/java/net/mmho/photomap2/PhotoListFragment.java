@@ -14,6 +14,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -65,7 +66,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         LruCache<Long, Bitmap> mBitmapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
-                return value.getByteCount() / 1024;
+                return value.getRowBytes()*value.getHeight() / 1024;
             }
         };
 
@@ -245,12 +246,12 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private void setProgress(int progress){
         getActivity().setProgress(progress);
-        getActivity().setProgressBarVisibility(true);
+        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(true);
     }
 
     private void endProgress(){
         getActivity().setProgress(Window.PROGRESS_END);
-        getActivity().setProgressBarVisibility(false);
+        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(false);
     }
 
 
