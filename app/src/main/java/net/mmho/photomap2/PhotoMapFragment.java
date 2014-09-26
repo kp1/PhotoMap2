@@ -52,7 +52,7 @@ public class PhotoMapFragment extends MapFragment {
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
-    private Cursor photoCursor;
+    private PhotoCursor photoCursor;
     private PhotoGroupList mGroup;
     private int progress;
     private MarkerOptions sharedMarker;
@@ -63,6 +63,7 @@ public class PhotoMapFragment extends MapFragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
+        mGroup = new PhotoGroupList();
 	}
 
     @Override
@@ -344,6 +345,7 @@ public class PhotoMapFragment extends MapFragment {
     final private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            if(isRemoving()) return;
             switch(msg.what){
                 case PhotoGroupList.MESSAGE_RESTART:
                     progress = 0;
@@ -371,7 +373,7 @@ public class PhotoMapFragment extends MapFragment {
 
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-                photoCursor = cursor;
+                photoCursor = new PhotoCursor(cursor);
                 if(photoCursor.getCount()!=0) {
                     getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                     getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
@@ -393,23 +395,20 @@ public class PhotoMapFragment extends MapFragment {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
                 return new PhotoGroupListLoader(getActivity(),
-                        photoCursor,getPartitionDistance(mapBounds),true,handler);
+                        mGroup,photoCursor,getPartitionDistance(mapBounds),true,handler);
             }
 
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
                 endProgress();
                 hideActionBarDelayed(HIDE_DELAY);
-                if(mGroup==null || !mGroup.equals(data)){
-                    mGroup = data;
-                    mMap.clear();
-                    for(PhotoGroup group:mGroup){
-                        MarkerOptions ops = new MarkerOptions().position(group.getCenter());
-                        ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(group.size())));
-                        group.marker = mMap.addMarker(ops);
-                    }
-                    if(sharedMarker !=null)mMap.addMarker(sharedMarker);
+                mMap.clear();
+                for(PhotoGroup group:mGroup){
+                    MarkerOptions ops = new MarkerOptions().position(group.getCenter());
+                    ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(group.size())));
+                    group.marker = mMap.addMarker(ops);
                 }
+                if(sharedMarker !=null)mMap.addMarker(sharedMarker);
             }
 
             @Override

@@ -22,24 +22,23 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_APPEND = 2;
     public static final int MESSAGE_ADDRESS = 3;
     private static final int ADDRESS_MAX_RESULTS = 1;
-    final PhotoCursor mCursor;
+
     private float distance;
     private boolean finished;
 
-    PhotoGroupList(PhotoCursor cursor){
+    PhotoGroupList(){
         clear();
-        mCursor = cursor;
         distance = 0;
         finished = false;
     }
 
-    public PhotoGroupList exec(float distance,boolean geocode,Context context,Handler handler,CancellationSignal signal){
+    public PhotoGroupList exec(PhotoCursor cursor,float distance,boolean geocode,Context context,Handler handler,CancellationSignal signal){
         clear();
 
         finished = false;
         this.distance = distance;
 
-        if(!mCursor.moveToFirst()) return this;
+        if(cursor==null || !cursor.moveToFirst()) return this;
 
         if(handler!=null){
             Message message = new Message();
@@ -51,7 +50,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             int i;
             for(i=0;i<this.size();i++){
                 if(signal!=null)signal.throwIfCanceled();
-                LatLng p = mCursor.getLocation();
+                LatLng p = cursor.getLocation();
                 boolean contains = get(i).getArea().contains(p);
                 if(!contains) {
                     LatLng c = get(i).getCenter();
@@ -62,7 +61,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                     }
                 }
                 if(contains){
-                    get(i).append(p, mCursor.getID());
+                    get(i).append(p, cursor.getID());
                     if (handler != null) {
                         handler.sendEmptyMessage(MESSAGE_APPEND);
                     }
@@ -70,7 +69,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 }
             }
             if(i==this.size()){
-                PhotoGroup g = new PhotoGroup(mCursor.getLocation(),mCursor.getID());
+                PhotoGroup g = new PhotoGroup(cursor.getLocation(),cursor.getID());
                 add(g);
                 if(handler!=null){
                     Bundle b = new Bundle();
@@ -81,7 +80,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                     handler.sendMessage(message);
                 }
             }
-        }while(mCursor.moveToNext());
+        }while(cursor.moveToNext());
 
         if(!geocode){
             finished = true;

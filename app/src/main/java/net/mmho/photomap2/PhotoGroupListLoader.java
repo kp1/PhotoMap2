@@ -2,7 +2,6 @@ package net.mmho.photomap2;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
-import android.database.Cursor;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.OperationCanceledException;
@@ -10,14 +9,16 @@ import android.os.OperationCanceledException;
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     private PhotoGroupList list;
+    private PhotoCursor cursor;
     private float distance;
     private Handler handler;
     private CancellationSignal signal;
     private boolean geocode;
 
-    public PhotoGroupListLoader(Context context,Cursor cursor,float distance,boolean geocode,Handler handler) {
+    public PhotoGroupListLoader(Context context,PhotoGroupList list,PhotoCursor cursor,float distance,boolean geocode,Handler handler) {
         super(context);
-        this.list = new PhotoGroupList(new PhotoCursor(cursor));
+        this.list = list;
+        this.cursor = cursor;
         this.distance = distance;
         this.geocode = geocode;
         this.handler = handler;
@@ -30,7 +31,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     public PhotoGroupList loadInBackground() {
         signal = new CancellationSignal();
         try {
-            list.exec(distance,geocode,getContext(), handler, signal);
+            list.exec(cursor,distance,geocode,getContext(), handler, signal);
         }
         catch (OperationCanceledException e){
             // do nothing
@@ -58,6 +59,13 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     protected void onReset() {
         if(signal!=null){
             signal.cancel();
+            do{
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }while(signal!=null);
         }
         super.onReset();
     }

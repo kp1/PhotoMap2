@@ -27,15 +27,14 @@ import android.widget.Filterable;
 import android.widget.GridView;
 import android.widget.SearchView;
 
-import java.util.ArrayList;
-
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
     private static final int ADAPTER_LOADER_ID = 1000;
 
-    private Cursor mCursor;
+    private PhotoCursor mCursor;
+    private PhotoGroupList groupList;
     private PhotoListAdapter adapter;
     private int distance_index;
     private boolean newest = true;
@@ -69,7 +68,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             }
         };
 
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,new ArrayList<PhotoGroup>(),getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
+        groupList = new PhotoGroupList();
+        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,groupList,getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
@@ -243,13 +243,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             };
 
     private void setProgress(int progress){
-        if(getActivity()==null) return;
         getActivity().setProgress(progress);
         getActivity().setProgressBarVisibility(true);
     }
 
     private void endProgress(){
-        if(getActivity()==null) return;
         getActivity().setProgress(Window.PROGRESS_END);
         getActivity().setProgressBarVisibility(false);
     }
@@ -258,20 +256,18 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            if(isRemoving()) return;
             final int PROGRESS_GROUPING_RATIO=8000;
             switch (msg.what){
             case PhotoGroupList.MESSAGE_RESTART:
+                adapter.notifyDataSetChanged();
                 setProgress(0);
-                adapter.clear();
                 break;
             case PhotoGroupList.MESSAGE_ADD:
-                Bundle b = msg.getData();
-                PhotoGroup g = b.getParcelable(PhotoGroupList.EXTRA_GROUP);
-                adapter.add(g);
             case PhotoGroupList.MESSAGE_APPEND:
                 adapter.notifyDataSetChanged();
                 progress++;
-                if(!mCursor.isClosed())setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
+                setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
                 geo_progress++;
@@ -296,7 +292,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
-                mCursor = data;
+                mCursor = new PhotoCursor(data);
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                 getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
             }
@@ -318,7 +314,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             }
             resetFilter(false);
             loaded = false;
-            return new PhotoGroupListLoader(getActivity(),mCursor,
+            return new PhotoGroupListLoader(getActivity(),groupList,mCursor,
                     DistanceUtils.getDistance(distance_index),true, handler);
         }
 
