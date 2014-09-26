@@ -1,10 +1,6 @@
 package net.mmho.photomap2;
 
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -12,7 +8,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.util.LruCache;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
-import android.widget.SearchView;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
@@ -87,20 +88,20 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         SubMenu sub = menu.findItem(R.id.distance).getSubMenu();
 
         for(int i=0,l=DistanceUtils.size();i<l;i++){
-            sub.add(i+1,Menu.NONE,Menu.NONE,DistanceUtils.pretty(i));
+            sub.add(i+1,Menu.NONE, Menu.NONE,DistanceUtils.pretty(i));
         }
 
         search = menu.findItem(R.id.search);
-        search.setOnActionExpandListener(onActionExpandListener);
-        SearchView searchView = (SearchView) search.getActionView();
+        MenuItemCompat.setOnActionExpandListener(search, onActionExpandListener);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
         searchView.setQueryHint(getString(R.string.search_list));
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
 
     }
 
-    final private MenuItem.OnActionExpandListener onActionExpandListener =
-            new MenuItem.OnActionExpandListener() {
+    final private MenuItemCompat.OnActionExpandListener onActionExpandListener =
+            new MenuItemCompat.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
                     if(!loaded) return false;
@@ -122,7 +123,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                     filtered = true;
                     PhotoListFragment.this.query = query;
                     getActivity().setTitle(getString(R.string.filtered,query));
-                    search.collapseActionView();
+                    MenuItemCompat.collapseActionView(search);
                     return true;
                 }
 
@@ -140,7 +141,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             new SearchView.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
-                    if(!hasFocus) search.collapseActionView();
+                    if(!hasFocus) MenuItemCompat.collapseActionView(search);
                 }
             };
 
@@ -308,7 +309,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
             progress = geo_progress = 0;
             if(search!=null) {
-                if (search.isActionViewExpanded()) search.collapseActionView();
+                if (MenuItemCompat.isActionViewExpanded(search)) MenuItemCompat.collapseActionView(search);
                 search.setEnabled(false);
             }
             resetFilter(false);

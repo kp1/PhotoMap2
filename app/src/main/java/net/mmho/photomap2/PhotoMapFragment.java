@@ -1,13 +1,8 @@
 package net.mmho.photomap2;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,19 +13,25 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,7 +42,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PhotoMapFragment extends MapFragment {
+public class PhotoMapFragment extends SupportMapFragment {
 	final static int PARTITION_RATIO = 6;
     final static int PHOTO_CURSOR_LOADER = 0;
     final static int PHOTO_GROUP_LOADER = 1;
@@ -70,7 +71,7 @@ public class PhotoMapFragment extends MapFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG,"onActivityResult():"+resultCode);
         switch(resultCode){
-        case Activity.RESULT_OK:
+        case ActionBarActivity.RESULT_OK:
             LatLng position = data.getExtras().getParcelable("location");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM));
             break;
@@ -82,16 +83,16 @@ public class PhotoMapFragment extends MapFragment {
         inflater.inflate(R.menu.photo_map_menu,menu);
 
         SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        SearchView searchView = (SearchView)MenuItemCompat.getActionView(menu.findItem(R.id.search));
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchMenuItem = menu.findItem(R.id.search);
-        searchMenuItem.setOnActionExpandListener(actionExpandListener);
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem,actionExpandListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
     }
 
-    final private MenuItem.OnActionExpandListener actionExpandListener =
-            new MenuItem.OnActionExpandListener() {
+    final private MenuItemCompat.OnActionExpandListener actionExpandListener =
+            new MenuItemCompat.OnActionExpandListener() {
                 @Override
                 public boolean onMenuItemActionExpand(MenuItem item) {
                     showActionBar(false);
@@ -111,7 +112,7 @@ public class PhotoMapFragment extends MapFragment {
 
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    searchMenuItem.collapseActionView();
+                    MenuItemCompat.collapseActionView(searchMenuItem);
                     requestQuery(query);
                     return true;
                 }
@@ -126,7 +127,7 @@ public class PhotoMapFragment extends MapFragment {
             new View.OnFocusChangeListener() {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
-                    if(!hasFocus) searchMenuItem.collapseActionView();
+                    if(!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem);
                 }
             };
 
@@ -232,7 +233,7 @@ public class PhotoMapFragment extends MapFragment {
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
 
-        mActionBar = getActivity().getActionBar();
+        mActionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
 
     }
 

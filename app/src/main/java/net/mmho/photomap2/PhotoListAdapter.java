@@ -1,9 +1,9 @@
 package net.mmho.photomap2;
 
-import android.app.LoaderManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.LruCache;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

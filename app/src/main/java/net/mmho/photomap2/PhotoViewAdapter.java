@@ -1,14 +1,12 @@
 package net.mmho.photomap2;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
-import android.support.v13.app.FragmentPagerAdapter;
-import android.util.Log;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
 public class PhotoViewAdapter extends FragmentPagerAdapter {
 
-    private static final String TAG = "PhotoViewAdapter";
     private PhotoGroup group;
 
     public PhotoViewAdapter(FragmentManager fm,PhotoGroup group) {

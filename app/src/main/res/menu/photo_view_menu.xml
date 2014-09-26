@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:appcompat="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/share"
         android:title="@string/share"
         android:icon="@android:drawable/ic_menu_share"
-        android:showAsAction="always"
+        appcompat:showAsAction="always"
     />
     <item
         android:id="@+id/map"
         android:icon="@android:drawable/ic_menu_mapmode"
         android:title="@string/display_on_map"
-        android:showAsAction="ifRoom"
+        appcompat:showAsAction="ifRoom"
     />
 </menu>

@@ -1,12 +1,12 @@
 package net.mmho.photomap2;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
-import android.util.LruCache;
 import android.widget.ImageView;
 
 public class ThumbnailImageView extends ImageView{

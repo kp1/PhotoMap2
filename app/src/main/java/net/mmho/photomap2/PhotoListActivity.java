@@ -1,24 +1,24 @@
 package net.mmho.photomap2;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Window;
 
-public class PhotoListActivity extends Activity {
+public class PhotoListActivity extends ActionBarActivity {
 
     final static String TAG_LIST="list";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        requestWindowFeature(Window.FEATURE_PROGRESS);
+        supportRequestWindowFeature(Window.FEATURE_PROGRESS);
 
-        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_LIST);
         if(fragment==null){
             fragment = new PhotoListFragment();
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(android.R.id.content,fragment,TAG_LIST);
             fragmentTransaction.commit();
         }
@@ -26,7 +26,7 @@ public class PhotoListActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        Fragment fragment = getFragmentManager().findFragmentByTag(TAG_LIST);
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_LIST);
         if(fragment!=null && fragment instanceof BackPressedListener){
             ((BackPressedListener) fragment).onBackPressed();
         }

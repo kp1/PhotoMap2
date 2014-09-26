@@ -1,16 +1,16 @@
 package net.mmho.photomap2;
 
-import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.util.LruCache;
+import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.util.LruCache;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 

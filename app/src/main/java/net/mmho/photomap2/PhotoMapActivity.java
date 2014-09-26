@@ -1,20 +1,20 @@
 package net.mmho.photomap2;
 
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Dialog;
-import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Window;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
-public class PhotoMapActivity extends Activity{
+public class PhotoMapActivity extends ActionBarActivity {
 
     private static final String TAG_MAP = "map";
 
@@ -39,10 +39,10 @@ public class PhotoMapActivity extends Activity{
         super.onResume();
         int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if(result == ConnectionResult.SUCCESS){
-            PhotoMapFragment fragment = (PhotoMapFragment) getFragmentManager().findFragmentByTag(TAG_MAP);
+            PhotoMapFragment fragment = (PhotoMapFragment) getSupportFragmentManager().findFragmentByTag(TAG_MAP);
             if(fragment==null){
                 fragment = new PhotoMapFragment();
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.add(android.R.id.content,fragment,TAG_MAP);
                 fragmentTransaction.commit();
             }
@@ -65,7 +65,7 @@ public class PhotoMapActivity extends Activity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_PROGRESS);
-        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        supportRequestWindowFeature(Window.FEATURE_PROGRESS);
+        supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
     }
 }

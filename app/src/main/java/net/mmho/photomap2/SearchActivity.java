@@ -1,28 +1,30 @@
 package net.mmho.photomap2;
 
-import android.app.ListActivity;
-import android.app.LoaderManager;
+
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.location.Address;
 import android.os.Bundle;
-import android.view.View;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
-public class SearchActivity extends ListActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
+public class SearchActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
     private ArrayAdapter<Address> adapter;
     private String location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_search_result);
 
         handleIntent(getIntent());
     }
@@ -39,7 +41,7 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
             setTitle(getString(R.string.search_title,location));
             Bundle bundle = new Bundle();
             bundle.putString("location",location);
-            getLoaderManager().initLoader(0,bundle,this);
+            getSupportLoaderManager().initLoader(0,bundle,this);
         }
         else{
             setResult(RESULT_CANCELED);
@@ -47,17 +49,6 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
         }
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        Address address = adapter.getItem(position);
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("location",addressToPosition(address));
-        intent.putExtras(bundle);
-        setResult(RESULT_OK,intent);
-        finish();
-
-    }
 
     // LoaderManager
     private LatLng addressToPosition(Address address){
@@ -87,7 +78,8 @@ public class SearchActivity extends ListActivity implements LoaderManager.Loader
         }
         else {
             adapter = new AddressListAdapter(this, android.R.layout.simple_list_item_2, data);
-            setListAdapter(adapter);
+            ListFragment fragment = (ListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment);
+            fragment.setListAdapter(adapter);
         }
     }
 

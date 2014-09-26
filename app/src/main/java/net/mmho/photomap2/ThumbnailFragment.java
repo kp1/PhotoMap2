@@ -1,11 +1,11 @@
 package net.mmho.photomap2;
 
-import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.util.LruCache;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,7 +21,7 @@ public class ThumbnailFragment extends Fragment {
     private PhotoGroup group;
     private GridView list;
 
-    private LruCache<Long,Bitmap> mBitMapCache;
+    private LruCache<Long,Bitmap> mBitMapCache = null;
     private String TAG="ThumbnailFragment";
 
     @Override
@@ -33,10 +33,11 @@ public class ThumbnailFragment extends Fragment {
         final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
         final int cacheSize = maxMemory/8;
         Log.d(TAG, "cache size:"+cacheSize);
-        mBitMapCache = new LruCache<Long, Bitmap>(cacheSize){
+
+        mBitMapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
-                return value.getByteCount()/1024;
+                return value.getByteCount() / 1024;
             }
         };
 

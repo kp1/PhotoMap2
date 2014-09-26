@@ -1,19 +1,19 @@
 package net.mmho.photomap2;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.WindowCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
-public class PhotoViewActivity extends Activity {
+public class PhotoViewActivity extends ActionBarActivity {
 
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
@@ -32,11 +32,11 @@ public class PhotoViewActivity extends Activity {
             return;
         }
 
-        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+        supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
 
         showActionBar(true);
-        ActionBar bar = getActionBar();
+        ActionBar bar = getSupportActionBar();
         if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
         PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
@@ -44,7 +44,7 @@ public class PhotoViewActivity extends Activity {
             setTitle(AddressUtil.getTitle(group.address,this));
         }
         int position = bundle.getInt(EXTRA_POSITION);
-        adapter = new PhotoViewAdapter(getFragmentManager(), group);
+        adapter = new PhotoViewAdapter(getSupportFragmentManager(), group);
 
         pager = (ViewPager) findViewById(R.id.photo_pager);
         pager.setAdapter(adapter);
@@ -62,14 +62,14 @@ public class PhotoViewActivity extends Activity {
     };
 
     private void showActionBar(boolean hide) {
-        ActionBar bar = getActionBar();
+        ActionBar bar = getSupportActionBar();
         if(bar!=null) bar.show();
         if(!hide) handler.removeCallbacks(runnable);
         else hideActionBarDelayed(HIDE_DELAY);
     }
 
     private void hideActionBar(){
-        ActionBar bar = getActionBar();
+        ActionBar bar = getSupportActionBar();
         if(bar!=null){
             bar.hide();
         }
@@ -94,7 +94,7 @@ public class PhotoViewActivity extends Activity {
             new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ActionBar bar = getActionBar();
+                    ActionBar bar = getSupportActionBar();
                     if(bar!=null){
                         if(bar.isShowing()) hideActionBar();
                         else showActionBar(true);

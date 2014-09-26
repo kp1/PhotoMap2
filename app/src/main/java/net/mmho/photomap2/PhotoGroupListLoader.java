@@ -1,10 +1,10 @@
 package net.mmho.photomap2;
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.OperationCanceledException;
+import android.support.v4.content.AsyncTaskLoader;
 
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 

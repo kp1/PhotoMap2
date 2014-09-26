@@ -1,17 +1,16 @@
 package net.mmho.photomap2;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
 public class PhotoImageView extends ImageView{
 
-    private static final String TAG = "PhotoImageView";
     private static final String EXTRA_IMAGE = "image";
     private static final String EXTRA_WIDTH = "width";
     private long image_id = -1;
