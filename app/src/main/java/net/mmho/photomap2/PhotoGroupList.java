@@ -4,10 +4,8 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Bundle;
 import android.os.CancellationSignal;
 import android.os.Handler;
-import android.os.Message;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -16,11 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
-    public final static String EXTRA_GROUP="group";
     public static final int MESSAGE_RESTART = 0;
-    public static final int MESSAGE_ADD=1;
-    public static final int MESSAGE_APPEND = 2;
-    public static final int MESSAGE_ADDRESS = 3;
+    public static final int MESSAGE_APPEND = 1;
+    public static final int MESSAGE_ADDRESS = 2;
     private static final int ADDRESS_MAX_RESULTS = 1;
 
     private float distance;
@@ -40,11 +36,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
 
         if(cursor==null || !cursor.moveToFirst()) return this;
 
-        if(handler!=null){
-            Message message = new Message();
-            message.what = MESSAGE_RESTART;
-            handler.sendMessage(message);
-        }
+        if(handler!=null) handler.sendEmptyMessage(MESSAGE_RESTART);
 
         do{
             int i;
@@ -62,24 +54,14 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 }
                 if(contains){
                     get(i).append(p, cursor.getID());
-                    if (handler != null) {
-                        handler.sendEmptyMessage(MESSAGE_APPEND);
-                    }
                     break;
                 }
             }
             if(i==this.size()){
                 PhotoGroup g = new PhotoGroup(cursor.getLocation(),cursor.getID());
                 add(g);
-                if(handler!=null){
-                    Bundle b = new Bundle();
-                    b.putParcelable(EXTRA_GROUP,g);
-                    Message message = new Message();
-                    message.setData(b);
-                    message.what = MESSAGE_ADD;
-                    handler.sendMessage(message);
-                }
             }
+            if (handler != null) handler.sendEmptyMessage(MESSAGE_APPEND);
         }while(cursor.moveToNext());
 
         if(!geocode){

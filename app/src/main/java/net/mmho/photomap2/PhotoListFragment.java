@@ -263,7 +263,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 adapter.notifyDataSetChanged();
                 setProgress(0);
                 break;
-            case PhotoGroupList.MESSAGE_ADD:
             case PhotoGroupList.MESSAGE_APPEND:
                 adapter.notifyDataSetChanged();
                 progress++;

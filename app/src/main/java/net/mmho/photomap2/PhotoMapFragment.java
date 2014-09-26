@@ -350,7 +350,6 @@ public class PhotoMapFragment extends MapFragment {
                 case PhotoGroupList.MESSAGE_RESTART:
                     progress = 0;
                     break;
-                case PhotoGroupList.MESSAGE_ADD:
                 case PhotoGroupList.MESSAGE_APPEND:
                     progress++;
                     setProgress(progress * Window.PROGRESS_END/photoCursor.getCount());
