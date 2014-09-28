@@ -223,6 +223,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
+            getLoaderManager().initLoader(GROUPING_LOADER_ID,null,photoGroupListLoaderCallbacks);
         if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
