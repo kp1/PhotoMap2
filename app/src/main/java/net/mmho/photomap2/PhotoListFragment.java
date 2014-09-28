@@ -35,7 +35,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private static final int GROUPING_LOADER_ID = 1;
     private static final int ADAPTER_LOADER_ID = 1000;
 
-    private PhotoCursor mCursor;
+    private Cursor mCursor;
     private PhotoGroupList groupList;
     private PhotoListAdapter adapter;
     private int distance_index;
@@ -223,8 +223,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
-            getLoaderManager().initLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
         if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
@@ -295,7 +293,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
-                mCursor = new PhotoCursor(data);
+                mCursor = data;
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                 getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
             }
@@ -317,7 +315,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             }
             resetFilter(false);
             loaded = false;
-            return new PhotoGroupListLoader(getActivity(),groupList,mCursor,
+            return new PhotoGroupListLoader(getActivity(),groupList,new PhotoCursor(mCursor),
                     DistanceUtils.getDistance(distance_index),true, handler);
         }
 
