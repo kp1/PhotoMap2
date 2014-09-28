@@ -1,9 +1,7 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.os.CancellationSignal;
 import android.os.Handler;
-import android.os.OperationCanceledException;
 import android.support.v4.content.AsyncTaskLoader;
 
 import java.util.concurrent.CancellationException;
@@ -43,7 +41,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     @Override
     protected void onStartLoading() {
-        if(list.getFinished() && list.getDistance()==distance){
+        if(list.isFinished() && list.getDistance()==distance){
             deliverResult(list);
         }
         else if(takeContentChanged()){

@@ -163,10 +163,12 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         switch(item.getItemId()){
         case R.id.oldest:
             newest = false;
+            groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
         case R.id.newest:
             newest = true;
+            groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
         case R.id.distance:

@@ -107,8 +107,11 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         cancel = true;
     }
 
-    public boolean getFinished(){
+    public boolean isFinished(){
         return finished;
+    }
+    public void reset(){
+        finished = false;
     }
     public float getDistance(){
         return distance;
