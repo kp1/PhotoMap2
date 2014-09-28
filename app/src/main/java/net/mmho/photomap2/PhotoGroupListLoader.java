@@ -6,14 +6,16 @@ import android.os.Handler;
 import android.os.OperationCanceledException;
 import android.support.v4.content.AsyncTaskLoader;
 
+import java.util.concurrent.CancellationException;
+
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     private PhotoGroupList list;
     private PhotoCursor cursor;
     private float distance;
     private Handler handler;
-    private CancellationSignal signal;
     private boolean geocode;
+    private boolean exec;
 
     public PhotoGroupListLoader(Context context,PhotoGroupList list,PhotoCursor cursor,float distance,boolean geocode,Handler handler) {
         super(context);
@@ -22,21 +24,20 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
         this.distance = distance;
         this.geocode = geocode;
         this.handler = handler;
-        signal = null;
 
         onContentChanged();
     }
 
     @Override
     public PhotoGroupList loadInBackground() {
-        signal = new CancellationSignal();
+        exec = true;
         try {
-            list.exec(cursor,distance,geocode,getContext(), handler, signal);
+            list.exec(cursor,distance,geocode,getContext(), handler);
         }
-        catch (OperationCanceledException e){
+        catch (CancellationException e){
             // do nothing
         }
-        signal = null;
+        exec = false;
         return list;
     }
 
@@ -57,15 +58,13 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     @Override
     protected void onReset() {
-        if(signal!=null){
-            signal.cancel();
-            do{
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }while(signal!=null);
+        list.cancel();
+        while(exec){
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         super.onReset();
     }

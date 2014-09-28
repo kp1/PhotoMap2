@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_RESTART = 0;
@@ -21,6 +22,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
 
     private float distance;
     private boolean finished;
+    private boolean cancel;
 
     PhotoGroupList(){
         clear();
@@ -28,10 +30,12 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         finished = false;
     }
 
-    public PhotoGroupList exec(PhotoCursor cursor,float distance,boolean geocode,Context context,Handler handler,CancellationSignal signal){
+    public PhotoGroupList exec(PhotoCursor cursor,float distance,boolean geocode,Context context,Handler handler)
+        throws CancellationException{
         clear();
 
         finished = false;
+        cancel = false;
         this.distance = distance;
 
         if(cursor==null || !cursor.moveToFirst()) return this;
@@ -41,7 +45,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         do{
             int i;
             for(i=0;i<this.size();i++){
-                if(signal!=null)signal.throwIfCanceled();
+                if(cancel)throw new CancellationException("cancel grouping.");
                 LatLng p = cursor.getLocation();
                 boolean contains = get(i).getArea().contains(p);
                 if(!contains) {
@@ -71,7 +75,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
 
         Geocoder g = new Geocoder(context);
         for(PhotoGroup group:this){
-            if(signal!=null)signal.throwIfCanceled();
+            if(cancel)throw new CancellationException("cancel grouping.");
             LatLng location = group.getCenter();
             List<Address> addresses;
             try {
@@ -97,6 +101,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             if(!get(i).equals(photoGroup.get(i))) return false;
         }
         return true;
+    }
+
+    public void cancel(){
+        cancel = true;
     }
 
     public boolean getFinished(){
