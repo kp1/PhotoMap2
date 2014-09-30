@@ -22,7 +22,6 @@ public class PhotoViewActivity extends ActionBarActivity {
 
     private PhotoViewAdapter adapter;
     private ViewPager pager;
-    private long HIDE_DELAY=3*1000;
     private ShareActionProvider shareActionProvider;
 
     @Override
@@ -38,7 +37,7 @@ public class PhotoViewActivity extends ActionBarActivity {
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
 
-//        showActionBar(true);
+        showActionBar(true);
         ActionBar bar = getSupportActionBar();
         if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
@@ -69,7 +68,7 @@ public class PhotoViewActivity extends ActionBarActivity {
         ActionBar bar = getSupportActionBar();
         if(bar!=null) bar.show();
         if(!hide) handler.removeCallbacks(runnable);
-        else hideActionBarDelayed(HIDE_DELAY);
+        else hideActionBarDelayed();
     }
 
     private void hideActionBar(){
@@ -79,9 +78,10 @@ public class PhotoViewActivity extends ActionBarActivity {
         }
     }
 
-    private void hideActionBarDelayed(long delay){
+    private void hideActionBarDelayed(){
+        final long DELAY=3*1000;
         handler.removeCallbacks(runnable);
-        handler.postDelayed(runnable,delay);
+        handler.postDelayed(runnable,DELAY);
     }
 
 
@@ -90,7 +90,7 @@ public class PhotoViewActivity extends ActionBarActivity {
                 @Override
                 public void onMenuVisibilityChanged(boolean isVisible) {
                     if(isVisible) showActionBar(false);
-                    else hideActionBarDelayed(HIDE_DELAY);
+                    else hideActionBarDelayed();
                 }
             };
 
@@ -101,7 +101,7 @@ public class PhotoViewActivity extends ActionBarActivity {
                     ActionBar bar = getSupportActionBar();
                     if(bar!=null){
                         if(bar.isShowing()) hideActionBar();
-                        else showActionBar(false);
+                        else showActionBar(true);
                     }
                 }
             };
@@ -131,6 +131,13 @@ public class PhotoViewActivity extends ActionBarActivity {
         MenuItem share = menu.findItem(R.id.share);
         shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         shareActionProvider.setShareIntent(setShareIntent(new Intent(),pager.getCurrentItem()));
+        shareActionProvider.setSubUiVisibilityListener(new ShareActionProvider.SubUiVisibilityListener() {
+            @Override
+            public void onSubUiVisibilityChanged(boolean visible) {
+                if(visible) showActionBar(false);
+                else hideActionBarDelayed();
+            }
+        });
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -153,7 +160,7 @@ public class PhotoViewActivity extends ActionBarActivity {
         switch (item.getItemId()){
         case R.id.map:
             intent = new Intent(this,PhotoMapActivity.class);
-            setShareIntent(intent,pager.getCurrentItem());
+            setShareIntent(intent, pager.getCurrentItem());
             startActivity(intent);
             return true;
         }
