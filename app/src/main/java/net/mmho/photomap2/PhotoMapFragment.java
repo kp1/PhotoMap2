@@ -193,6 +193,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             if(c.getCount()==0){
                 Toast.makeText(getActivity(),getString(R.string.no_position_data),Toast.LENGTH_LONG).show();
                 getActivity().finish();
+                return null;
             }
             c.moveToFirst();
             LatLng position = c.getLocation();
