@@ -45,7 +45,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean loaded = false;
     private boolean filtered;
     private String query="";
-    private float distance;
+    private int distance_index;
 
     public void onBackPressed() {
         if(filtered) resetFilter(true);
@@ -72,11 +72,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         groupList = new PhotoGroupList();
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,groupList,getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
         if(savedInstanceState!=null) {
-            distance = savedInstanceState.getFloat("DISTANCE");
+            distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
-            distance = DistanceActionProvider.initial();
+            distance_index = DistanceActionProvider.initialIndex();
         }
     }
 
@@ -87,6 +87,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         MenuItem distance = menu.findItem(R.id.distance);
         DistanceActionProvider distanceActionProvider
                 = (DistanceActionProvider) MenuItemCompat.getActionProvider(distance);
+        distanceActionProvider.setDistanceIndex(distance_index);
         distanceActionProvider.setOnDistanceChangeListener(onDistanceChangeListener);
 
 
@@ -198,7 +199,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putFloat("DISTANCE", distance);
+        outState.putInt("DISTANCE", distance_index);
         outState.putString("title",getActivity().getTitle().toString());
     }
 
@@ -243,6 +244,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
+            int count;
             if(isRemoving()) return;
             final int PROGRESS_GROUPING_RATIO=8000;
             switch (msg.what){
@@ -253,12 +255,16 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             case PhotoGroupList.MESSAGE_APPEND:
                 adapter.notifyDataSetChanged();
                 progress++;
-                setProgress(progress * PROGRESS_GROUPING_RATIO/mCursor.getCount());
+                count = mCursor.getCount();
+                if(count!=0) setProgress(progress * PROGRESS_GROUPING_RATIO/count);
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
                 geo_progress++;
-                setProgress(PROGRESS_GROUPING_RATIO+
-                        geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/adapter.getCount());
+                count = adapter.getCount();
+                if(count!=0){
+                    setProgress(PROGRESS_GROUPING_RATIO+
+                            geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/count);
+                }
                 adapter.notifyDataSetChanged();
                 break;
             }
@@ -301,7 +307,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),groupList,new PhotoCursor(mCursor),
-                    distance,true, handler);
+                    DistanceActionProvider.getDistance(distance_index),true, handler);
         }
 
         @Override
@@ -320,8 +326,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
             new DistanceActionProvider.OnDistanceChangeListener() {
                 @Override
-                public void onDistanceChange(float distance) {
-                    PhotoListFragment.this.distance = distance;
+                public void onDistanceChange(int index) {
+                    distance_index = index;
                     if(mCursor==null || mCursor.isClosed()) {
                         getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
                     }

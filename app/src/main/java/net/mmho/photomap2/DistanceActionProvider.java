@@ -11,7 +11,7 @@ import java.text.NumberFormat;
 public class DistanceActionProvider extends ActionProvider
     implements MenuItem.OnMenuItemClickListener{
     private OnDistanceChangeListener onDistanceChangeListener;
-    private float selected;
+    private int selected;
 
     private static final int INITIAL_INDEX = 1;
 
@@ -36,13 +36,22 @@ public class DistanceActionProvider extends ActionProvider
         return pretty.toString();
     }
 
-    static public float initial(){
-        return distance[INITIAL_INDEX];
-    }
 
     public DistanceActionProvider(Context context) {
         super(context);
         selected = INITIAL_INDEX;
+    }
+
+    public static int initialIndex(){
+        return INITIAL_INDEX;
+    }
+
+    public void setDistanceIndex(int index){
+        selected = index;
+    }
+
+    public static float getDistance(int index){
+        return distance[index];
     }
 
     @Override
@@ -69,12 +78,12 @@ public class DistanceActionProvider extends ActionProvider
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         selected = item.getItemId();
-        if(onDistanceChangeListener !=null) onDistanceChangeListener.onDistanceChange(distance[item.getItemId()]);
+        if(onDistanceChangeListener !=null) onDistanceChangeListener.onDistanceChange(selected);
         return false;
     }
     
     public interface OnDistanceChangeListener {
-        public void onDistanceChange(float distance);
+        public void onDistanceChange(int index);
     }
 
     public void setOnDistanceChangeListener(OnDistanceChangeListener changeListener){
