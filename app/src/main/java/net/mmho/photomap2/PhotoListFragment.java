@@ -76,7 +76,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
-            distance = DistanceUtils.initial();
+            distance = DistanceActionProvider.initial();
         }
     }
 
