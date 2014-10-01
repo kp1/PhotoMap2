@@ -20,7 +20,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,7 +48,6 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     final public static String EXTRA_GROUP="group";
     final private static float DEFAULT_ZOOM = 15;
-    private static final String TAG = "PhotoMapFragment";
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -69,7 +67,6 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG,"onActivityResult():"+resultCode);
         switch(resultCode){
         case ActionBarActivity.RESULT_OK:
             LatLng position = data.getExtras().getParcelable("location");
@@ -101,7 +98,7 @@ public class PhotoMapFragment extends SupportMapFragment {
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    hideActionBarDelayed(HIDE_DELAY);
+                    hideActionBarDelayed();
                     return true;
                 }
             };
@@ -238,7 +235,6 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     }
 
-    final long HIDE_DELAY = 3*1000;  // 3sec
 
     final Handler ab_handler = new Handler();
     final Runnable runnable= new Runnable() {
@@ -251,16 +247,17 @@ public class PhotoMapFragment extends SupportMapFragment {
     private void showActionBar(boolean hide){
         mActionBar.show();
         if(!hide)ab_handler.removeCallbacks(runnable);
-        else hideActionBarDelayed(HIDE_DELAY);
+        else hideActionBarDelayed();
     }
 
     private void hideActionBar(){
         mActionBar.hide();
     }
 
-    private void hideActionBarDelayed(long delay){
+    private void hideActionBarDelayed(){
+        final long DELAY = 3*1000;  // 3sec
         ab_handler.removeCallbacks(runnable);
-        ab_handler.postDelayed(runnable,delay);
+        ab_handler.postDelayed(runnable,DELAY);
     }
 
     GoogleMap.OnMapClickListener photoMapClickListener =
@@ -382,7 +379,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 else{
                     mMap.clear();
                     if(sharedMarker!=null)mMap.addMarker(sharedMarker);
-                    hideActionBarDelayed(HIDE_DELAY);
+                    hideActionBarDelayed();
                 }
             }
 
@@ -402,7 +399,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
                 endProgress();
-                hideActionBarDelayed(HIDE_DELAY);
+                hideActionBarDelayed();
                 mMap.clear();
                 for(PhotoGroup group:mGroup){
                     MarkerOptions ops = new MarkerOptions().position(group.getCenter());
