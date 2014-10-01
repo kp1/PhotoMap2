@@ -28,8 +28,8 @@ public class DistanceUtils {
         return distance[position];
     }
 
-    static public int initial(){
-        return 1;
+    static public float initial(){
+        return getDistance(1);
     }
     static public int size(){
         return distance.length;

@@ -11,7 +11,8 @@
         android:title="@string/oldest"/>
     <item
         android:id="@+id/distance"
-        android:title="@string/change_distance">
+        android:title="@string/change_distance"
+        appcompat:actionProviderClass="net.mmho.photomap2.DistanceActionProvider">
         <menu>
         </menu>
     </item>

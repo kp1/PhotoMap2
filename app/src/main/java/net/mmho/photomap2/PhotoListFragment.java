@@ -20,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -29,7 +28,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 
-public class PhotoListFragment extends Fragment implements BackPressedListener{
+public class PhotoListFragment extends Fragment
+        implements BackPressedListener,DistanceActionProvider.Callbacks{
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
@@ -38,7 +38,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private Cursor mCursor;
     private PhotoGroupList groupList;
     private PhotoListAdapter adapter;
-    private int distance_index;
     private boolean newest = true;
     private int progress;
     private int geo_progress;
@@ -47,6 +46,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean loaded = false;
     private boolean filtered;
     private String query="";
+    private float distance;
 
     public void onBackPressed() {
         if(filtered) resetFilter(true);
@@ -73,24 +73,23 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         groupList = new PhotoGroupList();
         adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,groupList,getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
         if(savedInstanceState!=null) {
-            distance_index = savedInstanceState.getInt("DISTANCE");
+            distance = savedInstanceState.getFloat("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
-            distance_index = DistanceUtils.initial();
+            distance = DistanceUtils.initial();
         }
     }
-
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.photo_list_menu, menu);
 
-        SubMenu sub = menu.findItem(R.id.distance).getSubMenu();
+        MenuItem distance = menu.findItem(R.id.distance);
+        DistanceActionProvider distanceActionProvider
+                = (DistanceActionProvider) MenuItemCompat.getActionProvider(distance);
+        distanceActionProvider.setCallbacks(this);
 
-        for(int i=0,l=DistanceUtils.size();i<l;i++){
-            sub.add(i+1,Menu.NONE, Menu.NONE,DistanceUtils.pretty(i));
-        }
 
         search = menu.findItem(R.id.search);
         MenuItemCompat.setOnActionExpandListener(search, onActionExpandListener);
@@ -171,22 +170,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
-        case R.id.distance:
-            return true;
         default:
-            int id = item.getGroupId();
-            if(id==0) return super.onOptionsItemSelected(item);
-            id--;
-            if(id!=distance_index) {
-                distance_index = id;
-                if(mCursor==null || mCursor.isClosed()) {
-                    getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-                }
-                else {
-                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-                }
-            }
             return true;
         }
     }
@@ -215,7 +199,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("DISTANCE",distance_index);
+        outState.putFloat("DISTANCE", distance);
         outState.putString("title",getActivity().getTitle().toString());
     }
 
@@ -318,7 +302,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),groupList,new PhotoCursor(mCursor),
-                    DistanceUtils.getDistance(distance_index),true, handler);
+                    distance,true, handler);
         }
 
         @Override
@@ -333,4 +317,16 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
         }
     };
+
+    @Override
+    public void changeDistanceCallback(float distance) {
+        this.distance = distance;
+        if(mCursor==null || mCursor.isClosed()) {
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+        }
+        else {
+            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+        }
+    }
 }
