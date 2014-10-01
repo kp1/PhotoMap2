@@ -28,8 +28,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 
-public class PhotoListFragment extends Fragment
-        implements BackPressedListener,DistanceActionProvider.Callbacks{
+public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
@@ -88,7 +87,7 @@ public class PhotoListFragment extends Fragment
         MenuItem distance = menu.findItem(R.id.distance);
         DistanceActionProvider distanceActionProvider
                 = (DistanceActionProvider) MenuItemCompat.getActionProvider(distance);
-        distanceActionProvider.setCallbacks(this);
+        distanceActionProvider.setOnDistanceChangeListener(onDistanceChangeListener);
 
 
         search = menu.findItem(R.id.search);
@@ -318,15 +317,19 @@ public class PhotoListFragment extends Fragment
         }
     };
 
-    @Override
-    public void changeDistanceCallback(float distance) {
-        this.distance = distance;
-        if(mCursor==null || mCursor.isClosed()) {
-            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-        }
-        else {
-            getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-            getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-        }
-    }
+    private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
+            new DistanceActionProvider.OnDistanceChangeListener() {
+                @Override
+                public void onDistanceChange(float distance) {
+                    PhotoListFragment.this.distance = distance;
+                    if(mCursor==null || mCursor.isClosed()) {
+                        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
+                    }
+                    else {
+                        getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                        getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+                    }
+                }
+            };
+
 }

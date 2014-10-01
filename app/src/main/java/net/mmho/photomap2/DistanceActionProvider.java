@@ -8,7 +8,7 @@ import android.view.View;
 
 public class DistanceActionProvider extends ActionProvider
     implements MenuItem.OnMenuItemClickListener{
-    private Callbacks callback;
+    private OnDistanceChangeListener onDistanceChangeListener;
 
     public DistanceActionProvider(Context context) {
         super(context);
@@ -35,16 +35,16 @@ public class DistanceActionProvider extends ActionProvider
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        if(callback!=null) callback.changeDistanceCallback(DistanceUtils.getDistance(item.getItemId()));
+        if(onDistanceChangeListener !=null) onDistanceChangeListener.onDistanceChange(DistanceUtils.getDistance(item.getItemId()));
         return false;
     }
-
-    public interface Callbacks{
-        public void changeDistanceCallback(float distance);
+    
+    public interface OnDistanceChangeListener {
+        public void onDistanceChange(float distance);
     }
 
-    public void setCallbacks(Callbacks callback){
-        this.callback = callback;
+    public void setOnDistanceChangeListener(OnDistanceChangeListener changeListener){
+        onDistanceChangeListener = changeListener;
     }
 
 }
