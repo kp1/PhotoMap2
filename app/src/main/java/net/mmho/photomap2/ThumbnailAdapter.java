@@ -52,6 +52,12 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
         }
 
         holder.thumbnail.startLoading(manager,id,getItem(position),mBitmapCache);
+        holder.thumbnail.setOnLoadListener(new LoadableImageView.OnLoadListener() {
+            @Override
+            public void onImageLoadFinished(long image_id, boolean success) {
+                if(!success) remove(image_id);
+            }
+        });
 
         return v;
     }

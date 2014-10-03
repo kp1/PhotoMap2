@@ -13,13 +13,11 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
 
     private long image_id;
     private int width;
-    private boolean thumbnail;
 
-    public PhotoImageLoader(Context context, long image_id,int width,boolean thumbnail) {
+    public PhotoImageLoader(Context context, long image_id,int width) {
         super(context);
         this.image_id = image_id;
         this.width = width;
-        this.thumbnail = thumbnail;
         onContentChanged();
     }
 
@@ -40,6 +38,7 @@ public class PhotoImageLoader extends AsyncTaskLoader<Bitmap> {
                 QueryBuilder.createQuery(image_id), null, null);
 
         Bitmap bmp = null;
+        boolean thumbnail = width==0;
 
         if(thumbnail){
             bmp = MediaStore.Images.Thumbnails.getThumbnail(getContext().getContentResolver(),image_id,

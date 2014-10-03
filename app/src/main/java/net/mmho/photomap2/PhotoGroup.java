@@ -86,10 +86,14 @@ public class PhotoGroup implements Parcelable{
         return id_list;
     }
 
-    void append(LatLng point,long id){
+    public void append(LatLng point,long id){
         area = area.including(point);
         id_list.add(id);
         address = null;
+    }
+
+    public boolean remove(long image_id){
+        return id_list.remove(image_id);
     }
 
     public boolean equals(PhotoGroup g) {
@@ -124,5 +128,4 @@ public class PhotoGroup implements Parcelable{
         }
         return color;
     }
-
 }

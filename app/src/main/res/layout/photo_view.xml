@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <net.mmho.photomap2.PhotoImageView
+    <net.mmho.photomap2.LoadableImageView
         android:id="@+id/photo_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

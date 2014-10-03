@@ -15,7 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class PhotoViewActivity extends ActionBarActivity {
+public class PhotoViewActivity extends ActionBarActivity
+    implements OnLoadFailedCallback {
 
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
@@ -23,6 +24,7 @@ public class PhotoViewActivity extends ActionBarActivity {
     private PhotoViewAdapter adapter;
     private ViewPager pager;
     private ShareActionProvider shareActionProvider;
+    private PhotoGroup group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +43,7 @@ public class PhotoViewActivity extends ActionBarActivity {
         ActionBar bar = getSupportActionBar();
         if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
-        PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
+        group = bundle.getParcelable(EXTRA_GROUP);
         if(group.address!=null){
             setTitle(AddressUtil.getTitle(group.address,this));
         }
@@ -175,5 +177,10 @@ public class PhotoViewActivity extends ActionBarActivity {
         i.putExtras(b);
         setResult(RESULT_OK, i);
         super.onBackPressed();
+    }
+
+    @Override
+    public void onLoadFailed(long image_id) {
+        group.remove(image_id);
     }
 }
