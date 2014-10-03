@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -220,11 +221,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                     Intent intent;
                     if(group.size()==1){
                         intent = new Intent(getActivity(),PhotoViewActivity.class);
-                        intent.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                        intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
                     }
                     else {
                         intent = new Intent(getActivity(), ThumbnailActivity.class);
-                        intent.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
+                        intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
                     }
                     startActivity(intent);
                 }

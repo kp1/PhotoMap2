@@ -12,7 +12,7 @@ public class PhotoViewFragment extends Fragment {
 
     public static final String EXTRA_IMAGE_ID = "image_id";
     private long image_id;
-    private PhotoImageView image = null;
+    private LoadableImageView image = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,8 +25,8 @@ public class PhotoViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.photo_view,container,false);
-        image = (PhotoImageView)v.findViewById(R.id.photo_view);
-        image.startLoading(getActivity().getSupportLoaderManager(),(int)image_id,image_id);
+        image = (LoadableImageView)v.findViewById(R.id.photo_view);
+        image.startLoading(getActivity().getSupportLoaderManager(),(int)image_id,image_id,null);
         return v;
     }
 

@@ -3,9 +3,9 @@ package net.mmho.photomap2;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.LruCache;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,7 +39,7 @@ public class ThumbnailFragment extends Fragment {
 
         Bundle bundle = getArguments();
         group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group.getIDList(),getLoaderManager(),0, mBitMapCache);
+        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group,getLoaderManager(),0, mBitMapCache);
     }
 
 
@@ -75,7 +75,7 @@ public class ThumbnailFragment extends Fragment {
         switch(item.getItemId()){
             case R.id.map:
                 Intent i = new Intent(getActivity(),PhotoMapActivity.class);
-                i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
+                i.putExtra(PhotoMapFragment.EXTRA_GROUP, (Parcelable) group);
                 startActivity(i);
                 return true;
         }
@@ -87,7 +87,7 @@ public class ThumbnailFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getActivity(),PhotoViewActivity.class);
-                i.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
                 i.putExtra(PhotoViewActivity.EXTRA_POSITION,position);
                 startActivityForResult(i,0);
             }

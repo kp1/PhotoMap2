@@ -11,10 +11,9 @@ import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
-public class PhotoGroup implements Parcelable{
+public class PhotoGroup extends ArrayList<Long> implements Parcelable{
     public Marker marker;
     private LatLngBounds area;
-    private ArrayList<Long> id_list = new ArrayList<Long>();
 
     public Address address;
 
@@ -32,7 +31,7 @@ public class PhotoGroup implements Parcelable{
     };
 
     PhotoGroup(Parcel in){
-        in.readList(id_list, null);
+        in.readList(this, null);
         area = LatLngBounds.CREATOR.createFromParcel(in);
         try {
             address = Address.CREATOR.createFromParcel(in);
@@ -46,7 +45,7 @@ public class PhotoGroup implements Parcelable{
         LatLngBounds.Builder b = new LatLngBounds.Builder();
         b.include(p);
         area = b.build();
-        id_list.add(id);
+        add(id);
         address = null;
     }
 
@@ -74,26 +73,15 @@ public class PhotoGroup implements Parcelable{
         return builder.toString();
     }
 
-    public int size(){
-        return id_list.size();
-    }
 
-    public long getID(int index){
-        return id_list.get(index);
-    }
-
-    public ArrayList<Long> getIDList(){
-        return id_list;
-    }
-
-    void append(LatLng point,long id){
+    public void append(LatLng point,long id){
         area = area.including(point);
-        id_list.add(id);
+        add(id);
         address = null;
     }
 
     public boolean equals(PhotoGroup g) {
-        return id_list.equals(g.id_list) && area.equals(g.area);
+        return super.equals(g) && area.equals(g.area);
     }
 
     @Override
@@ -103,7 +91,7 @@ public class PhotoGroup implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeList(id_list);
+        out.writeList(this);
         area.writeToParcel(out,0);
         if(address!=null)address.writeToParcel(out,0);
     }
@@ -124,5 +112,4 @@ public class PhotoGroup implements Parcelable{
         }
         return color;
     }
-
 }

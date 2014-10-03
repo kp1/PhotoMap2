@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -62,7 +63,6 @@ public class PhotoMapFragment extends SupportMapFragment {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
-        mGroup = new PhotoGroupList();
 	}
 
     @Override
@@ -221,10 +221,13 @@ public class PhotoMapFragment extends SupportMapFragment {
                     @Override
                     public void run() {
                         mMap.moveCamera(update);
+                        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
                     }
                 });
             }
-            mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+            else{
+                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+            }
             mMap.setOnMarkerClickListener(photoGroupClickListener);
             mMap.setOnMapClickListener(photoMapClickListener);
             mMap.getUiSettings().setZoomControlsEnabled(false);
@@ -309,11 +312,11 @@ public class PhotoMapFragment extends SupportMapFragment {
                         Intent intent;
                         if(group.size()==1){
                             intent = new Intent(getActivity(),PhotoViewActivity.class);
-                            intent.putExtra(PhotoViewActivity.EXTRA_GROUP,group);
+                            intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
                         }
                         else{
                             intent = new Intent(getActivity(),ThumbnailActivity.class);
-                            intent.putExtra(ThumbnailActivity.EXTRA_GROUP,group);
+                            intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
                         }
                         startActivity(intent);
                         break;
@@ -345,13 +348,14 @@ public class PhotoMapFragment extends SupportMapFragment {
         @Override
         public void handleMessage(Message msg) {
             if(isRemoving()) return;
+            int count = photoCursor.getCount();
             switch(msg.what){
                 case PhotoGroupList.MESSAGE_RESTART:
                     progress = 0;
                     break;
                 case PhotoGroupList.MESSAGE_APPEND:
                     progress++;
-                    setProgress(progress * Window.PROGRESS_END/photoCursor.getCount());
+                    if(count!=0) setProgress(progress * Window.PROGRESS_END/count);
                     break;
             }
         }
@@ -393,18 +397,21 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
                 return new PhotoGroupListLoader(getActivity(),
-                        mGroup,photoCursor,getPartitionDistance(mapBounds),true,handler);
+                        new PhotoGroupList(),photoCursor,getPartitionDistance(mapBounds),false,handler);
             }
 
             @Override
-            public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
+            public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList group) {
                 endProgress();
                 hideActionBarDelayed();
-                mMap.clear();
-                for(PhotoGroup group:mGroup){
-                    MarkerOptions ops = new MarkerOptions().position(group.getCenter());
-                    ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(group.size())));
-                    group.marker = mMap.addMarker(ops);
+                if(mGroup==null || !mGroup.equals(group)) {
+                    mMap.clear();
+                    mGroup = group;
+                    for (PhotoGroup g : mGroup) {
+                        MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                        ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
+                        g.marker = mMap.addMarker(ops);
+                    }
                 }
                 if(sharedMarker !=null)mMap.addMarker(sharedMarker);
             }
