@@ -182,5 +182,6 @@ public class PhotoViewActivity extends ActionBarActivity
     @Override
     public void onLoadFailed(long image_id) {
         group.remove(image_id);
+        adapter.notifyDataSetChanged();
     }
 }
