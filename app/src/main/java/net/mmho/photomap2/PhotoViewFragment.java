@@ -27,20 +27,6 @@ public class PhotoViewFragment extends Fragment {
         View v = inflater.inflate(R.layout.photo_view,container,false);
         image = (LoadableImageView)v.findViewById(R.id.photo_view);
         image.startLoading(getActivity().getSupportLoaderManager(),(int)image_id,image_id,null);
-        image.setOnLoadListener(new LoadableImageView.OnLoadListener() {
-            @Override
-            public void onImageLoadFinished(long image_id, boolean success) {
-                try{
-                    OnLoadFailedCallback callback = (OnLoadFailedCallback)getActivity();
-                    if(!success) callback.onLoadFailed(image_id);
-                }
-                catch (ClassCastException e){
-                    throw new ClassCastException(getActivity().toString()
-                            +" must implement OnLoadFailedCallback");
-                }
-
-            }
-        });
         return v;
     }
 

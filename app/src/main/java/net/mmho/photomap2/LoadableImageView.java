@@ -16,7 +16,6 @@ public class LoadableImageView extends ImageView{
     private long image_id = -1;
     private LoaderManager manager;
     private LruCache<Long,Bitmap> mBitmapCache;
-    private OnLoadListener onLoadListener;
     protected boolean thumbnail = false;
 
     public LoadableImageView(Context context) {
@@ -29,14 +28,6 @@ public class LoadableImageView extends ImageView{
 
     public LoadableImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-    }
-
-    public interface OnLoadListener{
-        void onImageLoadFinished(long image_id,boolean success);
-    }
-
-    public void setOnLoadListener(OnLoadListener listener){
-        onLoadListener = listener;
     }
 
     public void startLoading(final LoaderManager manager, final int loader_id, final long image_id,
@@ -84,7 +75,6 @@ public class LoadableImageView extends ImageView{
                     long image_id = ((PhotoImageLoader)loader).getImageId();
                     if(mBitmapCache!=null)mBitmapCache.put(image_id,bitmap);
                     manager.destroyLoader(loader.getId());
-                    if(onLoadListener!=null) onLoadListener.onImageLoadFinished(image_id,bitmap!=null);
                 }
 
                 @Override

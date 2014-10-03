@@ -15,8 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class PhotoViewActivity extends ActionBarActivity
-    implements OnLoadFailedCallback {
+public class PhotoViewActivity extends ActionBarActivity{
 
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
@@ -177,11 +176,5 @@ public class PhotoViewActivity extends ActionBarActivity
         i.putExtras(b);
         setResult(RESULT_OK, i);
         super.onBackPressed();
-    }
-
-    @Override
-    public void onLoadFailed(long image_id) {
-        group.remove(image_id);
-        adapter.notifyDataSetChanged();
     }
 }
