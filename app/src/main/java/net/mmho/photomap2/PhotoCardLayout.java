@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.util.LruCache;
 import android.support.v7.widget.PopupMenu;
@@ -49,7 +50,7 @@ public class PhotoCardLayout extends RelativeLayout{
 
     private void moveMap(){
         Intent i = new Intent(getContext(),PhotoMapActivity.class);
-        i.putExtra(PhotoMapFragment.EXTRA_GROUP,group);
+        i.putExtra(PhotoMapFragment.EXTRA_GROUP, (Parcelable) group);
         getContext().startActivity(i);
     }
     final ImageView.OnClickListener onClickListener =
@@ -82,7 +83,7 @@ public class PhotoCardLayout extends RelativeLayout{
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(manager,loader_id,g.getID(0),cache);
+        thumbnail.startLoading(manager,loader_id,g.get(0),cache);
 
         Address address = g.address;
         if(address==null) {

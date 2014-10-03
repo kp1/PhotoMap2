@@ -7,7 +7,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 public class LoadableImageView extends ImageView{
@@ -45,7 +44,6 @@ public class LoadableImageView extends ImageView{
 
 
         if(image_id!=this.image_id) {
-            Log.d("LoadableImageView", "load thumbnail " + thumbnail);
             this.image_id = image_id;
             this.manager = manager;
             mBitmapCache = cache;
