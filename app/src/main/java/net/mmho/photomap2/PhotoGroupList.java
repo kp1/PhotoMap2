@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.CancellationSignal;
 import android.os.Handler;
 
 import com.google.android.gms.maps.model.LatLng;

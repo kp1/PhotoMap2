@@ -73,7 +73,7 @@ public class LoadableImageView extends ImageView{
                 public void onLoadFinished(Loader<Bitmap> loader, Bitmap bitmap) {
                     setImageBitmap(bitmap);
                     long image_id = ((PhotoImageLoader)loader).getImageId();
-                    if(mBitmapCache!=null)mBitmapCache.put(image_id,bitmap);
+                    if(mBitmapCache!=null && bitmap!=null)mBitmapCache.put(image_id,bitmap);
                     manager.destroyLoader(loader.getId());
                 }
 
