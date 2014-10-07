@@ -3,9 +3,4 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
     </style>
-<!--
-    <style name="AppTheme.Dialog" parent="@style/Theme.AppCompat.CompactMenu.Dialog">
-        <item name="android:textAppearanceListItem">@style/TextAppearance.AppCompat.Base.CompactMenu.Dialog</item>
-    </style>
--->
 </resources>
