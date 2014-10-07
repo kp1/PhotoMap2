@@ -49,6 +49,10 @@
                 android:resource="@xml/searchable"/>
         </activity>
 
+        <provider
+            android:authorities="net.mmho.MapSuggestionProvider"
+            android:name=".MapSuggestionProvider"/>
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

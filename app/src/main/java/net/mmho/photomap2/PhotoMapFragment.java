@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -86,6 +87,18 @@ public class PhotoMapFragment extends SupportMapFragment {
         MenuItemCompat.setOnActionExpandListener(searchMenuItem,actionExpandListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.clear_history:
+                SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
+                        MapSuggestionProvider.AUTHORITY,MapSuggestionProvider.MODE);
+                suggestions.clearHistory();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     final private MenuItemCompat.OnActionExpandListener actionExpandListener =

@@ -18,4 +18,5 @@
     <string name="search_list">search by address</string>
     <string name="change_distance">change distance</string>
     <string name="google_maps_key" translatable="false">AIzaSyCrR_m4U-5N5hqvUyCqF3jtmIcnRCk-5Yg</string>
+    <string name="clear_search_history">clear search history</string>
 </resources>

@@ -17,4 +17,5 @@
     <string name="filtered">%1$sで絞込み中</string>
     <string name="search_list">住所で検索</string>
     <string name="change_distance">距離を変更</string>
+    <string name="clear_search_history">検索履歴を削除</string>
 </resources>

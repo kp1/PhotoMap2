@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -38,6 +39,11 @@ public class SearchActivity extends FragmentActivity implements LoaderManager.Lo
     private void handleIntent(Intent intent) {
         if(Intent.ACTION_SEARCH.equals(intent.getAction())){
             location = intent.getStringExtra(SearchManager.QUERY);
+
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MapSuggestionProvider.AUTHORITY,MapSuggestionProvider.MODE);
+            suggestions.saveRecentQuery(location,null);
+
             setTitle(getString(R.string.search_title,location));
             Bundle bundle = new Bundle();
             bundle.putString("location",location);

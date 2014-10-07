@@ -2,4 +2,6 @@
 
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/app_name"
-    android:hint="@string/search_map"/>
+    android:hint="@string/search_map"
+    android:searchSuggestAuthority="net.mmho.MapSuggestionProvider"
+    android:searchSuggestSelection=" ?"/>
