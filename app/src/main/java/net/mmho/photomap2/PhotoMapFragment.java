@@ -180,11 +180,10 @@ public class PhotoMapFragment extends SupportMapFragment {
                     double longitude = Double.parseDouble(matcher.group(2));
                     float zoom = DEFAULT_ZOOM;
 
-                    if (matcher.groupCount() == 5){
-                        if(matcher.group(4).equals("z")) {
+                    if (matcher.groupCount() == 5 && matcher.group(4)!=null){
+                        if (matcher.group(4).equals("z")) {
                             zoom = Integer.parseInt(matcher.group(5));
-                        }
-                        else if(matcher.group(4).equals("q")){
+                        } else if (matcher.group(4).equals("q")) {
                             requestQuery(matcher.group(5));
                             return null;
                         }
