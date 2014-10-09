@@ -2,22 +2,39 @@ package net.mmho.photomap2;
 
 
 import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.SearchRecentSuggestions;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 
-public class PhotoMapActivity extends ActionBarActivity {
+import java.util.List;
+
+public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
 
     private static final String TAG_MAP = "map";
-
+    private static final String TAG_DIALOG = "dialog";
+    private final static int ADDRESS_LOADER_ID = 10;
+    private final static String SEARCH_QUERY = "query";
+    private String searchQuery;
     private Dialog dialog = null;
 
     private final Handler cancelHandler = new Handler(){
@@ -33,6 +50,23 @@ public class PhotoMapActivity extends ActionBarActivity {
             cancelHandler.sendEmptyMessage(0);
         }
     };
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+    private void handleIntent(Intent intent) {
+        if(Intent.ACTION_SEARCH.equals(intent.getAction())){
+            searchQuery = intent.getStringExtra(SearchManager.QUERY);
+            Log.d(this.getClass().getSimpleName(),"handleIntent:"+searchQuery);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MapSuggestionProvider.AUTHORITY,MapSuggestionProvider.MODE);
+            suggestions.saveRecentQuery(searchQuery, null);
+            Bundle bundle = new Bundle();
+            bundle.putString(SEARCH_QUERY, searchQuery);
+            getSupportLoaderManager().restartLoader(ADDRESS_LOADER_ID, bundle, this);
+        }
+    }
 
     @Override
     protected void onResume() {
@@ -68,4 +102,43 @@ public class PhotoMapActivity extends ActionBarActivity {
         supportRequestWindowFeature(Window.FEATURE_PROGRESS);
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
     }
+
+    @Override
+    public Loader<List<Address>> onCreateLoader(int i, Bundle bundle) {
+        return new GeocodeLoader(this,bundle.getString(SEARCH_QUERY));
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Address>> addressLoader, List<Address> addresses) {
+        Log.d(this.getClass().getSimpleName(),addresses.toString());
+        if(addresses==null || addresses.size()==0){
+            Toast.makeText(getApplicationContext(), getString(R.string.location_not_found, searchQuery),
+                    Toast.LENGTH_LONG).show();
+        }
+        else if(addresses.size()==1){
+            PhotoMapFragment fragment = (PhotoMapFragment) getSupportFragmentManager().findFragmentByTag(TAG_MAP);
+            CameraUpdate update =
+                    CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(addresses.get(0)),PhotoMapFragment.DEFAULT_ZOOM);
+            if(fragment!=null) fragment.getMap().moveCamera(update);
+        }
+        else {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            Fragment prev = getSupportFragmentManager().findFragmentByTag(TAG_DIALOG);
+            if(prev!=null){
+                transaction.remove(prev);
+            }
+            transaction.addToBackStack(null);
+
+            SearchResultFragment fragment = SearchResultFragment.newInstance();
+            fragment.show(getSupportFragmentManager(),TAG_DIALOG);
+        }
+
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Address>> addressLoader) {
+
+    }
+
 }

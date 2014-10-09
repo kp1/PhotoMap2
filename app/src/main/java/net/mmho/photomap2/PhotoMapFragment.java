@@ -49,7 +49,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     final static int PHOTO_GROUP_LOADER = 1;
 
     final public static String EXTRA_GROUP="group";
-    final private static float DEFAULT_ZOOM = 15;
+    final public static float DEFAULT_ZOOM = 15;
 
     private GoogleMap mMap;
     private LatLngBounds mapBounds;
@@ -142,10 +142,10 @@ public class PhotoMapFragment extends SupportMapFragment {
             };
 
     private void requestQuery(String query){
-        Intent intent = new Intent(getActivity(),SearchActivity.class);
+        Intent intent = new Intent(getActivity(),PhotoMapActivity.class);
         intent.setAction(Intent.ACTION_SEARCH);
         intent.putExtra(SearchManager.QUERY,query);
-        startActivityForResult(intent,0);
+        startActivity(intent);
     }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){

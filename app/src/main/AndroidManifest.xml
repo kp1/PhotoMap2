@@ -28,8 +28,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".PhotoMapActivity"
-            android:parentActivityName=".PhotoListActivity">
+        <activity
+            android:name=".PhotoMapActivity"
+            android:parentActivityName=".PhotoListActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <data android:scheme="geo" />
@@ -43,10 +45,17 @@
             </intent-filter>
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".SearchActivity"/>
+                android:value=".PhotoMapActivity"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PhotoListActivity"/>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
         </activity>
         <activity android:name=".ThumbnailActivity"
             android:parentActivityName=".PhotoListActivity">
@@ -59,16 +68,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PhotoListActivity"/>
-        </activity>
-        <activity
-            android:name=".SearchActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
         </activity>
 
         <provider

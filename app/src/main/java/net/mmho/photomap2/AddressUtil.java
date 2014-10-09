@@ -3,6 +3,8 @@ package net.mmho.photomap2;
 import android.content.Context;
 import android.location.Address;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class AddressUtil {
     static public String getTitle(Address address, Context context){
         StringBuilder builder = new StringBuilder();
@@ -43,4 +45,10 @@ public class AddressUtil {
         }
         return removePostalCode(description.toString());
     }
+
+    static public LatLng addressToLatLng(Address address){
+        return new LatLng(address.getLatitude(),address.getLongitude());
+    }
+
+
 }
