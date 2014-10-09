@@ -8,14 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.List;
-
 public class AddressListAdapter extends ArrayAdapter<Address>{
 
     private int resource;
     private LayoutInflater inflater;
 
-    public AddressListAdapter(Context context, int resource,List<Address> addresses) {
+    public AddressListAdapter(Context context, int resource,Address[] addresses) {
         super(context,resource,addresses);
         this.resource = resource;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

@@ -87,6 +87,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         MenuItemCompat.setOnActionExpandListener(searchMenuItem,actionExpandListener);
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setQueryRefinementEnabled(true);
     }
 
     @Override

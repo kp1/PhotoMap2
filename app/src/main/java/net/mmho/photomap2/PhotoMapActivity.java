@@ -10,14 +10,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.SearchRecentSuggestions;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Window;
 import android.widget.Toast;
 
@@ -30,11 +28,10 @@ import java.util.List;
 
 public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
 
-    private static final String TAG_MAP = "map";
+    public static final String TAG_MAP = "map";
     private static final String TAG_DIALOG = "dialog";
     private final static int ADDRESS_LOADER_ID = 10;
     private final static String SEARCH_QUERY = "query";
-    private String searchQuery;
     private Dialog dialog = null;
 
     private final Handler cancelHandler = new Handler(){
@@ -57,8 +54,7 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
     }
     private void handleIntent(Intent intent) {
         if(Intent.ACTION_SEARCH.equals(intent.getAction())){
-            searchQuery = intent.getStringExtra(SearchManager.QUERY);
-            Log.d(this.getClass().getSimpleName(),"handleIntent:"+searchQuery);
+            String searchQuery = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     MapSuggestionProvider.AUTHORITY,MapSuggestionProvider.MODE);
             suggestions.saveRecentQuery(searchQuery, null);
@@ -110,9 +106,9 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<List<Address>> addressLoader, List<Address> addresses) {
-        Log.d(this.getClass().getSimpleName(),addresses.toString());
+        String location =((GeocodeLoader)addressLoader).getLocation();
         if(addresses==null || addresses.size()==0){
-            Toast.makeText(getApplicationContext(), getString(R.string.location_not_found, searchQuery),
+            Toast.makeText(getApplicationContext(), getString(R.string.location_not_found,location),
                     Toast.LENGTH_LONG).show();
         }
         else if(addresses.size()==1){
@@ -129,7 +125,7 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
             }
             transaction.addToBackStack(null);
 
-            SearchResultFragment fragment = SearchResultFragment.newInstance();
+            SearchResultFragment fragment = SearchResultFragment.newInstance(location,addresses);
             fragment.show(getSupportFragmentManager(),TAG_DIALOG);
         }
 

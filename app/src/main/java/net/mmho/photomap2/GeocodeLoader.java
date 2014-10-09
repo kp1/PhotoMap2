@@ -48,6 +48,10 @@ public class GeocodeLoader extends AsyncTaskLoader<List<Address>> {
         }
     }
 
+    public String getLocation() {
+        return location;
+    }
+
     @Override
     protected void onStopLoading() {
         cancelLoad();
