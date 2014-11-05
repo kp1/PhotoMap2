@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -241,12 +242,25 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(false);
     }
 
+    boolean attached = false;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        attached = true;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        attached = false;
+    }
 
     private final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             int count;
-            if(isRemoving()) return;
+            if(!attached) return;
             final int PROGRESS_GROUPING_RATIO=8000;
             switch (msg.what){
             case PhotoGroupList.MESSAGE_RESTART:
