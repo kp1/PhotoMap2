@@ -13,16 +13,16 @@ public class QueryBuilder {
     static String createQuery(LatLngBounds bounds){
         LatLng start = bounds.southwest;
         LatLng end = bounds.northeast;
-        String latitude = String.format("%s between %f and %f and ",
-                LATITUDE,start.latitude,end.latitude);
+        String latitude = String.format("%s between %s and %s and ",
+                LATITUDE,Double.toString(start.latitude),Double.toString(end.latitude));
         String longitude;
         if(start.longitude<end.longitude){
-            longitude= String.format("%s between %f and %f",
-                    LONGITUDE,start.longitude,end.longitude);
+            longitude= String.format("%s between %s and %s",
+                    LONGITUDE,Double.toString(start.longitude),Double.toString(end.longitude));
         }
         else{
-            longitude = String.format("(%s between -180.0 and %f or %s between %f and 180.0)",
-                    LONGITUDE,end.longitude,LONGITUDE,start.longitude);
+            longitude = String.format("(%s between -180.0 and %s or %s between %s and 180.0)",
+                    LONGITUDE,Double.toString(end.longitude),LONGITUDE,Double.toString(start.longitude));
 
         }
 
