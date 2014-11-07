@@ -16,7 +16,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,6 +47,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean filtered;
     private String query="";
     private int distance_index;
+
+    boolean attached = false;
+
+    private ProgressChangeListener listener;
 
     public void onBackPressed() {
         if(filtered) resetFilter(true);
@@ -232,21 +235,14 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 }
             };
 
-    private void setProgress(int progress){
-        getActivity().setProgress(progress);
-        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(true);
-    }
-
-    private void endProgress(){
-        getActivity().setProgress(Window.PROGRESS_END);
-        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(false);
-    }
-
-    boolean attached = false;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        if(!(activity instanceof ProgressChangeListener)){
+            throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
+        }
+        listener = (ProgressChangeListener) activity;
         attached = true;
     }
 
@@ -265,19 +261,19 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             switch (msg.what){
             case PhotoGroupList.MESSAGE_RESTART:
                 adapter.notifyDataSetChanged();
-                setProgress(0);
+                listener.showProgress(0);
                 break;
             case PhotoGroupList.MESSAGE_APPEND:
                 adapter.notifyDataSetChanged();
                 progress++;
                 count = mCursor.getCount();
-                if(count!=0) setProgress(progress * PROGRESS_GROUPING_RATIO/count);
+                if(count!=0) listener.showProgress(progress * PROGRESS_GROUPING_RATIO/count);
                 break;
             case PhotoGroupList.MESSAGE_ADDRESS:
                 geo_progress++;
                 count = adapter.getCount();
                 if(count!=0){
-                    setProgress(PROGRESS_GROUPING_RATIO+
+                    listener.showProgress(PROGRESS_GROUPING_RATIO+
                             geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/count);
                 }
                 adapter.notifyDataSetChanged();
@@ -327,9 +323,9 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
         @Override
         public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-            search.setEnabled(true);
+            if(search!=null)search.setEnabled(true);
             loaded = true;
-            endProgress();
+            listener.endProgress();
         }
 
         @Override

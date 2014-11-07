@@ -26,7 +26,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.util.List;
 
-public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>{
+public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>,
+                ProgressChangeListener{
 
     public static final String TAG_MAP = "map";
     private static final String TAG_DIALOG = "dialog";
@@ -137,4 +138,15 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
 
     }
 
+    @Override
+    public void showProgress(int progress) {
+        setProgress(progress);
+        setSupportProgressBarVisibility(true);
+    }
+
+    @Override
+    public void endProgress() {
+        setProgress(Window.PROGRESS_END);
+        setSupportProgressBarVisibility(false);
+    }
 }

@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -60,11 +61,22 @@ public class PhotoMapFragment extends SupportMapFragment {
     private MenuItem searchMenuItem;
     private ActionBar mActionBar;
 
+    private ProgressChangeListener listener;
+
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
 	}
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(!(activity instanceof ProgressChangeListener)){
+            throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
+        }
+        listener = (ProgressChangeListener)activity;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -347,16 +359,6 @@ public class PhotoMapFragment extends SupportMapFragment {
         return d[0]/PARTITION_RATIO;
     }
 
-    private void setProgress(int progress){
-        getActivity().setProgress(progress);
-        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(true);
-    }
-
-    private void endProgress(){
-        getActivity().setProgress(Window.PROGRESS_END);
-        ((ActionBarActivity)getActivity()).setSupportProgressBarVisibility(false);
-    }
-
     final private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -368,7 +370,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                     break;
                 case PhotoGroupList.MESSAGE_APPEND:
                     progress++;
-                    if(count!=0) setProgress(progress * Window.PROGRESS_END/count);
+                    if(count!=0) listener.showProgress(progress * Window.PROGRESS_END/count);
                     break;
             }
         }
@@ -415,7 +417,7 @@ public class PhotoMapFragment extends SupportMapFragment {
 
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList group) {
-                endProgress();
+                listener.endProgress();
                 hideActionBarDelayed();
                 if(mGroup==null || !mGroup.equals(group)) {
                     mMap.clear();

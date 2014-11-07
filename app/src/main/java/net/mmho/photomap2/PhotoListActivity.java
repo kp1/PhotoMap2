@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Window;
 
-public class PhotoListActivity extends ActionBarActivity {
+public class PhotoListActivity extends ActionBarActivity implements ProgressChangeListener{
 
     final static String TAG_LIST="list";
     @Override
@@ -34,4 +34,18 @@ public class PhotoListActivity extends ActionBarActivity {
             super.onBackPressed();
         }
     }
+
+    @Override
+    public void showProgress(int progress){
+        setProgress(progress);
+        setSupportProgressBarVisibility(true);
+    }
+
+    @Override
+    public void endProgress(){
+        setProgress(Window.PROGRESS_END);
+        setSupportProgressBarVisibility(false);
+    }
+
+
 }
