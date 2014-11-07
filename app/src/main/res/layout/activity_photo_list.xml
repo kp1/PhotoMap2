@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--<fragment
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <fragment
         android:id="@+id/list"
-        tools:context=".PhotoListActivity"
-        android:name="net.mmho.photomap2.PhotoListFragment"/>-->
-</LinearLayout>
+        android:name="net.mmho.photomap2.PhotoListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="10000"
+        android:maxHeight="6dp"
+        android:minHeight="6dp"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"/>
+</RelativeLayout>

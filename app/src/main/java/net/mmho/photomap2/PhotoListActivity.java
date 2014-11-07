@@ -2,31 +2,31 @@ package net.mmho.photomap2;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.view.Window;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.ProgressBar;
 
 public class PhotoListActivity extends ActionBarActivity implements ProgressChangeListener{
 
-    final static String TAG_LIST="list";
+    private ProgressBar progressBar;
+    private String TAG = "PhotoListActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         supportRequestWindowFeature(Window.FEATURE_PROGRESS);
+        setContentView(R.layout.activity_photo_list);
 
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_LIST);
-        if(fragment==null){
-            fragment = new PhotoListFragment();
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(android.R.id.content,fragment,TAG_LIST);
-            fragmentTransaction.commit();
-        }
+        progressBar = (ProgressBar) findViewById(R.id.progress);
     }
 
     @Override
     public void onBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_LIST);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.list);
         if(fragment!=null && fragment instanceof BackPressedListener){
             ((BackPressedListener) fragment).onBackPressed();
         }
@@ -37,14 +37,34 @@ public class PhotoListActivity extends ActionBarActivity implements ProgressChan
 
     @Override
     public void showProgress(int progress){
-        setProgress(progress);
-        setSupportProgressBarVisibility(true);
+        progressBar.setProgress(progress);
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void endProgress(){
-        setProgress(Window.PROGRESS_END);
-        setSupportProgressBarVisibility(false);
+        progressBar.setProgress(progressBar.getMax());
+        AlphaAnimation fadeout;
+        fadeout = new AlphaAnimation(1,0);
+        fadeout.setDuration(1000);
+        fadeout.setFillAfter(true);
+        fadeout.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        progressBar.startAnimation(fadeout);
     }
 
 
