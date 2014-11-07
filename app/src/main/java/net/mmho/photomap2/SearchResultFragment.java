@@ -7,6 +7,7 @@ import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
@@ -39,12 +40,11 @@ public class SearchResultFragment extends DialogFragment{
         builder.setAdapter(adapter,new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                PhotoMapFragment f = (PhotoMapFragment) getActivity()
-                        .getSupportFragmentManager().findFragmentByTag(PhotoMapActivity.TAG_MAP);
-                if(f!=null){
+                Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
+                if(f instanceof PhotoMapFragment){
                     CameraUpdate update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[which]),
                             PhotoMapFragment.DEFAULT_ZOOM);
-                    f.getMap().moveCamera(update);
+                    ((PhotoMapFragment)f).getMap().moveCamera(update);
                 }
             }
         });
