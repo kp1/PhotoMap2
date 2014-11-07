@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ProgressBar;
@@ -12,15 +11,11 @@ import android.widget.ProgressBar;
 public class PhotoListActivity extends ActionBarActivity implements ProgressChangeListener{
 
     private ProgressBar progressBar;
-    private String TAG = "PhotoListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        supportRequestWindowFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_photo_list);
-
         progressBar = (ProgressBar) findViewById(R.id.progress);
     }
 
