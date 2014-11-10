@@ -4,10 +4,10 @@
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">#6A6</item>
         <item name="colorPrimaryDark">#383</item>
-        <item name="colorAccent">#F00</item>
+        <item name="colorAccent">#040</item>
         <item name="android:textColorPrimary">#FFF</item>
         <item name="android:textColorSecondary">#FFF</item>
-        <item name="android:textColor">#333</item>
+        <item name="android:textColor">@color/menu_item</item>
     </style>
 
     <style name="AppTheme.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
