@@ -26,20 +26,20 @@ public class ThumbnailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         setHasOptionsMenu(true);
+    }
 
+    public void setList(PhotoGroup g){
+        group = g;
         final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
         final int cacheSize = maxMemory/8;
-
         LruCache<Long, Bitmap> mBitMapCache = new LruCache<Long, Bitmap>(cacheSize) {
             @Override
             protected int sizeOf(Long key, Bitmap value) {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
-
-        Bundle bundle = getArguments();
-        group = bundle.getParcelable(ThumbnailActivity.EXTRA_GROUP);
         adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group,getLoaderManager(),0, mBitMapCache);
+        list.setAdapter(adapter);
     }
 
 
@@ -55,7 +55,6 @@ public class ThumbnailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View parent = inflater.inflate(R.layout.fragment_thumbnail,container,false);
         list = (GridView)parent.findViewById(R.id.thumbnail_grid);
-        list.setAdapter(adapter);
         list.setOnItemClickListener(clickListener);
         return parent;
     }

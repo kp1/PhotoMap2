@@ -2,8 +2,8 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 public class ThumbnailActivity extends ActionBarActivity {
@@ -23,14 +23,10 @@ public class ThumbnailActivity extends ActionBarActivity {
             finish();
         }
 
-        fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentByTag(TAG_THUMBNAIL);
-        if(fragment==null){
-            fragment = new ThumbnailFragment();
-            fragment.setArguments(bundle);
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(android.R.id.content,fragment,TAG_THUMBNAIL);
-            fragmentTransaction.commit();
-        }
+        setContentView(R.layout.activity_thumbnail_list);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+        fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentById(R.id.list);
+        fragment.setList((PhotoGroup) bundle.getParcelable(EXTRA_GROUP));
 
     }
 

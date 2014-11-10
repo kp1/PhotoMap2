@@ -16,16 +16,9 @@
             android:background="?attr/colorPrimary"/>
         <fragment
             android:id="@+id/list"
-            android:name="net.mmho.photomap2.PhotoListFragment"
+            android:name="net.mmho.photomap2.ThumbnailFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:layout="@layout/fragment_photo_list" />
+            tools:layout="@layout/fragment_thumbnail" />
     </LinearLayout>
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:max="10000"
-        style="@style/LoadProgressBar"/>
 </RelativeLayout>

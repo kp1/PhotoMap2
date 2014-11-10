@@ -16,6 +16,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -100,6 +101,7 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_photo_map);
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         progressBar = (ProgressBar) findViewById(R.id.progress);
     }
 

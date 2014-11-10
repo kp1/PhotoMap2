@@ -32,7 +32,20 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
 
     PhotoGroup(Parcel in){
         in.readList(this, null);
-        area = LatLngBounds.CREATOR.createFromParcel(in);
+        double latitude,longitude;
+
+        // south-west
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        LatLng southwest = new LatLng(latitude,longitude);
+
+        // north-east
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+        LatLng northeast = new LatLng(latitude,longitude);
+
+
+        area = new LatLngBounds(southwest,northeast);
         try {
             address = Address.CREATOR.createFromParcel(in);
         }
@@ -92,7 +105,10 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeList(this);
-        area.writeToParcel(out,0);
+        out.writeDouble(area.southwest.latitude);
+        out.writeDouble(area.southwest.longitude);
+        out.writeDouble(area.northeast.latitude);
+        out.writeDouble(area.northeast.longitude);
         if(address!=null)address.writeToParcel(out,0);
     }
 
