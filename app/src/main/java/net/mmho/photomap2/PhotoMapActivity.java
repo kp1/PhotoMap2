@@ -102,6 +102,8 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_photo_map);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         progressBar = (ProgressBar) findViewById(R.id.progress);
     }
 

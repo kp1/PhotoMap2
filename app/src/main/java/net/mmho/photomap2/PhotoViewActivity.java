@@ -39,6 +39,7 @@ public class PhotoViewActivity extends ActionBarActivity{
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         showActionBar(true);
         ActionBar bar = getSupportActionBar();

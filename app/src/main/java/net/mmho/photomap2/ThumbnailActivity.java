@@ -25,6 +25,8 @@ public class ThumbnailActivity extends ActionBarActivity {
 
         setContentView(R.layout.activity_thumbnail_list);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentById(R.id.list);
         fragment.setList((PhotoGroup) bundle.getParcelable(EXTRA_GROUP));
 

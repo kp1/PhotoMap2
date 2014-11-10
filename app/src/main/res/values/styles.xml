@@ -2,8 +2,16 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">#77F</item>
-        <item name="colorPrimaryDark">#55F</item>
+        <item name="colorPrimary">#6A6</item>
+        <item name="colorPrimaryDark">#383</item>
+        <item name="colorAccent">#F00</item>
+        <item name="android:textColorPrimary">#FFF</item>
+        <item name="android:textColorSecondary">#FFF</item>
+        <item name="android:textColor">#333</item>
+    </style>
+
+    <style name="AppTheme.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">#EEE</item>
     </style>
 
     <style name="LoadProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
