@@ -54,6 +54,7 @@ public class PhotoListActivity extends ActionBarActivity implements ProgressChan
             @Override
             public void onAnimationEnd(Animation animation) {
                 progressBar.setVisibility(View.GONE);
+                progressBar.setAnimation(null);
             }
 
             @Override
@@ -62,6 +63,7 @@ public class PhotoListActivity extends ActionBarActivity implements ProgressChan
             }
         });
         progressBar.startAnimation(fadeout);
+
     }
 
 

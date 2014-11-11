@@ -167,6 +167,7 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
             @Override
             public void onAnimationEnd(Animation animation) {
                 progressBar.setVisibility(View.GONE);
+                progressBar.setAnimation(null);
             }
 
             @Override
