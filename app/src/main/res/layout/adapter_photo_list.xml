@@ -69,7 +69,8 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_action_overflow"
-        android:background="@color/selectable_item_tarnslucent"/>
+        android:src="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+        android:tint="@color/overflow"
+        android:background="@color/selectable_item_tarnsparent"/>
 
 </net.mmho.photomap2.PhotoCardLayout>

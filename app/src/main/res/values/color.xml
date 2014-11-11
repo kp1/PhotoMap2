@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#FF66AA66</color>
+    <color name="primaryDark">#FF338833</color>
+    <color name="accent">#FF003300</color>
+    <color name="textPrimary">#FFFFFFFF</color>
+    <color name="textSecondary">#FFFFFFFF</color>
+    <color name="overflow">#DD333333</color>
+    <color name="selectItem">#ff70dfff</color>
+</resources>
