@@ -63,7 +63,7 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     private ProgressChangeListener listener;
 
-	public void onCreate(Bundle savedInstanceState){
+    public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
@@ -90,7 +90,7 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.photo_map_menu,menu);
+        inflater.inflate(R.menu.photo_map_menu, menu);
 
         SearchManager searchManager = (SearchManager)getActivity().getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView)MenuItemCompat.getActionView(menu.findItem(R.id.search));
@@ -100,6 +100,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setQueryRefinementEnabled(true);
+
     }
 
     @Override
@@ -113,6 +114,19 @@ public class PhotoMapFragment extends SupportMapFragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    final private ActionBar.OnMenuVisibilityListener onMenuVisibilityListener =
+            new ActionBar.OnMenuVisibilityListener() {
+                @Override
+                public void onMenuVisibilityChanged(boolean visible) {
+                    if(visible){
+                        showActionBar(false);
+                    }
+                    else{
+                        hideActionBarDelayed();
+                    }
+                }
+            };
 
     final private MenuItemCompat.OnActionExpandListener actionExpandListener =
             new MenuItemCompat.OnActionExpandListener() {
@@ -260,6 +274,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         }
 
         mActionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+        mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
 
     }
 
