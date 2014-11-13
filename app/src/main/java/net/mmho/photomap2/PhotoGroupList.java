@@ -43,9 +43,9 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
 
         do{
             int i;
-            for(i=0;i<this.size();i++){
+            LatLng p = cursor.getLocation();
+            for(i=0;i<size();i++){
                 if(cancel)throw new CancellationException("cancel grouping.");
-                LatLng p = cursor.getLocation();
                 boolean contains = get(i).getArea().contains(p);
                 if(!contains) {
                     LatLng c = get(i).getCenter();
@@ -60,7 +60,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                     break;
                 }
             }
-            if(i==this.size()){
+            if(i==size()){
                 PhotoGroup g = new PhotoGroup(cursor.getLocation(),cursor.getID());
                 add(g);
             }
