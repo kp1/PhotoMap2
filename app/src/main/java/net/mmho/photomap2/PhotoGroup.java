@@ -5,15 +5,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
 
-public class PhotoGroup extends ArrayList<Long> implements Parcelable{
+import ch.hsr.geohash.GeoHash;
+import ch.hsr.geohash.WGS84Point;
+
+public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public Marker marker;
-    private LatLngBounds area;
+    private GeoHash geoHash;
 
     public Address address;
 
@@ -26,26 +27,14 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
 
         @Override
         public PhotoGroup[] newArray(int size) {
-            return new PhotoGroup[0];
+            return new PhotoGroup[size];
         }
     };
 
-    PhotoGroup(Parcel in){
-        in.readList(this, null);
-        double latitude,longitude;
+    public PhotoGroup(Parcel in){
+        in.readTypedList(this,HashedPhoto.CREATOR);
+        geoHash = (GeoHash) in.readSerializable();
 
-        // south-west
-        latitude = in.readDouble();
-        longitude = in.readDouble();
-        LatLng southwest = new LatLng(latitude,longitude);
-
-        // north-east
-        latitude = in.readDouble();
-        longitude = in.readDouble();
-        LatLng northeast = new LatLng(latitude,longitude);
-
-
-        area = new LatLngBounds(southwest,northeast);
         try {
             address = Address.CREATOR.createFromParcel(in);
         }
@@ -54,24 +43,27 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
         }
     }
 
-    PhotoGroup(LatLng p, long id){
-        LatLngBounds.Builder b = new LatLngBounds.Builder();
-        b.include(p);
-        area = b.build();
-        add(id);
+    public PhotoGroup(GeoHash hash, long id){
+        geoHash = hash;
+        add(new HashedPhoto(id, hash.toBase32()));
         address = null;
     }
 
-    public LatLng getCenter(){
-        return area.getCenter();
+    public void append(long id,GeoHash hash){
+        if(!hash.within(geoHash)) geoHash = GeoHashUtils.expand(geoHash, hash);
+        add(new HashedPhoto(id,hash.toBase32()));
     }
-    public LatLngBounds getArea(){
-        return area;
+
+    public WGS84Point getCenter(){
+        return geoHash.getBoundingBoxCenterPoint();
+    }
+    public GeoHash getArea(){
+        return geoHash;
     }
 
     public String locationToString() {
-        LatLng c = area.getCenter();
-        return String.format("% 8.5f , % 8.5f", c.latitude, c.longitude);
+        WGS84Point p = geoHash.getBoundingBoxCenterPoint();
+        return String.format("% 8.5f , % 8.5f", p.getLatitude(),p.getLongitude());
     }
 
     public String toString(){
@@ -87,15 +79,6 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
     }
 
 
-    public void append(LatLng point,long id){
-        area = area.including(point);
-        add(id);
-        address = null;
-    }
-
-    public boolean equals(PhotoGroup g) {
-        return super.equals(g) && area.equals(g.area);
-    }
 
     @Override
     public int describeContents() {
@@ -104,11 +87,8 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeList(this);
-        out.writeDouble(area.southwest.latitude);
-        out.writeDouble(area.southwest.longitude);
-        out.writeDouble(area.northeast.latitude);
-        out.writeDouble(area.northeast.longitude);
+        out.writeTypedList(this);
+        out.writeSerializable(geoHash);
         if(address!=null)address.writeToParcel(out,0);
     }
 

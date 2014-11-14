@@ -3,21 +3,24 @@ package net.mmho.photomap2;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Handler;
-
-import com.google.android.gms.maps.model.LatLng;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 
+import ch.hsr.geohash.GeoHash;
+import ch.hsr.geohash.WGS84Point;
+
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_RESTART = 0;
     public static final int MESSAGE_APPEND = 1;
     public static final int MESSAGE_ADDRESS = 2;
     private static final int ADDRESS_MAX_RESULTS = 1;
+
+    private static final int HASH_CHARACTER_LENGTH=9;
 
     private float distance;
     private boolean finished;
@@ -29,7 +32,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         finished = false;
     }
 
-    public PhotoGroupList exec(PhotoCursor cursor,float distance,boolean geocode,Context context,Handler handler)
+    public PhotoGroupList exec(PhotoCursor cursor,int distance,boolean geocode,Context context,Handler handler)
         throws CancellationException{
         clear();
 
@@ -42,26 +45,20 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         if(handler!=null) handler.sendEmptyMessage(MESSAGE_RESTART);
 
         do{
-            int i;
-            LatLng p = cursor.getLocation();
-            for(i=0;i<size();i++){
+            GeoHash hash = cursor.getGeoHash(HASH_CHARACTER_LENGTH);
+            boolean isBreak=false;
+            for(PhotoGroup g:this){
                 if(cancel)throw new CancellationException("cancel grouping.");
-                boolean contains = get(i).getArea().contains(p);
-                if(!contains) {
-                    LatLng c = get(i).getCenter();
-                    float[] d = new float[3];
-                    Location.distanceBetween(p.latitude, p.longitude, c.latitude, c.longitude, d);
-                    if (d[0] < distance) {
-                        contains = true;
-                    }
-                }
+                boolean contains = hash.within(GeoHash.fromLongValue(g.getArea().longValue(),distance));
+
                 if(contains){
-                    get(i).append(p, cursor.getID());
+                    g.append(cursor.getID(),hash);
+                    isBreak=true;
                     break;
                 }
             }
-            if(i==size()){
-                PhotoGroup g = new PhotoGroup(cursor.getLocation(),cursor.getID());
+            if(!isBreak){
+                PhotoGroup g = new PhotoGroup(hash,cursor.getID());
                 add(g);
             }
             if (handler != null) handler.sendEmptyMessage(MESSAGE_APPEND);
@@ -75,10 +72,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         Geocoder g = new Geocoder(context);
         for(PhotoGroup group:this){
             if(cancel)throw new CancellationException("cancel grouping.");
-            LatLng location = group.getCenter();
+            WGS84Point p = group.getCenter();
             List<Address> addresses;
             try {
-                addresses = g.getFromLocation(location.latitude, location.longitude, ADDRESS_MAX_RESULTS);
+                addresses = g.getFromLocation(p.getLatitude(),p.getLongitude(), ADDRESS_MAX_RESULTS);
                 if(addresses!=null && addresses.size()>0){
                     group.address = addresses.get(0);
                     if(handler!=null) handler.sendEmptyMessage(MESSAGE_ADDRESS);

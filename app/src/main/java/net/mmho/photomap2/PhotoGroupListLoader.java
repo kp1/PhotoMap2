@@ -10,12 +10,12 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     private PhotoGroupList list;
     private PhotoCursor cursor;
-    private float distance;
+    private int distance;
     private Handler handler;
     private boolean geocode;
     private boolean exec;
 
-    public PhotoGroupListLoader(Context context,PhotoGroupList list,PhotoCursor cursor,float distance,boolean geocode,Handler handler) {
+    public PhotoGroupListLoader(Context context,PhotoGroupList list,PhotoCursor cursor,int distance,boolean geocode,Handler handler) {
         super(context);
         this.list = list;
         this.cursor = cursor;

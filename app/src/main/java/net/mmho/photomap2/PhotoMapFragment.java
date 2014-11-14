@@ -23,6 +23,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -43,6 +44,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import ch.hsr.geohash.BoundingBox;
+import ch.hsr.geohash.GeoHash;
 
 public class PhotoMapFragment extends SupportMapFragment {
 	final static int PARTITION_RATIO = 6;
@@ -175,11 +179,12 @@ public class PhotoMapFragment extends SupportMapFragment {
         startActivity(intent);
     }
 
-    private LatLngBounds expandLatLngBounds(LatLngBounds bounds,double percentile){
-        double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
-        double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
-        LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
-        LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
+    private LatLngBounds expandLatLngBounds(GeoHash hash, double percentile){
+        BoundingBox bounds = hash.getBoundingBox();
+        double lat_distance = bounds.getLatitudeSize()*(percentile-1);
+        double lng_distance = bounds.getLongitudeSize()*(percentile-1);
+        LatLng northeast = new LatLng(bounds.getMaxLat()+lat_distance,bounds.getMaxLon()+lng_distance);
+        LatLng southwest = new LatLng(bounds.getMinLat()-lat_distance,bounds.getMinLon()-lng_distance);
         return new LatLngBounds(southwest,northeast);
     }
 
@@ -242,7 +247,9 @@ public class PhotoMapFragment extends SupportMapFragment {
         else{
             Bundle bundle = intent.getExtras();
             PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
-            if(group!=null) return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(), 1.2), 0);
+            if(group!=null) {
+                return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),1.2),0);
+            }
         }
         return null;
     }
@@ -422,23 +429,29 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
+    private String TAG = "PhotoMapFragment";
     LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
+                int distance = (int)getMap().getCameraPosition().zoom+10;
+                if(distance>45) distance = 45;
                 return new PhotoGroupListLoader(getActivity(),
-                        new PhotoGroupList(),photoCursor,getPartitionDistance(mapBounds),false,handler);
+                        new PhotoGroupList(),photoCursor,distance,false,handler);
             }
 
             @Override
             public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList group) {
                 listener.endProgress();
                 hideActionBarDelayed();
+                Log.d(TAG,getMap().getCameraPosition().toString());
                 if(mGroup==null || !mGroup.equals(group)) {
                     mMap.clear();
                     mGroup = group;
                     for (PhotoGroup g : mGroup) {
-                        MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                        LatLng l = new LatLng(g.getCenter().getLatitude(),g.getCenter().getLongitude());
+                        Log.d(TAG,l.toString());
+                        MarkerOptions ops = new MarkerOptions().position(l);
                         ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
                         g.marker = mMap.addMarker(ops);
                     }
