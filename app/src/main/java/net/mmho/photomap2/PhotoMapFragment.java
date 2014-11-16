@@ -434,7 +434,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
             @Override
             public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                int distance = (int)getMap().getCameraPosition().zoom+10;
+                int distance = (int)getMap().getCameraPosition().zoom*2+4;
                 if(distance>45) distance = 45;
                 return new PhotoGroupListLoader(getActivity(),
                         new PhotoGroupList(),photoCursor,distance,false,handler);
