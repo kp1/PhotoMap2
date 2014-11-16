@@ -49,7 +49,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             boolean isBreak=false;
             for(PhotoGroup g:this){
                 if(cancel)throw new CancellationException("cancel grouping.");
-                boolean contains = hash.within(GeoHash.fromLongValue(g.getArea().longValue(),distance));
+                boolean contains = (hash.longValue()^g.getArea().longValue())>>>distance==0;
 
                 if(contains){
                     g.append(cursor.getID(),hash);
