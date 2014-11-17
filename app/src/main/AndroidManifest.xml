@@ -18,61 +18,80 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="PhotoMap.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="1" />
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="net.mmho.photomap2.HashedPhoto" />
+
         <activity
-            android:name=".PhotoListActivity"
-            android:launchMode="singleTop">
+            android:name="net.mmho.photomap2.PhotoListActivity"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".PhotoMapActivity"
-            android:parentActivityName=".PhotoListActivity"
-            android:launchMode="singleTop">
+            android:name="net.mmho.photomap2.PhotoMapActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW" />
+
                 <data android:scheme="geo" />
-                <category android:name="android.intent.category.default"/>
+
+                <category android:name="android.intent.category.default" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SEND"/>
-                <data android:mimeType="image/jpeg"/>
-                <data android:mimeType="image/jpg"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SEND" />
+
+                <data android:mimeType="image/jpeg" />
+                <data android:mimeType="image/jpg" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.default_searchable"
-                android:value=".PhotoMapActivity"/>
+                android:value=".PhotoMapActivity" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PhotoListActivity"/>
+                android:value=".PhotoListActivity" />
+
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SEARCH" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+                android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".ThumbnailActivity"
-            android:parentActivityName=".PhotoListActivity">
+        <activity
+            android:name="net.mmho.photomap2.ThumbnailActivity"
+            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PhotoListActivity"/>
+                android:value=".PhotoListActivity" />
         </activity>
-        <activity android:name=".PhotoViewActivity"
-            android:parentActivityName=".PhotoListActivity">
+        <activity
+            android:name="net.mmho.photomap2.PhotoViewActivity"
+            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PhotoListActivity"/>
+                android:value=".PhotoListActivity" />
         </activity>
 
         <provider
-            android:authorities="net.mmho.MapSuggestionProvider"
-            android:name=".MapSuggestionProvider"/>
+            android:name="net.mmho.photomap2.MapSuggestionProvider"
+            android:authorities="net.mmho.MapSuggestionProvider" />
 
         <meta-data
             android:name="com.google.android.gms.version"

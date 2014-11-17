@@ -2,20 +2,27 @@ package net.mmho.photomap2;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.BaseColumns;
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
 
 import net.mmho.photomap2.geohash.GeoHash;
 
-public class HashedPhoto implements Parcelable {
-
+@Table(name="Items")
+public class HashedPhoto extends Model implements Parcelable {
+    @Column(name=BaseColumns._ID)
     private long id;
+    @Column(name="hash")
     private GeoHash hash;
 
-    public HashedPhoto(long id,GeoHash hash){
+    public HashedPhoto(long id, GeoHash hash){
+        super();
         this.id = id;
         this.hash = hash;
     }
 
-    public long getId() {
+    public long getPhotoId() {
         return id;
     }
 

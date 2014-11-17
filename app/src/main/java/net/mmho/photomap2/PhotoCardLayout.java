@@ -83,7 +83,7 @@ public class PhotoCardLayout extends RelativeLayout{
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(manager,loader_id,g.get(0).getId(),cache);
+        thumbnail.startLoading(manager,loader_id,g.get(0).getPhotoId(),cache);
 
         Address address = g.address;
         if(address==null) {

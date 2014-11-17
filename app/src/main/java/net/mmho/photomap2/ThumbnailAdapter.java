@@ -51,7 +51,7 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
             v.setTag(R.id.thumbnail,id);
         }
 
-        holder.thumbnail.startLoading(manager,id,getItem(position).getId(),mBitmapCache);
+        holder.thumbnail.startLoading(manager,id,getItem(position).getPhotoId(),mBitmapCache);
 
         return v;
     }

@@ -9,6 +9,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ProgressBar;
 
+
 public class PhotoListActivity extends ActionBarActivity implements ProgressChangeListener{
 
     private ProgressBar progressBar;
