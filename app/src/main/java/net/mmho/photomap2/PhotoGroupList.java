@@ -50,9 +50,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             for(PhotoGroup g:this){
                 if(cancel)throw new CancellationException("cancel grouping.");
                 int insignificantBits = 64-distance;
-                boolean contains = (hash.longValue()^g.getArea().longValue())>>>insignificantBits==0;
-
-                if(contains){
+                if((hash.longValue()^g.getArea().longValue())>>>insignificantBits==0){
                     g.append(cursor.getID(),hash);
                     isBreak=true;
                     break;
