@@ -7,4 +7,6 @@
     <color name="textSecondary">#FFFFFFFF</color>
     <color name="overflow">#DD333333</color>
     <color name="selectItem">#ff70dfff</color>
+    <color name="progress">#ff52b9b8</color>
+    <color name="background">#DDDDDD</color>
 </resources>
