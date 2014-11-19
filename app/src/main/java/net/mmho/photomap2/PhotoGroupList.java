@@ -4,15 +4,15 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Handler;
-import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
+
+import net.mmho.photomap2.geohash.GeoHash;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-
-import ch.hsr.geohash.GeoHash;
-import ch.hsr.geohash.WGS84Point;
 
 public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_RESTART = 0;
@@ -49,8 +49,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             boolean isBreak=false;
             for(PhotoGroup g:this){
                 if(cancel)throw new CancellationException("cancel grouping.");
-                int insignificantBits = 64-distance;
-                if((hash.longValue()^g.getArea().longValue())>>>insignificantBits==0){
+                if(hash.within(g.getHash(),distance)){
                     g.append(cursor.getID(),hash);
                     isBreak=true;
                     break;
@@ -71,10 +70,10 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         Geocoder g = new Geocoder(context);
         for(PhotoGroup group:this){
             if(cancel)throw new CancellationException("cancel grouping.");
-            WGS84Point p = group.getCenter();
+            LatLng p = group.getCenter();
             List<Address> addresses;
             try {
-                addresses = g.getFromLocation(p.getLatitude(),p.getLongitude(), ADDRESS_MAX_RESULTS);
+                addresses = g.getFromLocation(p.latitude,p.longitude, ADDRESS_MAX_RESULTS);
                 if(addresses!=null && addresses.size()>0){
                     group.address = addresses.get(0);
                     if(handler!=null) handler.sendEmptyMessage(MESSAGE_ADDRESS);

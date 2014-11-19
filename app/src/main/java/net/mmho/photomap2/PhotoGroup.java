@@ -5,14 +5,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import net.mmho.photomap2.geohash.GeoHash;
 
 import java.util.ArrayList;
 
-import ch.hsr.geohash.GeoHash;
-import ch.hsr.geohash.WGS84Point;
-
-public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
+public class PhotoGroup extends ArrayList<Long> implements Parcelable{
     public Marker marker;
     private GeoHash geoHash;
 
@@ -32,8 +32,8 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     };
 
     public PhotoGroup(Parcel in){
-        in.readTypedList(this,HashedPhoto.CREATOR);
-        geoHash = (GeoHash) in.readSerializable();
+        in.readList(this,null);
+        geoHash = GeoHash.CREATOR.createFromParcel(in);
 
         try {
             address = Address.CREATOR.createFromParcel(in);
@@ -45,25 +45,25 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public PhotoGroup(GeoHash hash, long id){
         geoHash = hash;
-        add(new HashedPhoto(id, hash.toBase32()));
+        add(id);
         address = null;
     }
 
     public void append(long id,GeoHash hash){
-        if(!hash.within(geoHash)) geoHash = GeoHashUtils.expand(geoHash, hash);
-        add(new HashedPhoto(id,hash.toBase32()));
+        if(!hash.within(geoHash)) geoHash.extend(hash);
+        add(id);
     }
 
-    public WGS84Point getCenter(){
-        return geoHash.getBoundingBoxCenterPoint();
+    public LatLng getCenter(){
+        return geoHash.getCenter();
     }
-    public GeoHash getArea(){
+    public GeoHash getHash(){
         return geoHash;
     }
 
     public String locationToString() {
-        WGS84Point p = geoHash.getBoundingBoxCenterPoint();
-        return String.format("% 8.5f , % 8.5f", p.getLatitude(),p.getLongitude());
+        LatLng p = geoHash.getCenter();
+        return String.format("% 8.5f , % 8.5f", p.latitude,p.latitude);
     }
 
     public String toString(){
@@ -87,9 +87,9 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeTypedList(this);
-        out.writeSerializable(geoHash);
-        if(address!=null)address.writeToParcel(out,0);
+        out.writeList(this);
+        geoHash.writeToParcel(out, flags);
+        if(address!=null)address.writeToParcel(out,flags);
     }
 
     static public float getMarkerColor(int size){

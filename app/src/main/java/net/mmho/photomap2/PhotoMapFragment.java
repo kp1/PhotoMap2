@@ -45,8 +45,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ch.hsr.geohash.BoundingBox;
-import ch.hsr.geohash.GeoHash;
 
 public class PhotoMapFragment extends SupportMapFragment {
 	final static int PARTITION_RATIO = 6;
@@ -179,12 +177,13 @@ public class PhotoMapFragment extends SupportMapFragment {
         startActivity(intent);
     }
 
-    private LatLngBounds expandLatLngBounds(GeoHash hash, double percentile){
-        BoundingBox bounds = hash.getBoundingBox();
-        double lat_distance = bounds.getLatitudeSize()*(percentile-1);
-        double lng_distance = bounds.getLongitudeSize()*(percentile-1);
-        LatLng northeast = new LatLng(bounds.getMaxLat()+lat_distance,bounds.getMaxLon()+lng_distance);
-        LatLng southwest = new LatLng(bounds.getMinLat()-lat_distance,bounds.getMinLon()-lng_distance);
+    private LatLngBounds expandLatLngBounds(LatLngBounds bounds, double percentile){
+        Log.d(TAG,bounds.toString());
+        double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
+        double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
+        LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
+        LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
+        Log.d(TAG,northeast.toString()+" , "+southwest);
         return new LatLngBounds(southwest,northeast);
     }
 
@@ -248,7 +247,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             Bundle bundle = intent.getExtras();
             PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
             if(group!=null) {
-                return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getArea(),1.2),0);
+                return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.getHash().getBounds(),1.2),0);
             }
         }
         return null;
@@ -449,9 +448,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                     mMap.clear();
                     mGroup = group;
                     for (PhotoGroup g : mGroup) {
-                        LatLng l = new LatLng(g.getCenter().getLatitude(),g.getCenter().getLongitude());
-                        Log.d(TAG,l.toString());
-                        MarkerOptions ops = new MarkerOptions().position(l);
+                        MarkerOptions ops = new MarkerOptions().position(g.getCenter());
                         ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
                         g.marker = mMap.addMarker(ops);
                     }

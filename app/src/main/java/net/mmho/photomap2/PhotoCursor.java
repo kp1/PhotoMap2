@@ -6,7 +6,7 @@ import android.provider.MediaStore;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import ch.hsr.geohash.GeoHash;
+import net.mmho.photomap2.geohash.GeoHash;
 
 public class PhotoCursor extends CursorWrapper{
 
@@ -35,10 +35,7 @@ public class PhotoCursor extends CursorWrapper{
     }
 
     public GeoHash getGeoHash(int character){
-        float latitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE));
-        float longitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE));
-        return GeoHash.withCharacterPrecision(latitude,longitude,character);
-
+        return GeoHash.createWithCharacterCount(getLocation(),character);
     }
 
 }
