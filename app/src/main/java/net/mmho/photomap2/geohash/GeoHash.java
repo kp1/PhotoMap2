@@ -11,7 +11,8 @@ public class GeoHash implements Parcelable {
     long bit;
     int significantBits;
 
-    private final static int MAX_SIGNIFICANT_BIT = 64;
+    private final static int MAX_SIGNIFICANT_BITS = 64;
+    private final static int BASE32_BITS = 5;
     private final static String BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
     static class Divider{
@@ -46,10 +47,27 @@ public class GeoHash implements Parcelable {
         return hash;
     }
 
+    public static GeoHash createFromHash(String hash) {
+        GeoHash geoHash = new GeoHash();
+        geoHash.significantBits = hash.length() * BASE32_BITS;
+        geoHash.bit = 0L;
+        if (geoHash.significantBits > MAX_SIGNIFICANT_BITS) {
+            throw new IllegalArgumentException("hash is too long.");
+        }
+        int offset = MAX_SIGNIFICANT_BITS - BASE32_BITS;
+        for (int c : hash.toLowerCase().toCharArray()) {
+            long bit = BASE32.indexOf(c);
+            if (bit < 0) throw new IllegalArgumentException("hash string is invalid");
+            geoHash.bit |= bit << offset;
+            offset -= MAX_SIGNIFICANT_BITS;
+        }
+        return geoHash;
+    }
+
     public static GeoHash create(double latitude, final double longitude,int significant){
 
-        if(significant>MAX_SIGNIFICANT_BIT){
-            throw new IllegalArgumentException(String.format("significant bit must under %d.",MAX_SIGNIFICANT_BIT));
+        if(significant> MAX_SIGNIFICANT_BITS){
+            throw new IllegalArgumentException(String.format("significant bit must under %d.", MAX_SIGNIFICANT_BITS));
         }
 
         GeoHash hash = new GeoHash();
@@ -81,6 +99,18 @@ public class GeoHash implements Parcelable {
 
     public int getSignificantBits(){
         return significantBits;
+    }
+
+    public String toBase32(){
+        StringBuilder b = new StringBuilder();
+        if((bit%BASE32_BITS)!=0){
+            throw new IllegalArgumentException();
+        }
+        long mask_bits = ~(~0L>>>(MAX_SIGNIFICANT_BITS-BASE32_BITS));
+        for(int i=0;i<bit/5;i++){
+            b.append(BASE32.charAt((int) (bit>>>(MAX_SIGNIFICANT_BITS-i*BASE32_BITS))));
+        }
+        return b.toString();
     }
 
     public void extend(GeoHash ext){
