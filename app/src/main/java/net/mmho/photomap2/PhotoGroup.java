@@ -12,7 +12,7 @@ import net.mmho.photomap2.geohash.GeoHash;
 
 import java.util.ArrayList;
 
-public class PhotoGroup extends ArrayList<Long> implements Parcelable{
+public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public Marker marker;
     private GeoHash geoHash;
 
@@ -45,13 +45,13 @@ public class PhotoGroup extends ArrayList<Long> implements Parcelable{
 
     public PhotoGroup(GeoHash hash, long id){
         geoHash = hash;
-        add(id);
+        add(new HashedPhoto(id,hash.toBase32()));
         address = null;
     }
 
     public void append(long id,GeoHash hash){
         if(!hash.within(geoHash)) geoHash.extend(hash);
-        add(id);
+        add(new HashedPhoto(id,hash.toBase32()));
     }
 
     public LatLng getCenter(){

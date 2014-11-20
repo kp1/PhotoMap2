@@ -18,7 +18,7 @@ public class PhotoViewAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int i) {
         Fragment f = new PhotoViewFragment();
         Bundle b = new Bundle();
-        b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID,group.get(i));
+        b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID,group.get(i).getId());
         f.setArguments(b);
         return f;
     }
@@ -29,7 +29,7 @@ public class PhotoViewAdapter extends FragmentPagerAdapter {
     }
 
     public long getItemID(int i){
-        return group.get(i);
+        return group.get(i).getId();
     }
 
 }
