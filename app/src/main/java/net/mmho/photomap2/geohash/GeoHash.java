@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+@SuppressWarnings("unused")
 public class GeoHash implements Parcelable {
 
     long bit;
