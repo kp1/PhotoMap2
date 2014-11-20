@@ -1,5 +1,6 @@
 package net.mmho.photomap2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -20,6 +21,7 @@ public class PhotoListActivity extends ActionBarActivity implements ProgressChan
         setContentView(R.layout.activity_photo_list);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
         progressBar = (ProgressBar) findViewById(R.id.progress);
+        startService(new Intent(PhotoListActivity.this,UpdateDBService.class));
     }
 
     @Override

@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name="com.activeandroid.app.Application"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -88,6 +89,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PhotoListActivity" />
         </activity>
+
+        <service android:name=".UpdateDBService" android:enabled="true"/>
 
         <provider
             android:name="net.mmho.photomap2.MapSuggestionProvider"
