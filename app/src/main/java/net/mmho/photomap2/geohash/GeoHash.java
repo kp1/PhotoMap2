@@ -33,7 +33,7 @@ public class GeoHash implements Parcelable {
     }
 
     public static GeoHash createWithCharacterCount(LatLng latLng,int length){
-        return create(latLng,length*5);
+        return create(latLng,length*BASE32_BITS);
     }
 
     public static GeoHash create(LatLng latlng,int significant){
