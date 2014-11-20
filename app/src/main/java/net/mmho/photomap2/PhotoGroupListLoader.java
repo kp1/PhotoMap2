@@ -4,21 +4,22 @@ import android.content.Context;
 import android.os.Handler;
 import android.support.v4.content.AsyncTaskLoader;
 
+import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
 
 public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
 
     private PhotoGroupList list;
-    private PhotoCursor cursor;
+    private ArrayList<HashedPhoto> photoList;
     private int distance;
     private Handler handler;
     private boolean geocode;
     private boolean exec;
 
-    public PhotoGroupListLoader(Context context,PhotoGroupList list,PhotoCursor cursor,int distance,boolean geocode,Handler handler) {
+    public PhotoGroupListLoader(Context context,PhotoGroupList list,ArrayList<HashedPhoto> photoList,int distance,boolean geocode,Handler handler) {
         super(context);
         this.list = list;
-        this.cursor = cursor;
+        this.photoList = photoList;
         this.distance = distance;
         this.geocode = geocode;
         this.handler = handler;
@@ -30,7 +31,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     public PhotoGroupList loadInBackground() {
         exec = true;
         try {
-            list.exec(cursor,distance,geocode,getContext(), handler);
+            list.exec(photoList,distance,geocode,getContext(), handler);
         }
         catch (CancellationException e){
             // do nothing

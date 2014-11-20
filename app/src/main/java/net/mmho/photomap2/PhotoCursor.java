@@ -8,6 +8,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import net.mmho.photomap2.geohash.GeoHash;
 
+import java.util.ArrayList;
+
 public class PhotoCursor extends CursorWrapper{
 
     final public static String[] projection = new String[]{
@@ -19,6 +21,9 @@ public class PhotoCursor extends CursorWrapper{
             MediaStore.Images.Media.DATE_TAKEN,
             MediaStore.Images.Media.ORIENTATION,
     };
+
+    private static final int HASH_CHARACTER_LENGTH=9;
+
 
     public PhotoCursor(Cursor cursor) {
         super(cursor);
@@ -36,6 +41,19 @@ public class PhotoCursor extends CursorWrapper{
 
     public GeoHash getGeoHash(int character){
         return GeoHash.createWithCharacterCount(getLocation(),character);
+    }
+
+    public HashedPhoto getHashedPhoto(int character){
+        return new HashedPhoto(getID(),getGeoHash(character));
+    }
+
+    public ArrayList<HashedPhoto> getHashedPhotoList(){
+        ArrayList<HashedPhoto> list = new ArrayList<HashedPhoto>();
+        if(isClosed()||!moveToFirst()) return list;
+        do{
+            list.add(getHashedPhoto(HASH_CHARACTER_LENGTH));
+        }while(moveToNext());
+        return list;
     }
 
 }

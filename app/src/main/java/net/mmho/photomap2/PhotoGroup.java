@@ -32,7 +32,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     };
 
     public PhotoGroup(Parcel in){
-        in.readList(this,null);
+        in.readTypedList(this,HashedPhoto.CREATOR);
         geoHash = GeoHash.CREATOR.createFromParcel(in);
 
         try {
@@ -43,15 +43,15 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         }
     }
 
-    public PhotoGroup(GeoHash hash, long id){
-        geoHash = hash;
-        add(new HashedPhoto(id,hash.toBase32()));
+    public PhotoGroup(HashedPhoto p){
+        geoHash = p.getHash();
+        add(p);
         address = null;
     }
 
-    public void append(long id,GeoHash hash){
-        if(!hash.within(geoHash)) geoHash.extend(hash);
-        add(new HashedPhoto(id,hash.toBase32()));
+    public void append(HashedPhoto p){
+        if(!p.getHash().within(geoHash)) geoHash.extend(p.getHash());
+        add(p);
     }
 
     public LatLng getCenter(){
@@ -87,7 +87,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeList(this);
+        out.writeTypedList(this);
         geoHash.writeToParcel(out, flags);
         if(address!=null)address.writeToParcel(out,flags);
     }

@@ -20,8 +20,6 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_ADDRESS = 2;
     private static final int ADDRESS_MAX_RESULTS = 1;
 
-    private static final int HASH_CHARACTER_LENGTH=9;
-
     private float distance;
     private boolean finished;
     private boolean cancel;
@@ -32,7 +30,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         finished = false;
     }
 
-    public PhotoGroupList exec(PhotoCursor cursor,int distance,boolean geocode,Context context,Handler handler)
+    public PhotoGroupList exec(ArrayList<HashedPhoto> list,int distance,boolean geocode,Context context,Handler handler)
         throws CancellationException{
         clear();
 
@@ -40,27 +38,25 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         cancel = false;
         this.distance = distance;
 
-        if(cursor==null || !cursor.moveToFirst()) return this;
-
         if(handler!=null) handler.sendEmptyMessage(MESSAGE_RESTART);
 
-        do{
-            GeoHash hash = cursor.getGeoHash(HASH_CHARACTER_LENGTH);
+        for(HashedPhoto p:list){
+            GeoHash hash = p.getHash();
             boolean isBreak=false;
             for(PhotoGroup g:this){
                 if(cancel)throw new CancellationException("cancel grouping.");
                 if(hash.within(g.getHash(),distance)){
-                    g.append(cursor.getID(),hash);
+                    g.append(p);
                     isBreak=true;
                     break;
                 }
             }
             if(!isBreak){
-                PhotoGroup g = new PhotoGroup(hash,cursor.getID());
+                PhotoGroup g = new PhotoGroup(p);
                 add(g);
             }
             if (handler != null) handler.sendEmptyMessage(MESSAGE_APPEND);
-        }while(cursor.moveToNext());
+        }
 
         if(!geocode){
             finished = true;

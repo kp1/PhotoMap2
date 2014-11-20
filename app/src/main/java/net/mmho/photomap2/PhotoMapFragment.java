@@ -42,6 +42,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,13 +56,13 @@ public class PhotoMapFragment extends SupportMapFragment {
     final public static float DEFAULT_ZOOM = 15;
 
     private GoogleMap mMap;
-    private LatLngBounds mapBounds;
     private PhotoCursor photoCursor;
     private PhotoGroupList mGroup;
     private int progress;
     private MarkerOptions sharedMarker;
     private MenuItem searchMenuItem;
     private ActionBar mActionBar;
+    private ArrayList<HashedPhoto> photoList;
 
     private ProgressChangeListener listener;
 
@@ -372,14 +373,6 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    private float getPartitionDistance(LatLngBounds b){
-        LatLng ne = b.northeast; // north-east
-        LatLng sw = b.southwest; // south-west
-        float[] d = new float[3];
-        Location.distanceBetween(ne.latitude, ne.longitude, sw.latitude, sw.longitude, d);
-        return d[0]/PARTITION_RATIO;
-    }
-
     final private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -401,7 +394,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-                mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                LatLngBounds mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                 String q = QueryBuilder.createQuery(mapBounds);
                 String o = QueryBuilder.sortDateNewest();
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -413,6 +406,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoCursor = new PhotoCursor(cursor);
                 if(photoCursor.getCount()!=0) {
+                    photoList = photoCursor.getHashedPhotoList();
                     getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                     getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
                 }
@@ -436,7 +430,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 int distance = (int)getMap().getCameraPosition().zoom*2+4;
                 if(distance>45) distance = 45;
                 return new PhotoGroupListLoader(getActivity(),
-                        new PhotoGroupList(),photoCursor,distance,false,handler);
+                        new PhotoGroupList(),photoList,distance,false,handler);
             }
 
             @Override

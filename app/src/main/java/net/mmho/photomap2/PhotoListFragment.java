@@ -29,6 +29,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 
+import java.util.ArrayList;
+
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
@@ -38,6 +40,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private Cursor mCursor;
     private PhotoGroupList groupList;
     private PhotoListAdapter adapter;
+    private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
     private int progress;
     private int geo_progress;
@@ -47,6 +50,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private boolean filtered;
     private String query="";
     private int distance_index;
+
 
     boolean attached = false;
 
@@ -282,6 +286,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         }
     };
 
+
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -296,6 +301,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
                 mCursor = data;
+                photoList = new PhotoCursor(mCursor).getHashedPhotoList();
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                 getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
             }
@@ -317,7 +323,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             }
             resetFilter(false);
             loaded = false;
-            return new PhotoGroupListLoader(getActivity(),groupList,new PhotoCursor(mCursor),
+            return new PhotoGroupListLoader(getActivity(),groupList,photoList,
                     DistanceActionProvider.getDistance(distance_index),true, handler);
         }
 
