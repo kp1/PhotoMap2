@@ -9,6 +9,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
+import net.mmho.photomap2.geohash.GeoHash;
+
 public class UpdateDBService extends Service implements Loader.OnLoadCompleteListener<Cursor> {
 
     CursorLoader mCursorLoader;
@@ -18,7 +20,7 @@ public class UpdateDBService extends Service implements Loader.OnLoadCompleteLis
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG,"onLoadCreate");
+        Log.d(TAG, "onLoadCreate");
         final String projection[]={
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.LATITUDE,
@@ -39,6 +41,17 @@ public class UpdateDBService extends Service implements Loader.OnLoadCompleteLis
     @Override
     public void onLoadComplete(Loader<Cursor> cursorLoader, Cursor cursor) {
         Log.d(TAG,"onLoadComplete");
+        cursor.moveToFirst();
+        do{
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+            HashedPhoto photo = HashedPhoto.getByPhotoId(id);
+            if(photo==null){
+                float latitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE));
+                float longitude = cursor.getFloat(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE));
+                photo = new HashedPhoto(id, GeoHash.create(latitude,longitude,9*5));
+                photo.save();
+            }
+        }while(cursor.moveToNext());
     }
 
     @Override

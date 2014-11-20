@@ -6,12 +6,13 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import net.mmho.photomap2.geohash.GeoHash;
 
-@Table(name="Items")
+@Table(name="HashedPhoto",id=BaseColumns._ID)
 public class HashedPhoto extends Model implements Parcelable {
-    @Column(name=BaseColumns._ID)
+    @Column(name="image_id")
     private long id;
     @Column(name="hash")
     private GeoHash hash;
@@ -55,4 +56,8 @@ public class HashedPhoto extends Model implements Parcelable {
             return new HashedPhoto[size];
         }
     };
+
+    public static HashedPhoto getByPhotoId(long id){
+        return new Select().from(HashedPhoto.class).where("image_id = ?",id).executeSingle();
+    }
 }
