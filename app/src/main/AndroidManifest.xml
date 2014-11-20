@@ -25,9 +25,6 @@
         <meta-data
             android:name="AA_DB_VERSION"
             android:value="1" />
-        <meta-data
-            android:name="AA_MODELS"
-            android:value="net.mmho.photomap2.HashedPhoto" />
 
         <activity
             android:name="net.mmho.photomap2.PhotoListActivity"
@@ -89,8 +86,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PhotoListActivity" />
         </activity>
-
-        <service android:name=".UpdateDBService" android:enabled="true"/>
 
         <provider
             android:name="net.mmho.photomap2.MapSuggestionProvider"
