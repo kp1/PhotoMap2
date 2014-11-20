@@ -50,7 +50,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     }
 
     public void append(HashedPhoto p){
-        if(!p.getHash().within(geoHash)) geoHash.extend(p.getHash());
+        if(!p.getHash().within(geoHash)) geoHash = geoHash.extend(p.getHash());
         add(p);
     }
 

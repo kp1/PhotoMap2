@@ -113,15 +113,17 @@ public class GeoHash implements Parcelable {
         return b.toString();
     }
 
-    public void extend(GeoHash ext){
+    public GeoHash extend(GeoHash ext){
         int significant = Math.min(significantBits,ext.significantBits);
         long xor_bit = (bit^ext.bit)&~(~0L>>>significant);
         while(xor_bit!=0){
             significant--;
             xor_bit = (bit^ext.bit)&~(~0L>>>significant);
         }
-        bit &= ~(~0L>>>significant);
-        significantBits = significant;
+        GeoHash hash = new GeoHash();
+        hash.bit = bit&~(~0L>>>significant);
+        hash.significantBits = significant;
+        return hash;
     }
 
     public boolean within(GeoHash base){
