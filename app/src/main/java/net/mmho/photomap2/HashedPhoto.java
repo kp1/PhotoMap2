@@ -36,7 +36,7 @@ public class HashedPhoto implements Parcelable {
 
     private HashedPhoto(Parcel in) {
         this.id = in.readLong();
-        GeoHash.CREATOR.createFromParcel(in);
+        this.hash = GeoHash.CREATOR.createFromParcel(in);
     }
 
     public static final Parcelable.Creator<HashedPhoto> CREATOR = new Parcelable.Creator<HashedPhoto>() {

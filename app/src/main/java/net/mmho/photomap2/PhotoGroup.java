@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.location.Address;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public Marker marker;
     private GeoHash geoHash;
-
-    public Address address;
+    private String address;
+    private String description;
 
     public final static Parcelable.Creator<PhotoGroup> CREATOR = new Parcelable.Creator<PhotoGroup>(){
 
@@ -34,24 +33,34 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public PhotoGroup(Parcel in){
         in.readTypedList(this,HashedPhoto.CREATOR);
         geoHash = GeoHash.CREATOR.createFromParcel(in);
+        address = in.readString();
+        description = in.readString();
 
-        try {
-            address = Address.CREATOR.createFromParcel(in);
-        }
-        catch (NullPointerException e){
-            address = null;
-        }
     }
 
     public PhotoGroup(HashedPhoto p){
         geoHash = p.getHash();
         add(p);
         address = null;
+        description = null;
     }
 
     public void append(HashedPhoto p){
         if(!p.getHash().within(geoHash)) geoHash = geoHash.extend(p.getHash());
         add(p);
+    }
+
+    public void setAddress(String title,String description){
+        address = title;
+        this.description = description;
+    }
+
+    public String getTitle(){
+        return address;
+    }
+
+    public String getDescription(){
+        return description;
     }
 
     public LatLng getCenter(){
@@ -67,15 +76,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     }
 
     public String toString(){
-        if(address==null) return "";
-        StringBuilder builder = new StringBuilder();
-        int index = address.getMaxAddressLineIndex();
-        for(int i=0;i<=index;i++) builder.append(address.getAddressLine(i)).append(" ");
-        if(address.getAdminArea()!=null) builder.append(address.getLocality()).append(" ");
-        if(address.getSubAdminArea()!=null) builder.append(address.getSubAdminArea()).append(" ");
-        if(address.getAdminArea()!=null) builder.append(address.getAdminArea()).append(" ");
-        if(address.getCountryCode()!=null) builder.append(address.getCountryCode()).append(" ");
-        return builder.toString();
+        return description;
     }
 
 
@@ -89,7 +90,8 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public void writeToParcel(Parcel out, int flags) {
         out.writeTypedList(this);
         geoHash.writeToParcel(out, flags);
-        if(address!=null)address.writeToParcel(out,flags);
+        out.writeString(address);
+        out.writeString(description);
     }
 
     static public float getMarkerColor(int size){

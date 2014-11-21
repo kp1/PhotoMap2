@@ -46,8 +46,9 @@ public class ThumbnailFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(group.address!=null){
-            getActivity().setTitle(AddressUtil.getTitle(group.address, getActivity()));
+        String title = group.getTitle();
+        if(title!=null){
+            getActivity().setTitle(title);
         }
     }
 

@@ -3,7 +3,6 @@ package net.mmho.photomap2;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.Address;
 import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.util.LruCache;
@@ -85,14 +84,14 @@ public class PhotoCardLayout extends RelativeLayout{
 
         thumbnail.startLoading(manager,loader_id,g.get(0).getPhotoId(),cache);
 
-        Address address = g.address;
+        String address= g.getTitle();
         if(address==null) {
             title.setText(R.string.loading);
             description.setText(g.locationToString());
         }
         else{
-            title.setText(AddressUtil.getTitle(address, getContext()));
-            description.setText(AddressUtil.getDescription(address));
+            title.setText(address);
+            description.setText(g.getDescription());
         }
 
     }

@@ -66,13 +66,20 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         Geocoder g = new Geocoder(context);
         for(PhotoGroup group:this){
             if(cancel)throw new CancellationException("cancel grouping.");
+            AddressRecord record = AddressRecord.getAddressByHash(group.getHash());
+            if(record!=null){
+                group.setAddress(record.getTitle(),record.getDescription());
+                continue;
+            }
             LatLng p = group.getCenter();
             List<Address> addresses;
             try {
                 addresses = g.getFromLocation(p.latitude,p.longitude, ADDRESS_MAX_RESULTS);
                 if(addresses!=null && addresses.size()>0){
-                    group.address = addresses.get(0);
+                    Address a = addresses.get(0);
+                    group.setAddress(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a));
                     if(handler!=null) handler.sendEmptyMessage(MESSAGE_ADDRESS);
+                    new AddressRecord(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a),group.getHash()).save();
                 }
             } catch (IOException e) {
                 // do nothing

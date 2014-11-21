@@ -46,8 +46,9 @@ public class PhotoViewActivity extends ActionBarActivity{
         if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
         group = bundle.getParcelable(EXTRA_GROUP);
-        if(group.address!=null){
-            setTitle(AddressUtil.getTitle(group.address,this));
+        String title = group.getTitle();
+        if(title!=null){
+            setTitle(title);
         }
         int position = bundle.getInt(EXTRA_POSITION);
         adapter = new PhotoViewAdapter(getSupportFragmentManager(), group);
