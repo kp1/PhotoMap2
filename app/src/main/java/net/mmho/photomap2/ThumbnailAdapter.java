@@ -11,15 +11,15 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
-public class ThumbnailAdapter extends ArrayAdapter<Long>{
+public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
 
     private int resource;
     private LayoutInflater inflater;
     private LoaderManager manager;
     private int loader_id;
-    private LruCache<Long,Bitmap> mBitmapCache;
+    private LruCache<java.lang.Long,Bitmap> mBitmapCache;
 
-    public ThumbnailAdapter(Context c, int resource, List<Long> objects,LoaderManager m,int loader_id_base,LruCache<Long,Bitmap> cache) {
+    public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects,LoaderManager m,int loader_id_base,LruCache<java.lang.Long,Bitmap> cache) {
         super(c, resource, objects);
         this.resource = resource;
         manager = m;
@@ -51,7 +51,7 @@ public class ThumbnailAdapter extends ArrayAdapter<Long>{
             v.setTag(R.id.thumbnail,id);
         }
 
-        holder.thumbnail.startLoading(manager,id,getItem(position),mBitmapCache);
+        holder.thumbnail.startLoading(manager,id,getItem(position).getId(),mBitmapCache);
 
         return v;
     }

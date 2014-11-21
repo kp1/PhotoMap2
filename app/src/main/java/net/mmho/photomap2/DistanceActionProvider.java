@@ -6,8 +6,6 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 
-import java.text.NumberFormat;
-
 public class DistanceActionProvider extends ActionProvider
     implements MenuItem.OnMenuItemClickListener{
     private OnDistanceChangeListener onDistanceChangeListener;
@@ -15,25 +13,13 @@ public class DistanceActionProvider extends ActionProvider
 
     private static final int INITIAL_INDEX = 1;
 
-    private static final float[] distance={
-            50,
-            500,
-            5*1000,
-            50*1000,
-            500*1000,
-            5000*1000,
+    private static final int[] distance={
+            7,6,5,4,3
+
     };
 
     static private String pretty(int position) {
-        StringBuilder pretty = new StringBuilder();
-        int d = (int) (distance[position]) * 2;
-        String prefix ="";
-        if(d>=1000){
-            d/=1000;
-            prefix = "k";
-        }
-        pretty.append(NumberFormat.getNumberInstance().format(d)).append(prefix).append("m");
-        return pretty.toString();
+        return String.valueOf(distance[position]);
     }
 
 
@@ -50,8 +36,8 @@ public class DistanceActionProvider extends ActionProvider
         selected = index;
     }
 
-    public static float getDistance(int index){
-        return distance[index];
+    public static int getDistance(int index){
+        return distance[index]*5;
     }
 
     @Override
