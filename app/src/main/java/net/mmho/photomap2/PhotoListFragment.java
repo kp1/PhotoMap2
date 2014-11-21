@@ -346,13 +346,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 @Override
                 public void onDistanceChange(int index) {
                     distance_index = index;
-                    if(mCursor==null || mCursor.isClosed()) {
-                        getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-                    }
-                    else {
-                        getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                        getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
-                    }
+                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
+                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
                 }
             };
 
