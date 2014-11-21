@@ -301,6 +301,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
                 mCursor = data;
+                groupList.reset();
                 photoList = new PhotoCursor(mCursor).getHashedPhotoList();
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                 getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
