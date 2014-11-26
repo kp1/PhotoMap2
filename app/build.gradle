@@ -8,8 +8,8 @@ android {
         applicationId "net.mmho.photomap2"
         minSdkVersion 10
         targetSdkVersion 21
-        versionCode 105
-        versionName "1.0.5"
+        versionCode 107
+        versionName "1.0.7"
     }
     buildTypes {
         release {
