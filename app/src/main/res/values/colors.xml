@@ -9,4 +9,5 @@
     <color name="selectItem">#ff70dfff</color>
     <color name="progress">#ff52b9b8</color>
     <color name="background">#DDDDDD</color>
+    <color name="separator">@android:color/darker_gray</color>
 </resources>

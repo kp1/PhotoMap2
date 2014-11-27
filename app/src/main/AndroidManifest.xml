@@ -84,6 +84,8 @@
                 android:value=".PhotoListActivity" />
         </activity>
 
+        <activity android:name=".AboutActivity"/>
+
         <provider
             android:name="net.mmho.photomap2.MapSuggestionProvider"
             android:authorities="net.mmho.MapSuggestionProvider" />

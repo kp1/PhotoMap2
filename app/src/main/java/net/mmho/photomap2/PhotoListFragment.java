@@ -179,8 +179,9 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
-        case R.id.clear_cache:
-            AddressRecord.clearCache();
+        case R.id.about:
+            Intent i = new Intent(getActivity(),AboutActivity.class);
+            startActivity(i);
             return true;
         default:
             return true;
