@@ -10,7 +10,7 @@
         <item name="android:textColor">@color/abc_primary_text_material_light</item>
     </style>
 
-    <style name="AppTheme.ActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="AppTheme.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="android:textColorPrimary">#EEE</item>
     </style>
 

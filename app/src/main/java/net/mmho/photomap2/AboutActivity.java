@@ -3,6 +3,8 @@ package net.mmho.photomap2;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -16,6 +18,22 @@ public class AboutActivity extends ActionBarActivity{
         LicenseAdapter adapter = new LicenseAdapter(this,R.layout.layout_license,
                 getResources().getStringArray(R.array.oss));
         ((ListView)findViewById(R.id.list)).setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.about_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.clear_cache:
+                AddressRecord.clearCache();
+                return true;
+        }
+        return false;
     }
 
     private void showAbout() {
