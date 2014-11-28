@@ -3,7 +3,7 @@ package net.mmho.photomap2;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.ScrollView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class AboutActivity extends ActionBarActivity{
@@ -13,16 +13,9 @@ public class AboutActivity extends ActionBarActivity{
         setContentView(R.layout.activity_about);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         showAbout();
-        showLicense();
-    }
-
-    private void showLicense() {
-        ScrollView scroll = (ScrollView) findViewById(R.id.license);
-        String[] list = getResources().getStringArray(R.array.oss);
-        for(String oss:list){
-            LicenseLayout layout = new LicenseLayout(this,oss);
-            scroll.addView(layout);
-        }
+        LicenseAdapter adapter = new LicenseAdapter(this,R.layout.layout_license,
+                getResources().getStringArray(R.array.oss));
+        ((ListView)findViewById(R.id.list)).setAdapter(adapter);
     }
 
     private void showAbout() {

@@ -16,8 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/separator"/>
-    <ScrollView
-        android:id="@+id/license"
+    <ListView
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>
