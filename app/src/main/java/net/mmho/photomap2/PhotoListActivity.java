@@ -1,6 +1,5 @@
 package net.mmho.photomap2;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
@@ -45,7 +44,7 @@ public class PhotoListActivity extends ActionBarActivity implements ProgressChan
         progressBar.setProgress(progressBar.getMax());
         AlphaAnimation fadeout;
         fadeout = new AlphaAnimation(1,0);
-        fadeout.setDuration(1000);
+        fadeout.setDuration(300);
         fadeout.setFillAfter(true);
         fadeout.setAnimationListener(new Animation.AnimationListener() {
             @Override

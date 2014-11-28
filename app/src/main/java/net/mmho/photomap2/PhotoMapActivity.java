@@ -156,7 +156,7 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
         progressBar.setProgress(progressBar.getMax());
         AlphaAnimation fadeout;
         fadeout = new AlphaAnimation(1,0);
-        fadeout.setDuration(1000);
+        fadeout.setDuration(300);
         fadeout.setFillAfter(true);
         fadeout.setAnimationListener(new Animation.AnimationListener() {
             @Override
