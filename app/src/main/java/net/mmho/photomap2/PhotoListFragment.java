@@ -79,7 +79,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         };
 
         groupList = new PhotoGroupList();
-        adapter= new PhotoListAdapter(getActivity(), R.layout.adapter_photo_list,groupList,getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList,getLoaderManager(),ADAPTER_LOADER_ID, mBitmapCache);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
@@ -179,8 +179,9 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
-        case R.id.clear_cache:
-            AddressRecord.clearCache();
+        case R.id.about:
+            Intent i = new Intent(getActivity(),AboutActivity.class);
+            startActivity(i);
             return true;
         default:
             return true;
