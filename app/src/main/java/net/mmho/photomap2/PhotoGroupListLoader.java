@@ -1,7 +1,6 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.os.Handler;
 import android.support.v4.content.AsyncTaskLoader;
 
 import java.util.ArrayList;
@@ -12,18 +11,15 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     private PhotoGroupList list;
     private ArrayList<HashedPhoto> photoList;
     private int distance;
-    private Handler handler;
     private boolean geocode;
     private boolean exec;
 
-    public PhotoGroupListLoader(Context context,PhotoGroupList list,ArrayList<HashedPhoto> photoList,int distance,boolean geocode,Handler handler) {
+    public PhotoGroupListLoader(Context context,PhotoGroupList list,ArrayList<HashedPhoto> photoList,int distance,boolean geocode) {
         super(context);
         this.list = list;
         this.photoList = photoList;
         this.distance = distance;
         this.geocode = geocode;
-        this.handler = handler;
-
         onContentChanged();
     }
 
@@ -31,7 +27,7 @@ public class PhotoGroupListLoader extends AsyncTaskLoader<PhotoGroupList> {
     public PhotoGroupList loadInBackground() {
         exec = true;
         try {
-            list.exec(photoList,distance,geocode,getContext(), handler);
+            list.exec(photoList,distance,geocode,getContext());
         }
         catch (CancellationException e){
             // do nothing

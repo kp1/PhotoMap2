@@ -1,9 +1,10 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -19,6 +20,8 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
     public static final int MESSAGE_APPEND = 1;
     public static final int MESSAGE_ADDRESS = 2;
     private static final int ADDRESS_MAX_RESULTS = 1;
+    public static final String PROGRESS_ACTION = "PROGRESS";
+    public static final String LOADER_STATUS = "STATUS";
 
     private float distance;
     private boolean finished;
@@ -30,7 +33,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         finished = false;
     }
 
-    public PhotoGroupList exec(ArrayList<HashedPhoto> list,int distance,boolean geocode,Context context,Handler handler)
+    public PhotoGroupList exec(ArrayList<HashedPhoto> list,int distance,boolean geocode,Context context)
         throws CancellationException{
         clear();
 
@@ -38,7 +41,9 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
         cancel = false;
         this.distance = distance;
 
-        if(handler!=null) handler.sendEmptyMessage(MESSAGE_RESTART);
+        Intent intent = new Intent(PROGRESS_ACTION);
+        intent.putExtra(LOADER_STATUS,MESSAGE_RESTART);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
         for(HashedPhoto p:list){
             GeoHash hash = p.getHash();
@@ -55,7 +60,8 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 PhotoGroup g = new PhotoGroup(p);
                 add(g);
             }
-            if (handler != null) handler.sendEmptyMessage(MESSAGE_APPEND);
+            intent = new Intent(PROGRESS_ACTION).putExtra(LOADER_STATUS,MESSAGE_APPEND);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
         }
 
         if(!geocode){
@@ -78,7 +84,8 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 if(addresses!=null && addresses.size()>0){
                     Address a = addresses.get(0);
                     group.setAddress(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a));
-                    if(handler!=null) handler.sendEmptyMessage(MESSAGE_ADDRESS);
+                    intent = new Intent(PROGRESS_ACTION).putExtra(LOADER_STATUS,MESSAGE_ADDRESS);
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
                     new AddressRecord(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a),group.getHash()).save();
                 }
             } catch (IOException e) {

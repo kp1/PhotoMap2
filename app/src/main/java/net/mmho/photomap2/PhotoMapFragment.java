@@ -2,23 +2,24 @@ package net.mmho.photomap2;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -71,6 +72,20 @@ public class PhotoMapFragment extends SupportMapFragment {
 		setRetainInstance(true);
         setHasOptionsMenu(true);
 	}
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(progressReceiver,new IntentFilter(PhotoGroupList.PROGRESS_ACTION));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(progressReceiver);
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -373,12 +388,12 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    final private Handler handler = new Handler(){
+    private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
         @Override
-        public void handleMessage(Message msg) {
-            if(isRemoving()) return;
+        public void onReceive(Context context, Intent intent) {
             int count = photoCursor.getCount();
-            switch(msg.what){
+            int status = intent.getIntExtra(PhotoGroupList.LOADER_STATUS,0);
+            switch(status){
                 case PhotoGroupList.MESSAGE_RESTART:
                     progress = 0;
                     break;
@@ -430,7 +445,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 int distance = (int)getMap().getCameraPosition().zoom*2+4;
                 if(distance>45) distance = 45;
                 return new PhotoGroupListLoader(getActivity(),
-                        new PhotoGroupList(),photoList,distance,false,handler);
+                        new PhotoGroupList(),photoList,distance,false);
             }
 
             @Override

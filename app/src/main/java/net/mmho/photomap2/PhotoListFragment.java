@@ -1,19 +1,21 @@
 package net.mmho.photomap2;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.LruCache;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
@@ -87,6 +89,20 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         else{
             distance_index = DistanceActionProvider.initialIndex();
         }
+    }
+
+    @Override
+    public void onStart() {
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(progressReceiver, new IntentFilter(PhotoGroupList.PROGRESS_ACTION));
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(progressReceiver);
     }
 
     @Override
@@ -260,36 +276,36 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         attached = false;
     }
 
-    private final Handler handler = new Handler(){
+    private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
         @Override
-        public void handleMessage(Message msg) {
-            int count;
-            if(!attached) return;
+        public void onReceive(Context context, Intent intent) {
             final int PROGRESS_GROUPING_RATIO=8000;
-            switch (msg.what){
-            case PhotoGroupList.MESSAGE_RESTART:
-                adapter.notifyDataSetChanged();
-                listener.showProgress(0);
-                break;
-            case PhotoGroupList.MESSAGE_APPEND:
-                adapter.notifyDataSetChanged();
-                progress++;
-                count = mCursor.getCount();
-                if(count!=0) listener.showProgress(progress * PROGRESS_GROUPING_RATIO/count);
-                break;
-            case PhotoGroupList.MESSAGE_ADDRESS:
-                geo_progress++;
-                count = adapter.getCount();
-                if(count!=0){
-                    listener.showProgress(PROGRESS_GROUPING_RATIO+
-                            geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/count);
-                }
-                adapter.notifyDataSetChanged();
-                break;
+            int status = intent.getIntExtra(PhotoGroupList.LOADER_STATUS,0);
+            int count;
+            switch(status){
+                case PhotoGroupList.MESSAGE_RESTART:
+                    adapter.notifyDataSetChanged();
+                    listener.showProgress(0);
+                    break;
+                case PhotoGroupList.MESSAGE_APPEND:
+                    adapter.notifyDataSetChanged();
+                    progress++;
+                    count = mCursor.getCount();
+                    if(count!=0) listener.showProgress(progress * PROGRESS_GROUPING_RATIO/count);
+                    break;
+                case PhotoGroupList.MESSAGE_ADDRESS:
+                    geo_progress++;
+                    count = adapter.getCount();
+                    if(count!=0){
+                        listener.showProgress(PROGRESS_GROUPING_RATIO+
+                                geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/count);
+                    }
+                    adapter.notifyDataSetChanged();
+                    break;
             }
+
         }
     };
-
 
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -329,7 +345,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             resetFilter(false);
             loaded = false;
             return new PhotoGroupListLoader(getActivity(),groupList,photoList,
-                    DistanceActionProvider.getDistance(distance_index),true, handler);
+                    DistanceActionProvider.getDistance(distance_index),true);
         }
 
         @Override
