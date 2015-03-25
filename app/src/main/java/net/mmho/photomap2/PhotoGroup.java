@@ -60,7 +60,8 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     }
 
     public String getDescription(){
-        return description;
+        if(description!=null) return description;
+        else return "";
     }
 
     public LatLng getCenter(){
@@ -76,7 +77,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     }
 
     public String toString(){
-        return description;
+        return getDescription();
     }
 
 

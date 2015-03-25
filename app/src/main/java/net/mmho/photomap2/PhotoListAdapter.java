@@ -75,16 +75,16 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults result = new FilterResults();
             if(mOriginalValues==null){
-                mOriginalValues = new ArrayList<PhotoGroup>(mObjects);
+                mOriginalValues = new ArrayList<>(mObjects);
             }
             if(constraint==null || constraint.length()==0){
                 result.count = mOriginalValues.size();
                 result.values = mOriginalValues;
             }
             else{
-                ArrayList<PhotoGroup> filtered = new ArrayList<PhotoGroup>();
+                ArrayList<PhotoGroup> filtered = new ArrayList<>();
                 for(PhotoGroup group:mOriginalValues){
-                    if(group.toString().toLowerCase().contains(String.format("%s", constraint.toString().toLowerCase()))){
+                    if(group.getDescription().toLowerCase().contains(String.format("%s", constraint.toString().toLowerCase()))){
                         filtered.add(group);
                     }
                 }
@@ -101,7 +101,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             notifyDataSetInvalidated();
             clearData();
             ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;
-            addAll(list);
+            if(list!=null) addAll(list);
             notifyDataSetChanged();
         }
     }
