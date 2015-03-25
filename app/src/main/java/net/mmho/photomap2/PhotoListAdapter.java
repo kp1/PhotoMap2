@@ -101,7 +101,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             notifyDataSetInvalidated();
             clearData();
             ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;
-            if(list!=null) addAll(list);
+            for(PhotoGroup g:list) add(g);
             notifyDataSetChanged();
         }
     }

@@ -21,4 +21,7 @@
     <string name="clear_cache_data">キャッシュを削除</string>
     <string name="show_about">アプリについて</string>
     <string name="about">%1$sは以下のオープンソースソフトウェアを使用しています。</string>
+    <string-array name="oss">
+        <item>ActiveAndroid</item>
+    </string-array>
 </resources>
