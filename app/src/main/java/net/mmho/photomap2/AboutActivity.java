@@ -39,7 +39,7 @@ public class AboutActivity extends ActionBarActivity{
     private void showAbout() {
         TextView about = (TextView)findViewById(R.id.about);
         StringBuilder b = new StringBuilder();
-        b.append(getString(R.string.about,getString(R.string.app_name)));
+        b.append(getString(R.string.about_software,getString(R.string.app_name)));
         b.append("\n\n");
         String[] list = getResources().getStringArray(R.array.oss);
         for(String oss:list){

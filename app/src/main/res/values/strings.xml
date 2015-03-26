@@ -21,7 +21,8 @@
     <string name="clear_search_history">clear search history</string>
     <string name="clear_cache_data">delete cache data</string>
     <string name="show_about">About</string>
-    <string name="about">%1$s is built using open source software.</string>
+    <string name="about_software">%1$s is built using open source software.</string>
+    <string name="about">about</string>
     <string-array name="oss">
         <item>ActiveAndroid</item>
     </string-array>

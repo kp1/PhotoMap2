@@ -17,9 +17,22 @@ public class DistanceActionProvider extends ActionProvider
             7,6,5,4,3
 
     };
+    private static final int[] meters={
+            150,
+            600,
+            5000,
+            20000,
+            150000,
+    };
 
-    static private String pretty(int position) {
-        return String.valueOf(distance[position]);
+    private String pretty(int position) {
+        int meter = meters[position];
+        String unit = "m";
+        if(meter>=1000){
+            unit = "km";
+            meter /= 1000;
+        }
+        return getContext().getString(R.string.about)+String.valueOf(meter)+unit;
     }
 
 
