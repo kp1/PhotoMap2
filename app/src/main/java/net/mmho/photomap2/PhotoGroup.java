@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.Marker;
 import net.mmho.photomap2.geohash.GeoHash;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public Marker marker;
@@ -70,7 +71,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public String locationToString() {
         LatLng p = geoHash.getCenter();
-        return String.format("% 8.5f , % 8.5f", p.latitude,p.latitude);
+        return String.format(Locale.getDefault(),"% 8.5f , % 8.5f", p.latitude, p.latitude);
     }
 
     public String toString(){

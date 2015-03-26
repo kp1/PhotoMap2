@@ -6,6 +6,8 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import java.util.Locale;
+
 @SuppressWarnings("unused")
 public class GeoHash implements Parcelable {
 
@@ -56,7 +58,7 @@ public class GeoHash implements Parcelable {
             throw new IllegalArgumentException("hash is too long.");
         }
         int offset = MAX_SIGNIFICANT_BITS - BASE32_BITS;
-        for (int c : hash.toLowerCase().toCharArray()) {
+        for (int c : hash.toLowerCase(Locale.US).toCharArray()) {
             long bit = BASE32.indexOf(c);
             if (bit < 0) throw new IllegalArgumentException("hash string is invalid");
             geoHash.bit |= bit << offset;

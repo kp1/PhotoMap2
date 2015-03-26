@@ -8,6 +8,7 @@ import android.widget.TextView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 public class LicenseLayout extends LinearLayout{
 
@@ -22,7 +23,7 @@ public class LicenseLayout extends LinearLayout{
     public void setData(String oss){
         ((TextView)findViewById(R.id.title)).setText(oss+"\n");
         try{
-            int id = getResources().getIdentifier("license_" + oss.toLowerCase(),"raw", getContext().getPackageName());
+            int id = getResources().getIdentifier("license_" + oss.toLowerCase(Locale.US),"raw", getContext().getPackageName());
             ((TextView)findViewById(R.id.license)).setText(getStringResource(id));
         } catch (IOException e) {
             e.printStackTrace();

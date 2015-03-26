@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
@@ -85,7 +86,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             else{
                 ArrayList<PhotoGroup> filtered = new ArrayList<>();
                 for(PhotoGroup group:mOriginalValues){
-                    if(group.getDescription().toLowerCase().contains(String.format("%s", constraint.toString().toLowerCase()))){
+                    if(group.getDescription().toLowerCase(Locale.getDefault()).contains(String.format("%s", constraint.toString().toLowerCase(Locale.getDefault())))){
                         filtered.add(group);
                     }
                 }

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 public class AddressListAdapter extends ArrayAdapter<Address>{
 
     private int resource;
@@ -32,7 +34,7 @@ public class AddressListAdapter extends ArrayAdapter<Address>{
         TextView text2 = (TextView) v.findViewById(android.R.id.text2);
         Address address = getItem(position);
         text1.setText(AddressUtil.getDescription(address));
-        text2.setText(String.format("%6.4f,%6.4f", address.getLatitude(), address.getLongitude()));
+        text2.setText(String.format(Locale.getDefault(),"%6.4f,%6.4f", address.getLatitude(), address.getLongitude()));
         return v;
     }
 
