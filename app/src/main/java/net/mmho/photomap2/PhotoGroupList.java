@@ -79,17 +79,19 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
             }
             LatLng p = group.getCenter();
             List<Address> addresses;
-            try {
-                addresses = g.getFromLocation(p.latitude,p.longitude, ADDRESS_MAX_RESULTS);
-                if(addresses!=null && addresses.size()>0){
-                    Address a = addresses.get(0);
-                    group.setAddress(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a));
-                    intent = new Intent(PROGRESS_ACTION).putExtra(LOADER_STATUS,MESSAGE_ADDRESS);
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-                    new AddressRecord(AddressUtil.getTitle(a,context),AddressUtil.getDescription(a),group.getHash()).save();
+            if(NetworkUtils.networkCheck(context)) {
+                try {
+                    addresses = g.getFromLocation(p.latitude, p.longitude, ADDRESS_MAX_RESULTS);
+                    if (addresses != null && addresses.size() > 0) {
+                        Address a = addresses.get(0);
+                        group.setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
+                        intent = new Intent(PROGRESS_ACTION).putExtra(LOADER_STATUS, MESSAGE_ADDRESS);
+                        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                        new AddressRecord(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a), group.getHash()).save();
+                    }
+                } catch (IOException e) {
+                    // do nothing
                 }
-            } catch (IOException e) {
-                // do nothing
             }
 
         }

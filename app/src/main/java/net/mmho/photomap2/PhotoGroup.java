@@ -15,7 +15,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public Marker marker;
     private GeoHash geoHash;
     private String address;
-    private String description;
+    private String description = "";
 
     public final static Parcelable.Creator<PhotoGroup> CREATOR = new Parcelable.Creator<PhotoGroup>(){
 
@@ -41,8 +41,6 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     public PhotoGroup(HashedPhoto p){
         geoHash = p.getHash();
         add(p);
-        address = null;
-        description = null;
     }
 
     public void append(HashedPhoto p){
@@ -60,8 +58,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
     }
 
     public String getDescription(){
-        if(description!=null) return description;
-        else return "";
+        return description;
     }
 
     public LatLng getCenter(){
