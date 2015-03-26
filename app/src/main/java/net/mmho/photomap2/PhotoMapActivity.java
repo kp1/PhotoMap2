@@ -7,8 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,20 +37,6 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
     private Dialog dialog = null;
     private ProgressBar progressBar;
 
-    private final Handler cancelHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            finish();
-        }
-    };
-
-    private final DialogInterface.OnCancelListener onCancelListener = new DialogInterface.OnCancelListener() {
-        @Override
-        public void onCancel(DialogInterface dialog) {
-            cancelHandler.sendEmptyMessage(0);
-        }
-    };
-
     @Override
     protected void onNewIntent(Intent intent) {
         handleIntent(intent);
@@ -82,7 +66,12 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
             }
         }
         else if(GooglePlayServicesUtil.isUserRecoverableError(result)){
-            dialog = GooglePlayServicesUtil.getErrorDialog(result,this,1,onCancelListener);
+            dialog = GooglePlayServicesUtil.getErrorDialog(result,this,1,new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    finish();
+                }
+            });
             dialog.show();
         }
         else{
