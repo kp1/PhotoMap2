@@ -48,9 +48,10 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
             id = loader_id++;
             v.setTag(id);
         }
-        PhotoGroup g = getItem(position);
-        ((PhotoCardLayout)v).setData(g, id, manager,mBitmapCache);
-
+        if(position < getCount()) {
+            PhotoGroup g = getItem(position);
+            ((PhotoCardLayout) v).setData(g, id, manager, mBitmapCache);
+        }
         return v;
     }
 
