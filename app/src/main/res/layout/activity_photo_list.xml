@@ -18,7 +18,7 @@
         android:max="10000"
         style="@style/LoadProgressBar"/>
     <fragment
-        android:id="@+id/list"
+        android:id="@+id/fragment"
         android:name="net.mmho.photomap2.PhotoListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
