@@ -54,8 +54,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private int distance_index;
 
 
-    boolean attached = false;
-
     private ProgressChangeListener listener;
 
     public void onBackPressed() {
@@ -267,13 +265,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
         }
         listener = (ProgressChangeListener) activity;
-        attached = true;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        attached = false;
     }
 
     private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
