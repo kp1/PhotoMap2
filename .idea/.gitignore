@@ -1,0 +1,5 @@
+*.xml
+libraries/
+!gradle.xml
+!runConfigurations/*.xml
+.name
