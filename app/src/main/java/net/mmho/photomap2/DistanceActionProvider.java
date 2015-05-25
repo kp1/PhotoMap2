@@ -82,7 +82,7 @@ public class DistanceActionProvider extends ActionProvider
     }
     
     public interface OnDistanceChangeListener {
-        public void onDistanceChange(int index);
+        void onDistanceChange(int index);
     }
 
     public void setOnDistanceChangeListener(OnDistanceChangeListener changeListener){

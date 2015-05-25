@@ -49,7 +49,6 @@ import java.util.regex.Pattern;
 
 
 public class PhotoMapFragment extends SupportMapFragment {
-	final static int PARTITION_RATIO = 6;
     final static int PHOTO_CURSOR_LOADER = 0;
     final static int PHOTO_GROUP_LOADER = 1;
 
@@ -296,7 +295,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         }
 
         mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
+        if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
 
     }
 

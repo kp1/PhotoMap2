@@ -61,11 +61,7 @@ public class SearchResultFragment extends DialogFragment{
             Field mShownByMeField = DialogFragment.class.getDeclaredField("mShownByMe");
             mShownByMeField.setAccessible(true);
             mShownByMeField.set(this, true);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        } catch(NoSuchFieldException e){
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 

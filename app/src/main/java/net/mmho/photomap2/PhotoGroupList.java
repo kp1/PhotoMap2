@@ -57,8 +57,7 @@ public class PhotoGroupList extends ArrayList<PhotoGroup>{
                 }
             }
             if(!isBreak){
-                PhotoGroup g = new PhotoGroup(p);
-                add(g);
+                add(new PhotoGroup(p));
             }
             intent = new Intent(PROGRESS_ACTION).putExtra(LOADER_STATUS,MESSAGE_APPEND);
             LocalBroadcastManager.getInstance(context).sendBroadcast(intent);

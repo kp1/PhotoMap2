@@ -24,7 +24,6 @@ public class PhotoViewActivity extends AppCompatActivity{
     private PhotoViewAdapter adapter;
     private ViewPager pager;
     private ShareActionProvider shareActionProvider;
-    private PhotoGroup group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +37,15 @@ public class PhotoViewActivity extends AppCompatActivity{
 
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
-        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         showActionBar(true);
         ActionBar bar = getSupportActionBar();
-        if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
-        group = bundle.getParcelable(EXTRA_GROUP);
+        if(bar!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            bar.addOnMenuVisibilityListener(menuVisibilityListener);
+        }
+        PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
         String title = group.getTitle();
         if(title!=null){
             setTitle(title);

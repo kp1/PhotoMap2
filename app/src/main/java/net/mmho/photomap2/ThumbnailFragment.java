@@ -17,7 +17,6 @@ import android.widget.GridView;
 
 public class ThumbnailFragment extends Fragment {
 
-    private ThumbnailAdapter adapter;
     private PhotoGroup group;
     private GridView list;
 
@@ -38,7 +37,8 @@ public class ThumbnailFragment extends Fragment {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
-        adapter = new ThumbnailAdapter(getActivity(),R.layout.adapter_thumbnail,group,getLoaderManager(),0, mBitMapCache);
+        ThumbnailAdapter adapter =
+            new ThumbnailAdapter(getActivity(), R.layout.adapter_thumbnail, group, getLoaderManager(), 0, mBitMapCache);
         list.setAdapter(adapter);
     }
 

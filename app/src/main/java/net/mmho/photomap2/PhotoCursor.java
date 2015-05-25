@@ -48,7 +48,7 @@ public class PhotoCursor extends CursorWrapper{
     }
 
     public ArrayList<HashedPhoto> getHashedPhotoList(){
-        ArrayList<HashedPhoto> list = new ArrayList<HashedPhoto>();
+        ArrayList<HashedPhoto> list = new ArrayList<>();
         if(isClosed()||!moveToFirst()) return list;
         do{
             list.add(getHashedPhoto(HASH_CHARACTER_LENGTH));
