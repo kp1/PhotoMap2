@@ -2,7 +2,7 @@ package net.mmho.photomap2;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -10,7 +10,7 @@ import android.view.animation.Animation;
 import android.widget.ProgressBar;
 
 
-public class PhotoListActivity extends ActionBarActivity implements ProgressChangeListener{
+public class PhotoListActivity extends AppCompatActivity implements ProgressChangeListener{
 
     private ProgressBar progressBar;
 

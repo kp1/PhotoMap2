@@ -2,11 +2,12 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-public class ThumbnailActivity extends ActionBarActivity {
+public class ThumbnailActivity extends AppCompatActivity {
 
     private final static String TAG="ThumbnailActivity";
     private final static String TAG_THUMBNAIL="thumbnail";

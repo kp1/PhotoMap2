@@ -13,7 +13,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -28,7 +28,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.util.List;
 
-public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>,
+public class PhotoMapActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Address>>,
                 ProgressChangeListener{
 
     private static final String TAG_DIALOG = "dialog";

@@ -22,7 +22,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
@@ -99,7 +99,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(resultCode){
-        case ActionBarActivity.RESULT_OK:
+        case AppCompatActivity.RESULT_OK:
             LatLng position = data.getExtras().getParcelable("location");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM));
             break;
@@ -295,7 +295,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
 
-        mActionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+        mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
 
     }
