@@ -88,7 +88,8 @@
 
         <provider
             android:name="net.mmho.photomap2.MapSuggestionProvider"
-            android:authorities="net.mmho.MapSuggestionProvider" />
+            android:authorities="net.mmho.MapSuggestionProvider"
+            android:exported="false"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

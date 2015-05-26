@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -22,7 +23,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
@@ -49,7 +50,6 @@ import java.util.regex.Pattern;
 
 
 public class PhotoMapFragment extends SupportMapFragment {
-	final static int PARTITION_RATIO = 6;
     final static int PHOTO_CURSOR_LOADER = 0;
     final static int PHOTO_GROUP_LOADER = 1;
 
@@ -99,7 +99,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch(resultCode){
-        case ActionBarActivity.RESULT_OK:
+        case AppCompatActivity.RESULT_OK:
             LatLng position = data.getExtras().getParcelable("location");
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM));
             break;
@@ -199,18 +199,27 @@ public class PhotoMapFragment extends SupportMapFragment {
         double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
         LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
         LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
-        Log.d(TAG,northeast.toString()+" , "+southwest);
+        Log.d(TAG, northeast.toString() + " , " + southwest);
         return new LatLngBounds(southwest,northeast);
     }
 
     private Bitmap createBitMap(int resource){
         int height = getResources().getDimensionPixelSize(R.dimen.marker_height);
         int width = getResources().getDimensionPixelSize(R.dimen.marker_width);
-        Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        Drawable shape = getResources().getDrawable(resource);
-        shape.setBounds(0,0,bitmap.getWidth(),bitmap.getHeight());
-        shape.draw(canvas);
+        Drawable shape;
+        if(Build.VERSION.SDK_INT >= 21) {
+            shape = getResources().getDrawable(resource, null);
+        }
+        else{
+            //noinspection deprecation
+            shape = getResources().getDrawable(resource);
+        }
+        if(shape!=null) {
+            shape.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            shape.draw(canvas);
+        }
         return bitmap;
     }
 
@@ -295,8 +304,8 @@ public class PhotoMapFragment extends SupportMapFragment {
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
 
-        mActionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
-        mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
+        mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
 
     }
 
@@ -429,6 +438,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                     mMap.clear();
                     if(sharedMarker!=null)mMap.addMarker(sharedMarker);
                     hideActionBarDelayed();
+                    listener.endProgress();
                 }
             }
 

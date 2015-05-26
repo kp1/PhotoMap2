@@ -9,14 +9,14 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class PhotoViewActivity extends ActionBarActivity{
+public class PhotoViewActivity extends AppCompatActivity{
 
     public static final String EXTRA_GROUP = "photo_group";
     public static final String EXTRA_POSITION = "position";
@@ -24,7 +24,6 @@ public class PhotoViewActivity extends ActionBarActivity{
     private PhotoViewAdapter adapter;
     private ViewPager pager;
     private ShareActionProvider shareActionProvider;
-    private PhotoGroup group;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +37,15 @@ public class PhotoViewActivity extends ActionBarActivity{
 
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.fragment_photo_view);
-        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         showActionBar(true);
         ActionBar bar = getSupportActionBar();
-        if(bar!=null) bar.addOnMenuVisibilityListener(menuVisibilityListener);
 
-        group = bundle.getParcelable(EXTRA_GROUP);
+        if(bar!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            bar.addOnMenuVisibilityListener(menuVisibilityListener);
+        }
+        PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
         String title = group.getTitle();
         if(title!=null){
             setTitle(title);

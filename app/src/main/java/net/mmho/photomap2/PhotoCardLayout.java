@@ -21,7 +21,6 @@ public class PhotoCardLayout extends RelativeLayout{
     private TextView title;
     private TextView description;
     private TextView count;
-    private ImageView menu;
 
     private PhotoGroup group = null;
 
@@ -42,7 +41,7 @@ public class PhotoCardLayout extends RelativeLayout{
         thumbnail = (ThumbnailImageView)findViewById(R.id.thumbnail);
         title = (TextView)findViewById(R.id.title);
         description = (TextView)findViewById(R.id.description);
-        menu = (ImageView)findViewById(R.id.overflow);
+        ImageView menu = (ImageView) findViewById(R.id.overflow);
         menu.setOnClickListener(onClickListener);
         count = (TextView)findViewById(R.id.count);
     }

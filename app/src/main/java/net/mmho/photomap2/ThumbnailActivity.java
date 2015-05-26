@@ -2,11 +2,12 @@ package net.mmho.photomap2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-public class ThumbnailActivity extends ActionBarActivity {
+public class ThumbnailActivity extends AppCompatActivity {
 
     private final static String TAG="ThumbnailActivity";
     private final static String TAG_THUMBNAIL="thumbnail";
@@ -16,19 +17,22 @@ public class ThumbnailActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_thumbnail_list);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle==null){
             if(BuildConfig.DEBUG) Log.d(TAG, "bundle is null.");
             finish();
         }
+        else{
+            fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentById(R.id.list);
+            fragment.setList((PhotoGroup) bundle.getParcelable(EXTRA_GROUP));
+        }
 
-        setContentView(R.layout.activity_thumbnail_list);
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar bar = getSupportActionBar();
+        if(bar!=null) bar.setDisplayHomeAsUpEnabled(true);
 
-        fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentById(R.id.list);
-        fragment.setList((PhotoGroup) bundle.getParcelable(EXTRA_GROUP));
 
     }
 

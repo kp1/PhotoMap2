@@ -7,13 +7,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -28,7 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 
 import java.util.List;
 
-public class PhotoMapActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<List<Address>>,
+public class PhotoMapActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Address>>,
                 ProgressChangeListener{
 
     private static final String TAG_DIALOG = "dialog";
@@ -91,7 +94,8 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
         supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
         setContentView(R.layout.activity_photo_map);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar bar = getSupportActionBar();
+        if(bar!=null) bar.setDisplayHomeAsUpEnabled(true);
 
         progressBar = (ProgressBar) findViewById(R.id.progress);
     }
@@ -102,8 +106,8 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Address>> addressLoader, List<Address> addresses) {
-        String location =((GeocodeLoader)addressLoader).getLocation();
+    public void onLoadFinished(Loader<List<Address>> addressLoader, final List<Address> addresses) {
+        final String location =((GeocodeLoader)addressLoader).getLocation();
         if(addresses==null || addresses.size()==0){
             Toast.makeText(getApplicationContext(), getString(R.string.location_not_found,location),
                     Toast.LENGTH_LONG).show();
@@ -115,18 +119,22 @@ public class PhotoMapActivity extends ActionBarActivity implements LoaderManager
             if(fragment instanceof PhotoMapFragment) ((PhotoMapFragment)fragment).getMap().moveCamera(update);
         }
         else {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            Fragment prev = getSupportFragmentManager().findFragmentByTag(TAG_DIALOG);
-            if(prev!=null){
-                transaction.remove(prev);
-            }
-            transaction.addToBackStack(null);
+            new Handler(Looper.getMainLooper()).post(new Runnable(){
+                @Override
+                public void run() {
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    Fragment prev = getSupportFragmentManager().findFragmentByTag(TAG_DIALOG);
+                    if(prev!=null){
+                        transaction.remove(prev);
+                    }
+                    transaction.addToBackStack(null);
+                    transaction.commit();
 
-            SearchResultFragment fragment = SearchResultFragment.newInstance(location,addresses);
-            fragment.show(getSupportFragmentManager(),TAG_DIALOG);
+                    SearchResultDialogFragment fragment = SearchResultDialogFragment.newInstance(location, addresses);
+                    fragment.show(getSupportFragmentManager(),TAG_DIALOG);
+                }
+            });
         }
-
-
     }
 
     @Override
