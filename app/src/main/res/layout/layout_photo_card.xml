@@ -4,7 +4,7 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/selectable_item">
+    android:background="@drawable/selectable_item">
    <RelativeLayout
        android:id="@+id/thumbnail_frame"
        android:layout_width="96dp"
