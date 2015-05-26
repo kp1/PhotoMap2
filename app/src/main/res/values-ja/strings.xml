@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">フォトマップ</string>
-    <string name="action_settings">設定</string>
     <string name="address_separator">" "</string>
     <string name="loading">""</string>
     <string name="display_on_map">地図で表示</string>
@@ -12,8 +11,6 @@
     <string name="search_map">地名で検索</string>
     <string name="location_not_found">%1$sは見つかりませんでした</string>
     <string name="search_title">%1$s は …</string>
-    <string name="show_map">地図を表示</string>
-    <string name="hide_map">地図を隠す</string>
     <string name="filtered">%1$sで絞込み中</string>
     <string name="search_list">住所で検索</string>
     <string name="change_distance">距離を変更</string>

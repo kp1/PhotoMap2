@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PhotoMap</string>
-    <string name="action_settings">Setting</string>
     <string name="address_separator">", "</string>
     <string name="loading">""</string>
     <string name="display_on_map">display on map</string>
@@ -12,8 +11,6 @@
     <string name="search_map">search location</string>
     <string name="location_not_found">%1$s was not found.</string>
     <string name="search_title">%1$s is …</string>
-    <string name="show_map">show map</string>
-    <string name="hide_map">hide map</string>
     <string name="filtered">Filtered by %1$s</string>
     <string name="search_list">search by address</string>
     <string name="change_distance">change distance</string>
