@@ -20,6 +20,7 @@
     <string name="show_about">About</string>
     <string name="about_software">%1$s is built using open source software.</string>
     <string name="about">about</string>
+    <string name="overflow" translatable="false">overflow</string>
     <string-array name="oss">
         <item>ActiveAndroid</item>
     </string-array>

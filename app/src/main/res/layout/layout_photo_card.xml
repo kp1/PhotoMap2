@@ -4,7 +4,7 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/selectable_item">
+    style="@style/SelectableItem">
    <RelativeLayout
        android:id="@+id/thumbnail_frame"
        android:layout_width="96dp"
@@ -71,6 +71,7 @@
         android:layout_alignParentRight="true"
         android:src="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
         android:tint="@color/overflow"
-        android:background="@color/selectable_item_tarnsparent"/>
+        android:background="@color/selectable_item_tarnsparent"
+        android:contentDescription="@string/overflow"/>
 
 </net.mmho.photomap2.PhotoCardLayout>
