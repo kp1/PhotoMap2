@@ -8,18 +8,15 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
-public class SearchResultFragment extends DialogFragment{
-    static SearchResultFragment newInstance(String location, List<Address> addresses){
-        SearchResultFragment fragment = new SearchResultFragment();
+public class SearchResultDialogFragment extends DialogFragment{
+    static SearchResultDialogFragment newInstance(String location, List<Address> addresses){
+        SearchResultDialogFragment fragment = new SearchResultDialogFragment();
 
 
         Bundle bundle = new Bundle();
@@ -50,23 +47,5 @@ public class SearchResultFragment extends DialogFragment{
         });
         return builder.create();
 
-    }
-
-    @Override
-    public void show(FragmentManager manager, String tag) {
-        try {
-            Field mDismissedField = DialogFragment.class.getDeclaredField("mDismissed");
-            mDismissedField.setAccessible(true);
-            mDismissedField.set(this, true);
-            Field mShownByMeField = DialogFragment.class.getDeclaredField("mShownByMe");
-            mShownByMeField.setAccessible(true);
-            mShownByMeField.set(this, true);
-        } catch (IllegalArgumentException | NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.add(this, tag);
-        ft.commitAllowingStateLoss();
     }
 }
