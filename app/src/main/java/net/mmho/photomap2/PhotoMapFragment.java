@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -198,18 +199,27 @@ public class PhotoMapFragment extends SupportMapFragment {
         double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
         LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
         LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
-        Log.d(TAG,northeast.toString()+" , "+southwest);
+        Log.d(TAG, northeast.toString() + " , " + southwest);
         return new LatLngBounds(southwest,northeast);
     }
 
     private Bitmap createBitMap(int resource){
         int height = getResources().getDimensionPixelSize(R.dimen.marker_height);
         int width = getResources().getDimensionPixelSize(R.dimen.marker_width);
-        Bitmap bitmap = Bitmap.createBitmap(width,height, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        Drawable shape = getResources().getDrawable(resource);
-        shape.setBounds(0,0,bitmap.getWidth(),bitmap.getHeight());
-        shape.draw(canvas);
+        Drawable shape;
+        if(Build.VERSION.SDK_INT >= 21) {
+            shape = getResources().getDrawable(resource, null);
+        }
+        else{
+            //noinspection deprecation
+            shape = getResources().getDrawable(resource);
+        }
+        if(shape!=null) {
+            shape.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+            shape.draw(canvas);
+        }
         return bitmap;
     }
 
@@ -428,6 +438,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                     mMap.clear();
                     if(sharedMarker!=null)mMap.addMarker(sharedMarker);
                     hideActionBarDelayed();
+                    listener.endProgress();
                 }
             }
 
