@@ -7,6 +7,9 @@
         <item name="colorAccent">@color/accent</item>
         <item name="android:textColorPrimary">@color/textPrimary</item>
         <item name="android:textColorSecondary">@color/textSecondary</item>
+        <item name="android:textColorPrimaryInverse">@color/textPrimaryInverse</item>
+        <item name="android:textColorSecondaryInverse">@color/textSecondaryInverse</item>
+        <item name="android:textColorTertiaryInverse">@color/textTertiaryInverse</item>
         <item name="android:textColor">@color/abc_primary_text_material_light</item>
     </style>
 
@@ -18,4 +21,12 @@
     <style name="SelectableItem">
         <item name="android:background">@drawable/selectable_item</item>
     </style>
+
+    <style name="Text.Title" parent="@style/TextAppearance.AppCompat.Medium.Inverse"/>
+
+    <style name="Text.Description" parent="@style/TextAppearance.AppCompat.Small.Inverse">
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
 </resources>

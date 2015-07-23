@@ -47,7 +47,7 @@
         android:layout_toEndOf="@+id/thumbnail_frame"
         android:layout_toRightOf="@+id/thumbnail_frame"
         android:layout_centerVertical="true"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        style="@style/Text.Title"/>
 
     <TextView
         android:id="@+id/description"
@@ -58,9 +58,7 @@
         android:layout_toStartOf="@+id/overflow"
         android:layout_toLeftOf="@+id/overflow"
         android:layout_alignParentBottom="true"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="1"
-        android:ellipsize="end"/>
+        style="@style/Text.Description"/>
 
     <ImageView
         android:id="@+id/overflow"
