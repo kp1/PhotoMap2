@@ -38,7 +38,7 @@ public class ThumbnailFragment extends Fragment {
             }
         };
         ThumbnailAdapter adapter =
-            new ThumbnailAdapter(getActivity(), R.layout.adapter_thumbnail, group, getLoaderManager(), 0, mBitMapCache);
+            new ThumbnailAdapter(getActivity(), R.layout.adapter_thumbnail, group, mBitMapCache);
         list.setAdapter(adapter);
     }
 

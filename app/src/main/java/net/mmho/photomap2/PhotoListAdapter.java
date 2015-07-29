@@ -17,8 +17,6 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private int resource;
     private LayoutInflater inflater;
-    private LoaderManager manager;
-    private int loader_id;
 
     private AddressFilter filter;
     private ArrayList<PhotoGroup> mOriginalValues;
@@ -26,12 +24,10 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private LruCache<Long,Bitmap> mBitmapCache;
 
-    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LoaderManager m,int loader_id_base,LruCache<Long,Bitmap> cache) {
+    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LruCache<Long,Bitmap> cache) {
         super(context, resource, objects);
         this.resource = resource;
-        manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        loader_id = loader_id_base;
         mObjects = objects;
         mBitmapCache = cache;
     }
@@ -39,19 +35,15 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
-        int id;
         if(convertView!=null){
             v = convertView;
-            id = (Integer)v.getTag();
         }
         else {
             v = inflater.inflate(resource,null);
-            id = loader_id++;
-            v.setTag(id);
         }
         if(position < getCount()) {
             PhotoGroup g = getItem(position);
-            ((PhotoCardLayout) v).setData(g, id, manager, mBitmapCache);
+            ((PhotoCardLayout) v).setData(g,mBitmapCache);
         }
         return v;
     }
