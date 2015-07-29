@@ -30,7 +30,7 @@ public class LoadableImageView extends ImageView{
 
     protected boolean thumbnail = false;
     private int width;
-    private long image_id;
+    private long image_id = -1;
 
     private Observable<Bitmap> observable;
 
