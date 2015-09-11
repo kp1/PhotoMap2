@@ -6,33 +6,22 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.Subscription;
-import rx.android.app.AppObservable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.android.view.ViewObservable;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class LoadableImageView extends ImageView{
 
     protected boolean thumbnail = false;
     private int width;
     private long image_id = -1;
-
-    private Observable<Bitmap> observable;
 
     public LoadableImageView(Context context) {
         super(context);
@@ -45,6 +34,7 @@ public class LoadableImageView extends ImageView{
     public LoadableImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
+
 
     public void startLoading(final long image_id,final LruCache<Long,Bitmap> cache){
 
@@ -66,11 +56,7 @@ public class LoadableImageView extends ImageView{
             public void run() {
                 width = Math.min(getWidth(), getHeight());
                 // load image
-                if(observable==null){
-                    observable = request();
-                    ViewObservable.bindView(LoadableImageView.this,observable);
-                }
-                observable
+                request()
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<Bitmap>() {
