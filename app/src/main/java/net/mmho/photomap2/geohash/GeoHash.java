@@ -111,7 +111,7 @@ public class GeoHash implements Parcelable {
         }
         final long mask_bits = ~0L>>>(MAX_SIGNIFICANT_BITS-BASE32_BITS);
         for(int i=0;i<significantBits/5;i++){
-            b.append(BASE32.charAt((int) ((bit>>>(MAX_SIGNIFICANT_BITS-i*BASE32_BITS))&mask_bits)));
+            b.append(BASE32.charAt((int) ((bit>>>(MAX_SIGNIFICANT_BITS-(i+1)*BASE32_BITS))&mask_bits)));
         }
         return b.toString();
     }
