@@ -32,7 +32,7 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
         ViewHolder holder;
-        if(convertView!=null && position!=0){
+        if(convertView!=null){
             v = convertView;
             holder = (ViewHolder) v.getTag();
         }

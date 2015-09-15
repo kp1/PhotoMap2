@@ -9,12 +9,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 import rx.Observable;
-import rx.Observer;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -22,7 +19,6 @@ import rx.subjects.BehaviorSubject;
 
 public class LoadableImageView extends ImageView{
 
-    private static final String TAG = "LoadableImageView";
     protected boolean thumbnail = false;
     private int width;
 
@@ -45,12 +41,16 @@ public class LoadableImageView extends ImageView{
     Subscription subscription;
     private void subscribeSubject(){
         subject = BehaviorSubject.create();
-        subscription = subject
+        subscription =
+        subject
             .onBackpressureDrop()
-            .doOnNext(image_id -> Log.d(TAG, "doOnNext:" + image_id))
-            .flatMap(this::loadImage)
+            .flatMap(image_id ->
+                loadImage(image_id)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+            )
             .share()
-            .subscribe();
+                .subscribe(this::setImageBitmap);
     }
 
     @Override
@@ -60,6 +60,9 @@ public class LoadableImageView extends ImageView{
     }
 
     public void startLoading(final long image_id,final LruCache<Long,Bitmap> cache){
+
+        Long value = subject.getValue();
+        if(value!=null && value==image_id) return;
 
         Bitmap bmp = null;
         if(cache!=null) bmp = cache.get(image_id);
@@ -77,9 +80,7 @@ public class LoadableImageView extends ImageView{
     }
 
     private Observable<Bitmap> loadImage(Long image_id){
-        Observable<Bitmap> observable =
-        Observable.create( subscriber -> {
-            Log.d(TAG,"load image:"+image_id);
+        return Observable.create( subscriber -> {
             final String[] projection = {
                 MediaStore.Images.ImageColumns._ID,
                 MediaStore.Images.ImageColumns.ORIENTATION,
@@ -131,25 +132,5 @@ public class LoadableImageView extends ImageView{
             subscriber.onCompleted();
             c.close();
         });
-        observable
-            .observeOn(Schedulers.newThread())
-            .subscribeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<Bitmap>() {
-                @Override
-                public void onCompleted() {
-
-                }
-
-                @Override
-                public void onError(Throwable e) {
-
-                }
-
-                @Override
-                public void onNext(Bitmap bitmap) {
-                    setImageBitmap(bitmap);
-                }
-            });
-        return observable;
     }
 }
