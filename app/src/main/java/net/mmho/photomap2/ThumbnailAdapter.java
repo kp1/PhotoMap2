@@ -15,13 +15,11 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
 
     private int resource;
     private LayoutInflater inflater;
-    private LruCache<java.lang.Long,Bitmap> mBitmapCache;
 
-    public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects,LruCache<java.lang.Long,Bitmap> cache) {
+    public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects) {
         super(c, resource, objects);
         this.resource = resource;
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mBitmapCache = cache;
     }
 
     private class ViewHolder{
@@ -43,7 +41,7 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
             v.setTag(holder);
         }
 
-        holder.thumbnail.startLoading(getItem(position).getPhotoId(),mBitmapCache);
+        holder.thumbnail.startLoading(getItem(position).getPhotoId());
 
         return v;
     }

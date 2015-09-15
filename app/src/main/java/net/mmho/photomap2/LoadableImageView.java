@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -19,6 +18,7 @@ import rx.subjects.BehaviorSubject;
 
 public class LoadableImageView extends ImageView{
 
+    private static final String TAG = "LoadableImageView";
     protected boolean thumbnail = false;
     private int width;
 
@@ -59,15 +59,15 @@ public class LoadableImageView extends ImageView{
         subscription.unsubscribe();
     }
 
-    public void startLoading(final long image_id,final LruCache<Long,Bitmap> cache){
+    public void startLoading(final long image_id){
 
         Long value = subject.getValue();
         if(value!=null && value==image_id) return;
 
-        Bitmap bmp = null;
-        if(cache!=null) bmp = cache.get(image_id);
-        if(bmp!=null){
-            setImageBitmap(bmp);
+        Bitmap bitmap = null;
+        if(thumbnail) bitmap = ThumbnailCache.getInstance().get(image_id);
+        if(bitmap!=null){
+            setImageBitmap(bitmap);
             return;
         }
 
@@ -128,6 +128,7 @@ public class LoadableImageView extends ImageView{
                     oldBmp.recycle();
                 }
             }
+            if(bmp!=null) ThumbnailCache.getInstance().put(image_id,bmp);
             subscriber.onNext(bmp);
             subscriber.onCompleted();
             c.close();

@@ -26,7 +26,7 @@ public class PhotoViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater,ViewGroup container,Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.photo_view,container,false);
         image = (LoadableImageView)v.findViewById(R.id.photo_view);
-        image.startLoading(image_id,null);
+        image.startLoading(image_id);
         return v;
     }
 

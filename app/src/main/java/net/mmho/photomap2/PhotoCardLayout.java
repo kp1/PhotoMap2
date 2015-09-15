@@ -76,12 +76,12 @@ public class PhotoCardLayout extends RelativeLayout{
             }
         };
 
-    public void setData(PhotoGroup g,LruCache<Long,Bitmap> cache){
+    public void setData(PhotoGroup g){
         group = g;
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(g.get(0).getPhotoId(),cache);
+        thumbnail.startLoading(g.get(0).getPhotoId());
 
         String address= g.getTitle();
         if(address==null) {
