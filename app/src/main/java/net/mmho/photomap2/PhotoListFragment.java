@@ -42,7 +42,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
-    private static final int ADAPTER_LOADER_ID = 1000;
     private static final String TAG = "PhotoListFragment";
 
     private Cursor mCursor;
@@ -75,17 +74,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
-        final int cacheSize = maxMemory/8;
-        LruCache<Long, Bitmap> mBitmapCache = new LruCache<Long, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(Long key, Bitmap value) {
-                return value.getRowBytes()*value.getHeight() / 1024;
-            }
-        };
-
         groupList = new PhotoGroupList();
-        adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList,mBitmapCache);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));

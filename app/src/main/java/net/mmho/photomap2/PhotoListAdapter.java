@@ -22,14 +22,11 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private ArrayList<PhotoGroup> mOriginalValues;
     private ArrayList<PhotoGroup> mObjects;
 
-    private LruCache<Long,Bitmap> mBitmapCache;
-
-    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LruCache<Long,Bitmap> cache) {
+    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);
         this.resource = resource;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mObjects = objects;
-        mBitmapCache = cache;
     }
 
     @Override
