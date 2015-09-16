@@ -1,7 +1,12 @@
 package net.mmho.photomap2;
 
+import android.content.Context;
+import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -9,7 +14,9 @@ import com.google.android.gms.maps.model.Marker;
 
 import net.mmho.photomap2.geohash.GeoHash;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
@@ -99,6 +106,29 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         geoHash.writeToParcel(out, flags);
         out.writeString(address);
         out.writeString(description);
+    }
+
+    public void resolveAddress(Context context){
+        Geocoder geocoder = new Geocoder(context);
+        AddressRecord record = AddressRecord.getAddressByHash(getHash());
+        if(record!=null){
+            setAddress(record.getTitle(), record.getDescription());
+            return;
+        }
+        LatLng p = getCenter();
+        List<Address> addresses;
+        if(NetworkUtils.networkCheck(context)) {
+            try {
+                addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1);
+                if (addresses != null && addresses.size() > 0) {
+                    Address a = addresses.get(0);
+                    setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+
     }
 
     static public float getMarkerColor(int size){

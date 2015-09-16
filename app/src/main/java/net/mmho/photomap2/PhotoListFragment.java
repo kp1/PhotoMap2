@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -16,7 +15,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.util.LruCache;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
@@ -37,15 +35,16 @@ import net.mmho.photomap2.geohash.GeoHash;
 import java.util.ArrayList;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
-    private static final int GROUPING_LOADER_ID = 1;
     private static final String TAG = "PhotoListFragment";
 
     private Cursor mCursor;
-    private PhotoGroupList groupList;
+    private ArrayList<PhotoGroup> groupList;
     private PhotoListAdapter adapter;
     private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
@@ -74,7 +73,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        groupList = new PhotoGroupList();
+        groupList = new ArrayList<>();
         adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
@@ -181,12 +180,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         switch(item.getItemId()){
         case R.id.oldest:
             newest = false;
-            groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
         case R.id.newest:
             newest = true;
-            groupList.reset();
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
             return true;
         case R.id.about:
@@ -223,15 +220,13 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("DISTANCE", distance_index);
-        outState.putString("title",getActivity().getTitle().toString());
+        outState.putString("title", getActivity().getTitle().toString());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-        if(getLoaderManager().getLoader(GROUPING_LOADER_ID)!=null)
-            getLoaderManager().initLoader(GROUPING_LOADER_ID,null,photoGroupListLoaderCallbacks);
         if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
@@ -308,21 +303,27 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             if(mCursor==null || !mCursor.equals(data)) {
                 mCursor = data;
-                groupList.reset();
                 photoList = new PhotoCursor(mCursor).getHashedPhotoList();
-                getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
 
                 Observable.from(photoList)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
                         DistanceActionProvider.getDistance(distance_index)).toBase32())
-                    .doOnNext(group -> Log.d(TAG, "group:" + group.getKey()))
-                    .subscribe(group ->{
-                        group
-                            .map(PhotoGroup::new)
-                            .reduce(PhotoGroup::append)
-                            .subscribe(g -> Log.d(TAG,"group:"+g.getCenter().toString()+"("+g.size()+")"));
-                    });
+                    .doOnNext(group -> group
+                        .map(PhotoGroup::new)
+                        .reduce(PhotoGroup::append)
+                        .doOnNext(g -> {
+                            g.resolveAddress(getActivity());
+                            Log.d(TAG, "resolve address.");
+
+                        })
+                        .doOnSubscribe(() -> {
+                            groupList.clear();
+                            adapter.notifyDataSetChanged();
+                        })
+                        .subscribe(groupList::add))
+                    .subscribe();
 
             }
         }
@@ -332,41 +333,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         }
     };
 
-    private final LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
-    new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
-        @Override
-        public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-            progress = geo_progress = 0;
-            if(search!=null) {
-                if (MenuItemCompat.isActionViewExpanded(search)) MenuItemCompat.collapseActionView(search);
-                search.setEnabled(false);
-            }
-            resetFilter(false);
-            loaded = false;
-            return new PhotoGroupListLoader(getActivity(),groupList,photoList,
-                    DistanceActionProvider.getDistance(distance_index),true);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList data) {
-            if(search!=null)search.setEnabled(true);
-            loaded = true;
-            listener.endProgress();
-        }
-
-        @Override
-        public void onLoaderReset(Loader<PhotoGroupList> loader) {
-
-        }
-    };
-
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
             new DistanceActionProvider.OnDistanceChangeListener() {
                 @Override
                 public void onDistanceChange(int index) {
                     distance_index = index;
-                    getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
-                    getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
                 }
             };
 
