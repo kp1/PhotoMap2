@@ -17,7 +17,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,7 +40,6 @@ import rx.schedulers.Schedulers;
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
-    private static final String TAG = "PhotoListFragment";
 
     private Cursor mCursor;
     private ArrayList<PhotoGroup> groupList;
@@ -307,22 +305,26 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
                 Observable.from(photoList)
                     .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe(() -> {
+                        groupList.clear();
+                        adapter.notifyDataSetChanged();
+                    })
                     .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
                         DistanceActionProvider.getDistance(distance_index)).toBase32())
                     .doOnNext(group -> group
                         .map(PhotoGroup::new)
                         .reduce(PhotoGroup::append)
-                        .doOnNext(g -> {
+                        .map(g -> {
                             g.resolveAddress(getActivity());
-                            Log.d(TAG, "resolve address.");
-
+                            return g;
                         })
-                        .doOnSubscribe(() -> {
-                            groupList.clear();
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(g -> {
+                            groupList.add(g);
                             adapter.notifyDataSetChanged();
                         })
-                        .subscribe(groupList::add))
+                        .subscribe()
+                    )
                     .subscribe();
 
             }
