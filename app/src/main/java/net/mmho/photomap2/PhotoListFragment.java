@@ -46,8 +46,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private PhotoListAdapter adapter;
     private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
-    private int progress;
-    private int geo_progress;
     private MenuItem search;
     private GridView list;
     private boolean loaded = false;
@@ -84,16 +82,12 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     @Override
     public void onStart() {
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(progressReceiver, new IntentFilter(PhotoGroupList.PROGRESS_ACTION));
         super.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(progressReceiver);
     }
 
     @Override
@@ -255,37 +249,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         }
         listener = (ProgressChangeListener) activity;
     }
-
-    private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final int PROGRESS_GROUPING_RATIO=8000;
-            int status = intent.getIntExtra(PhotoGroupList.LOADER_STATUS,0);
-            int count;
-            switch(status){
-                case PhotoGroupList.MESSAGE_RESTART:
-                    adapter.notifyDataSetChanged();
-                    listener.showProgress(0);
-                    break;
-                case PhotoGroupList.MESSAGE_APPEND:
-                    adapter.notifyDataSetChanged();
-                    progress++;
-                    count = mCursor.getCount();
-                    if(count!=0) listener.showProgress(progress * PROGRESS_GROUPING_RATIO/count);
-                    break;
-                case PhotoGroupList.MESSAGE_ADDRESS:
-                    geo_progress++;
-                    count = adapter.getCount();
-                    if(count!=0){
-                        listener.showProgress(PROGRESS_GROUPING_RATIO+
-                                geo_progress*(Window.PROGRESS_END-PROGRESS_GROUPING_RATIO)/count);
-                    }
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
-
-        }
-    };
 
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
