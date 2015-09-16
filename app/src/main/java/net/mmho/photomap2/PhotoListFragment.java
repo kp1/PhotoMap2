@@ -274,21 +274,17 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                     })
                     .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
                         DistanceActionProvider.getDistance(distance_index)).toBase32())
-                    .doOnNext(group -> group
-                        .map(PhotoGroup::new)
-                        .reduce(PhotoGroup::append)
-                        .map(g -> {
-                            g.resolveAddress(getActivity());
-                            return g;
-                        })
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(g -> {
-                            groupList.add(g);
-                            adapter.notifyDataSetChanged();
-                        })
-                    )
-                    .subscribe();
-
+                    .flatMap(group -> group.map(PhotoGroup::new)
+                        .reduce(PhotoGroup::append))
+                    .map(g -> {
+                        g.resolveAddress(getActivity());
+                        return g;
+                    })
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(g -> {
+                        groupList.add(g);
+                        adapter.notifyDataSetChanged();
+                    });
             }
         }
 
