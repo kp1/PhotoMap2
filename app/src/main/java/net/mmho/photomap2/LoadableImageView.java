@@ -54,6 +54,7 @@ public class LoadableImageView extends ImageView{
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         subscription.unsubscribe();
+        setImageBitmap(null);
     }
 
     public void startLoading(final long image_id){
