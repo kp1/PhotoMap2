@@ -44,13 +44,10 @@ public class LoadableImageView extends ImageView{
         subscription =
         subject
             .onBackpressureDrop()
-            .flatMap(image_id ->
-                loadImage(image_id)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-            )
-            .share()
-                .subscribe(this::setImageBitmap);
+            .subscribeOn(Schedulers.newThread())
+            .flatMap((image_id) -> loadImage(image_id).subscribeOn(Schedulers.newThread()))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(this::setImageBitmap);
     }
 
     @Override
