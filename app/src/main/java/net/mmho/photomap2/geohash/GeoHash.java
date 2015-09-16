@@ -165,6 +165,10 @@ public class GeoHash implements Parcelable {
         return new LatLng(dividers[1].middle(),dividers[0].middle());
     }
 
+    public boolean equals(GeoHash other){
+        return bit == other.bit && significantBits == other.significantBits;
+    }
+
     @Override
     public int describeContents() {
         return 0;

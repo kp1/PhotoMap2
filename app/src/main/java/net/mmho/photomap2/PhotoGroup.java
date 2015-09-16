@@ -49,6 +49,14 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         add(p);
     }
 
+    public PhotoGroup append(PhotoGroup o){
+        if(!o.getHash().within(geoHash)) geoHash = geoHash.extend(o.geoHash);
+        for(HashedPhoto p:o){
+            add(p);
+        }
+        return this;
+    }
+
     public void setAddress(String title,String description){
         address = title;
         this.description = description;

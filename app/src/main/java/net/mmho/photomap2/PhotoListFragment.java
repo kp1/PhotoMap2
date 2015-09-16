@@ -19,6 +19,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.util.LruCache;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,13 +32,18 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 
+import net.mmho.photomap2.geohash.GeoHash;
+
 import java.util.ArrayList;
+
+import rx.Observable;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
     private static final int GROUPING_LOADER_ID = 1;
     private static final int ADAPTER_LOADER_ID = 1000;
+    private static final String TAG = "PhotoListFragment";
 
     private Cursor mCursor;
     private PhotoGroupList groupList;
@@ -316,6 +322,18 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 photoList = new PhotoCursor(mCursor).getHashedPhotoList();
                 getLoaderManager().destroyLoader(GROUPING_LOADER_ID);
                 getLoaderManager().restartLoader(GROUPING_LOADER_ID, null, photoGroupListLoaderCallbacks);
+
+                Observable.from(photoList)
+                    .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
+                        DistanceActionProvider.getDistance(distance_index)).toBase32())
+                    .doOnNext(group -> Log.d(TAG, "group:" + group.getKey()))
+                    .subscribe(group ->{
+                        group
+                            .map(PhotoGroup::new)
+                            .reduce(PhotoGroup::append)
+                            .subscribe(g -> Log.d(TAG,"group:"+g.getCenter().toString()+"("+g.size()+")"));
+                    });
+
             }
         }
 
