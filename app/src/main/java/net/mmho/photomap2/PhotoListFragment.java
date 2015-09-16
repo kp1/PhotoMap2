@@ -1,20 +1,17 @@
 package net.mmho.photomap2;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -23,7 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -34,12 +30,16 @@ import net.mmho.photomap2.geohash.GeoHash;
 import java.util.ArrayList;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
+    private static final String TAG = "PhotoListFragment";
 
     private Cursor mCursor;
     private ArrayList<PhotoGroup> groupList;
@@ -70,6 +70,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setHasOptionsMenu(true);
 
         groupList = new ArrayList<>();
+        photoList = new ArrayList<>();
         adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
@@ -78,16 +79,29 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         else{
             distance_index = DistanceActionProvider.initialIndex();
         }
+        subject = BehaviorSubject.create();
     }
 
+    Subscription subscription;
+    BehaviorSubject<Void> subject;
     @Override
     public void onStart() {
         super.onStart();
+        subscription =
+            subject
+                .onBackpressureDrop()
+                .flatMap(aVoid -> groupObservable())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(g -> {
+                    groupList.add(g);
+                    adapter.notifyDataSetChanged();
+                });
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        subscription.unsubscribe();
     }
 
     @Override
@@ -265,26 +279,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             if(mCursor==null || !mCursor.equals(data)) {
                 mCursor = data;
                 photoList = new PhotoCursor(mCursor).getHashedPhotoList();
-
-                Observable.from(photoList)
-                    .subscribeOn(Schedulers.newThread())
-                    .doOnSubscribe(() -> {
-                        groupList.clear();
-                        adapter.notifyDataSetChanged();
-                    })
-                    .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
-                        DistanceActionProvider.getDistance(distance_index)).toBase32())
-                    .flatMap(group -> group.map(PhotoGroup::new)
-                        .reduce(PhotoGroup::append))
-                    .map(g -> {
-                        g.resolveAddress(getActivity());
-                        return g;
-                    })
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(g -> {
-                        groupList.add(g);
-                        adapter.notifyDataSetChanged();
-                    });
+                subject.onNext(null);
             }
         }
 
@@ -292,6 +287,20 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         public void onLoaderReset(Loader<Cursor> loader) {
         }
     };
+
+    private Observable<PhotoGroup> groupObservable(){
+        return Observable.from(photoList)
+            .doOnSubscribe(groupList::clear)
+            .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
+                DistanceActionProvider.getDistance(distance_index)).toBase32())
+            .flatMap(group -> group.map(PhotoGroup::new)
+                .reduce(PhotoGroup::append))
+            .subscribeOn(Schedulers.newThread())
+            .map(g -> {
+                g.resolveAddress(getActivity());
+                return g;
+            });
+    }
 
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
             new DistanceActionProvider.OnDistanceChangeListener() {
