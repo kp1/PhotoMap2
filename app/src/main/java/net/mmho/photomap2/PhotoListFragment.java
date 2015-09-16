@@ -282,11 +282,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                             return g;
                         })
                         .observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(g -> {
+                        .subscribe(g -> {
                             groupList.add(g);
                             adapter.notifyDataSetChanged();
                         })
-                        .subscribe()
                     )
                     .subscribe();
 
