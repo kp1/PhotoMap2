@@ -40,7 +40,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private static final int CURSOR_LOADER_ID = 0;
     private static final String TAG = "PhotoListFragment";
 
-    private Cursor mCursor;
     private ArrayList<PhotoGroup> groupList;
     private PhotoListAdapter adapter;
     private ArrayList<HashedPhoto> photoList;
@@ -289,9 +288,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if(mCursor==null || !mCursor.equals(data)) {
-                mCursor = data;
-                photoList = new PhotoCursor(mCursor).getHashedPhotoList();
+            if(data.getCount()!=photoList.size()) {
+                photoList = new PhotoCursor(data).getHashedPhotoList();
                 subject.onNext(null);
             }
         }
