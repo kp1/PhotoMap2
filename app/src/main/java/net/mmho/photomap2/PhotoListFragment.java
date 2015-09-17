@@ -288,9 +288,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             return new CursorLoader(getActivity(),uri,PhotoCursor.projection,q,null,o);
         }
 
+        private Cursor cursor = null;
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if(data.getCount()!=photoList.size()) {
+            if(cursor==null || !cursor.equals(data)) {
+                cursor = data;
                 photoList = new PhotoCursor(data).getHashedPhotoList();
                 subject.onNext(null);
             }
