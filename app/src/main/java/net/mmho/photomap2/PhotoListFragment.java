@@ -311,7 +311,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
                 DistanceActionProvider.getDistance(distance_index)).toBase32())
             .doOnNext(g -> group_count++)
-            .flatMap(group -> group.map(PhotoGroup::new)
+            .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
             .subscribeOn(Schedulers.newThread())
             .map(g -> g.resolveAddress(context));
