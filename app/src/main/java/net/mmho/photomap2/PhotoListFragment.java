@@ -96,7 +96,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             subscription =
                 subject
                     .onBackpressureDrop()
-                    .flatMap(aVoid -> groupObservable())
+                    .concatMap(aVoid -> groupObservable())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         g -> {
