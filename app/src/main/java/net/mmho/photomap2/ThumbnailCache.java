@@ -20,4 +20,8 @@ public class ThumbnailCache extends LruCache<Long,Bitmap> {
         return self;
     }
 
+    @Override
+    protected int sizeOf(Long key, Bitmap bitmap) {
+        return bitmap.getRowBytes() * bitmap.getHeight() / 1024;
+    }
 }
