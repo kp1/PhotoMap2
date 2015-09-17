@@ -70,7 +70,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        context = getActivity();
         groupList = new ArrayList<>();
         photoList = new ArrayList<>();
         adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
@@ -268,8 +267,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = context;
+        Activity activity = getActivity();
         if(!(activity instanceof ProgressChangeListener)){
             throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
         }
