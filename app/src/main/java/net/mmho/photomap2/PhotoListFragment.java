@@ -52,10 +52,16 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private String query="";
     private int distance_index;
 
-    private Context context;
-
-
+    // progress
     private ProgressChangeListener listener;
+    private int progress;
+    private int group_count;
+
+    // rxAndroid
+    private Context context;
+    Subscription subscription;
+    BehaviorSubject<Void> subject;
+
 
     public void onBackPressed() {
         if(filtered) resetFilter(true);
@@ -83,12 +89,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         subject = BehaviorSubject.create();
     }
 
-    Subscription subscription;
-    BehaviorSubject<Void> subject;
-
-    private int progress;
-    private int group_count;
-
     @Override
     public void onStart() {
         super.onStart();
@@ -105,11 +105,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                             adapter.notifyDataSetChanged();
                         });
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     @Override
