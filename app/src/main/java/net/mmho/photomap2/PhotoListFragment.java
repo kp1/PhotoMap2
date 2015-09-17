@@ -1,11 +1,11 @@
 package net.mmho.photomap2;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -34,7 +34,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
 
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
@@ -53,6 +52,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private String query="";
     private int distance_index;
 
+    private Context context;
+
 
     private ProgressChangeListener listener;
 
@@ -69,6 +70,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
+        context = getActivity();
         groupList = new ArrayList<>();
         photoList = new ArrayList<>();
         adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
@@ -87,21 +89,31 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onStart() {
         super.onStart();
-        subscription =
-            subject
-                .onBackpressureDrop()
-                .flatMap(aVoid -> groupObservable())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(g -> {
-                    groupList.add(g);
-                    adapter.notifyDataSetChanged();
-                });
+        if(subscription==null){
+            subscription =
+                subject
+                    .onBackpressureDrop()
+                    .flatMap(aVoid -> groupObservable())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(g -> {
+                        groupList.add(g);
+                        adapter.notifyDataSetChanged();
+                    });
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        subscription.unsubscribe();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(subscription!=null){
+            subscription.unsubscribe();
+            subscription = null;
+        }
     }
 
     @Override
@@ -297,7 +309,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 .reduce(PhotoGroup::append))
             .subscribeOn(Schedulers.newThread())
             .map(g -> {
-                g.resolveAddress(getActivity());
+                g.resolveAddress(context);
                 return g;
             });
     }
