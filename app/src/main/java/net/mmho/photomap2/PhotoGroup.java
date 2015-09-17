@@ -86,7 +86,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public String locationToString() {
         LatLng p = geoHash.getCenter();
-        return String.format(Locale.getDefault(),"% 8.5f , % 8.5f", p.latitude, p.latitude);
+        return String.format(Locale.getDefault(),"% 8.5f , % 8.5f", p.latitude, p.longitude);
     }
 
     public String toString(){
