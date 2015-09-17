@@ -14,6 +14,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -84,6 +85,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     Subscription subscription;
     BehaviorSubject<Void> subject;
+
+    private int progress;
+    private int group_count;
+
     @Override
     public void onStart() {
         super.onStart();
@@ -93,10 +98,12 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                     .onBackpressureDrop()
                     .flatMap(aVoid -> groupObservable())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(g -> {
-                        groupList.add(g);
-                        adapter.notifyDataSetChanged();
-                    });
+                    .subscribe(
+                        g -> {
+                            listener.showProgress(++progress*10000/group_count);
+                            groupList.add(g);
+                            adapter.notifyDataSetChanged();
+                        });
         }
     }
 
@@ -301,9 +308,14 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private Observable<PhotoGroup> groupObservable(){
         return Observable.from(photoList)
-            .doOnSubscribe(groupList::clear)
+            .doOnSubscribe(() -> {
+                groupList.clear();
+                listener.showProgress(0);
+                progress = group_count = 0;
+            })
             .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
                 DistanceActionProvider.getDistance(distance_index)).toBase32())
+            .doOnNext(g -> group_count++)
             .flatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
             .subscribeOn(Schedulers.newThread())
