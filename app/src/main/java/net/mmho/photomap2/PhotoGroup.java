@@ -7,6 +7,7 @@ import android.location.Geocoder;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -37,6 +38,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
             return new PhotoGroup[size];
         }
     };
+    private final static String TAG = "PhotoGroup";
 
     public PhotoGroup(Parcel in){
         in.readTypedList(this,HashedPhoto.CREATOR);
@@ -123,6 +125,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
                 if (addresses != null && addresses.size() > 0) {
                     Address a = addresses.get(0);
                     setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
+                    new AddressRecord(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a), getHash()).save();
                 }
             } catch (IOException e) {
                 // do nothing
