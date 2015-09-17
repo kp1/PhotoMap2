@@ -325,8 +325,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
             new DistanceActionProvider.OnDistanceChangeListener() {
                 @Override
-                public void onDistanceChange(int index) {
+                public void onDistanceChange(int index)
+                {
                     distance_index = index;
+                    subject.onNext(null);
                 }
             };
 
