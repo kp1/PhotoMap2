@@ -108,12 +108,12 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         out.writeString(description);
     }
 
-    public void resolveAddress(Context context){
+    public PhotoGroup resolveAddress(Context context){
         Geocoder geocoder = new Geocoder(context);
         AddressRecord record = AddressRecord.getAddressByHash(getHash());
         if(record!=null){
             setAddress(record.getTitle(), record.getDescription());
-            return;
+            return this;
         }
         LatLng p = getCenter();
         List<Address> addresses;
@@ -128,7 +128,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
                 // do nothing
             }
         }
-
+        return this;
     }
 
     static public float getMarkerColor(int size){

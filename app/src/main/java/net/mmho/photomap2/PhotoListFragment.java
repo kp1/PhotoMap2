@@ -307,10 +307,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .flatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
             .subscribeOn(Schedulers.newThread())
-            .map(g -> {
-                g.resolveAddress(context);
-                return g;
-            });
+            .map(g -> g.resolveAddress(context));
     }
 
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
