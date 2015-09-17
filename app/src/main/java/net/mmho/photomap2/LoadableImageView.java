@@ -125,7 +125,7 @@ public class LoadableImageView extends ImageView{
                     oldBmp.recycle();
                 }
             }
-            if(bmp!=null) ThumbnailCache.getInstance().put(image_id,bmp);
+            if(thumbnail&&bmp!=null) ThumbnailCache.getInstance().put(image_id,bmp);
             subscriber.onNext(bmp);
             subscriber.onCompleted();
             c.close();
