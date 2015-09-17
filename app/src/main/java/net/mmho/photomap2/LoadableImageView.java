@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.ImageView;
 
 import rx.Observable;
@@ -22,7 +21,6 @@ public class LoadableImageView extends ImageView{
     private static final String TAG = "LoadableImageView";
     protected boolean thumbnail = false;
     private int width;
-//    private Bitmap bitmap = null;
 
     public LoadableImageView(Context context) {
         super(context);
@@ -45,19 +43,11 @@ public class LoadableImageView extends ImageView{
         subject = BehaviorSubject.create();
         subscription =
         subject
-
             .onBackpressureDrop()
             .subscribeOn(Schedulers.newThread())
-            .concatMap((image_id) -> loadImage(image_id).subscribeOn(Schedulers.newThread()))
+            .flatMap((image_id) -> loadImage(image_id).subscribeOn(Schedulers.newThread()))
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe((bm) -> {
-                if(!bm.isRecycled()){
-//                    if (bitmap != null) bitmap.recycle();
-                    setImageBitmap(bm);
-//                    bitmap = bm;
-                }
-            });
-
+            .subscribe(this::setImageBitmap);
     }
 
     @Override
@@ -71,15 +61,14 @@ public class LoadableImageView extends ImageView{
         Long value = subject.getValue();
         if(value!=null && value==image_id) return;
 
-        setImageDrawable(null);
-
         Bitmap bitmap = null;
         if(thumbnail) bitmap = ThumbnailCache.getInstance().get(image_id);
-        if(bitmap!=null && !bitmap.isRecycled()) {
+        if(bitmap!=null){
             setImageBitmap(bitmap);
             return;
         }
 
+        setImageDrawable(null);
 
         post(() -> {
             width = Math.min(getWidth(), getHeight());
