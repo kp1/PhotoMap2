@@ -2,10 +2,8 @@ package net.mmho.photomap2;
 
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -20,17 +18,14 @@ import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -48,39 +43,84 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+
 
 public class PhotoMapFragment extends SupportMapFragment {
     final static int PHOTO_CURSOR_LOADER = 0;
-    final static int PHOTO_GROUP_LOADER = 1;
 
     final public static String EXTRA_GROUP="group";
     final public static float DEFAULT_ZOOM = 15;
 
     private GoogleMap mMap;
-    private PhotoCursor photoCursor;
-    private PhotoGroupList mGroup;
-    private int progress;
     private MarkerOptions sharedMarker;
     private MenuItem searchMenuItem;
     private ActionBar mActionBar;
     private ArrayList<HashedPhoto> photoList;
+    private ArrayList<PhotoGroup> groupList;
 
     private ProgressChangeListener listener;
+
+
+    private PublishSubject<Integer> subject;
+    private Subscription subscription;
+    private int progress;
+    private int group_count;
+    private Context context;
 
     public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
+        photoList = new ArrayList<>();
+        groupList = new ArrayList<>();
+        subject = PublishSubject.create();
 	}
 
     @Override
     public void onStart() {
         super.onStart();
+        if(subscription==null){
+            subscription =
+                subject
+                    .onBackpressureLatest()
+                    .doOnNext(d ->{
+                        getMap().clear();
+                        progress = group_count = 0;
+                        listener.showProgress(0);
+                        groupList.clear();
+                    })
+                    .concatMap(this::groupObservable)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(g ->{
+                        if(group_count!=0) {
+                            listener.showProgress(++progress*10000 / group_count);
+                            groupList.add(g);
+                            MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                            ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
+                            g.marker = mMap.addMarker(ops);
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(subscription!=null){
+            subscription.unsubscribe();
+            subscription = null;
+        }
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        context = activity;
         if(!(activity instanceof ProgressChangeListener)){
             throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
         }
@@ -182,12 +222,10 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds, double percentile){
-        Log.d(TAG,bounds.toString());
         double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
         double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
         LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
         LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
-        Log.d(TAG, northeast.toString() + " , " + southwest);
         return new LatLngBounds(southwest,northeast);
     }
 
@@ -323,12 +361,15 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
+    private final static int MAXIMUM_ZOOM = 17;
+    private final static int MINIMUM_ZOOM = 4;
+
     GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
-                if(position.zoom>16 || position.zoom<3){
-                    float zoom = position.zoom>16?16:3;
+                if(position.zoom> MAXIMUM_ZOOM || position.zoom<MINIMUM_ZOOM){
+                    float zoom = position.zoom> MAXIMUM_ZOOM ? MAXIMUM_ZOOM :MINIMUM_ZOOM;
                     mMap.setOnCameraChangeListener(null);
                     CameraUpdate cameraUpdate =
                             CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(position.target,zoom));
@@ -336,7 +377,6 @@ public class PhotoMapFragment extends SupportMapFragment {
                     return;
                 }
                 showActionBar(false);
-                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
                 getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
             }
         };
@@ -358,7 +398,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                for(PhotoGroup group:mGroup){
+                for(PhotoGroup group:groupList){
                     if(group.marker.equals(marker)){
                         Intent intent;
                         if(group.size()==1){
@@ -391,18 +431,10 @@ public class PhotoMapFragment extends SupportMapFragment {
 
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-                photoCursor = new PhotoCursor(cursor);
-                if(photoCursor.getCount()!=0) {
-                    photoList = photoCursor.getHashedPhotoList();
-                    getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                    getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
-                }
-                else{
-                    mMap.clear();
-                    if(sharedMarker!=null)mMap.addMarker(sharedMarker);
-                    hideActionBarDelayed();
-                    listener.endProgress();
-                }
+                photoList = new PhotoCursor(cursor).getHashedPhotoList();
+                int distance = (int)getMap().getCameraPosition().zoom*2+4;
+                if(distance>45) distance = 45;
+                subject.onNext(distance);
             }
 
             @Override
@@ -410,38 +442,17 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    private String TAG = "PhotoMapFragment";
-    LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
-        new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
-            @Override
-            public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                int distance = (int)getMap().getCameraPosition().zoom*2+4;
-                if(distance>45) distance = 45;
-                return new PhotoGroupListLoader(getActivity(),
-                        new PhotoGroupList(),photoList,distance,false);
-            }
-
-            @Override
-            public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList group) {
-                listener.endProgress();
+    private Observable<PhotoGroup> groupObservable(int distance){
+        return Observable.from(photoList)
+            .subscribeOn(Schedulers.newThread())
+            .groupBy(hash -> Long.toBinaryString(hash.getHash().getLong()).substring(0, distance))
+            .doOnNext(g -> group_count++)
+            .concatMap(group -> group.map(PhotoGroup::new)
+                .reduce(PhotoGroup::append))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnCompleted(() -> {
                 hideActionBarDelayed();
-                Log.d(TAG,getMap().getCameraPosition().toString());
-                if(mGroup==null || !mGroup.equals(group)) {
-                    mMap.clear();
-                    mGroup = group;
-                    for (PhotoGroup g : mGroup) {
-                        MarkerOptions ops = new MarkerOptions().position(g.getCenter());
-                        ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
-                        g.marker = mMap.addMarker(ops);
-                    }
-                }
-                if(sharedMarker !=null)mMap.addMarker(sharedMarker);
-            }
-
-            @Override
-            public void onLoaderReset(Loader<PhotoGroupList> loader) {
-
-            }
-        };
-
+                listener.endProgress();
+            });
+    }
 }
