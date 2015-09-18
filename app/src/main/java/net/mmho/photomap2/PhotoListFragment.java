@@ -59,7 +59,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     // rxAndroid
     private Context context;
     Subscription subscription;
-    PublishSubject<Void> subject;
+    PublishSubject<Integer> subject;
 
 
     public void onBackPressed() {
@@ -100,7 +100,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                         listener.showProgress(0);
                         progress = group_count = 0;
                     })
-                    .concatMap(aVoid -> groupObservable())
+                    .concatMap(this::groupObservable)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                         g -> {
@@ -300,7 +300,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             if(cursor==null || !cursor.equals(data)) {
                 cursor = data;
                 photoList = new PhotoCursor(data).getHashedPhotoList();
-                subject.onNext(null);
+                subject.onNext(distance_index);
             }
         }
 
@@ -309,11 +309,11 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         }
     };
 
-    private Observable<PhotoGroup> groupObservable(){
+    private Observable<PhotoGroup> groupObservable(int distance){
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
-            .groupBy(hash -> GeoHash.createFromLong(hash.getHash().getLong(),
-                DistanceActionProvider.getDistance(distance_index)).toBase32())
+            .groupBy(hash -> hash.getHash().toBase32()
+                .substring(0,DistanceActionProvider.getDistance(distance)))
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
@@ -329,7 +329,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 public void onDistanceChange(int index)
                 {
                     distance_index = index;
-                    subject.onNext(null);
+                    subject.onNext(index);
                 }
             };
 

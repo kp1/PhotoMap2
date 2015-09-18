@@ -50,7 +50,7 @@ public class DistanceActionProvider extends ActionProvider
     }
 
     public static int getDistance(int index){
-        return distance[index]*5;
+        return distance[index];
     }
 
     @Override
