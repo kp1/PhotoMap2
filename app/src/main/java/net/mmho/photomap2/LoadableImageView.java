@@ -8,13 +8,16 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.AsyncSubject;
 import rx.subjects.BehaviorSubject;
+import rx.subjects.PublishSubject;
 
 public class LoadableImageView extends ImageView{
 
@@ -37,13 +40,13 @@ public class LoadableImageView extends ImageView{
         subscribeSubject();
     }
 
-    BehaviorSubject<Long> subject;
+    PublishSubject<Long> subject;
     Subscription subscription;
     private void subscribeSubject(){
-        subject = BehaviorSubject.create();
+        subject = PublishSubject.create();
         subscription =
         subject
-            .onBackpressureDrop()
+            .onBackpressureLatest()
             .subscribeOn(Schedulers.newThread())
             .concatMap((image_id) -> loadImage(image_id).subscribeOn(Schedulers.newThread()))
             .observeOn(AndroidSchedulers.mainThread())
@@ -57,9 +60,6 @@ public class LoadableImageView extends ImageView{
     }
 
     public void startLoading(final long image_id){
-
-        Long value = subject.getValue();
-        if(value!=null && value==image_id) return;
 
         Bitmap bitmap = null;
         if(thumbnail) bitmap = ThumbnailCache.getInstance().get(image_id);

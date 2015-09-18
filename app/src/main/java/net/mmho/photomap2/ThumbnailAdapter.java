@@ -1,9 +1,6 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +27,8 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
         ViewHolder holder;
-        if(convertView!=null){
+
+        if(convertView!=null && position!=0){
             v = convertView;
             holder = (ViewHolder) v.getTag();
         }
