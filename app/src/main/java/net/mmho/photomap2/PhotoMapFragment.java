@@ -76,15 +76,6 @@ public class PhotoMapFragment extends SupportMapFragment {
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(progressReceiver,new IntentFilter(PhotoGroupList.PROGRESS_ACTION));
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(progressReceiver);
     }
 
     @Override
@@ -134,17 +125,14 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
     final private ActionBar.OnMenuVisibilityListener onMenuVisibilityListener =
-            new ActionBar.OnMenuVisibilityListener() {
-                @Override
-                public void onMenuVisibilityChanged(boolean visible) {
-                    if(visible){
-                        showActionBar(false);
-                    }
-                    else{
-                        hideActionBarDelayed();
-                    }
-                }
-            };
+        visible -> {
+            if(visible){
+                showActionBar(false);
+            }
+            else{
+                hideActionBarDelayed();
+            }
+        };
 
     final private MenuItemCompat.OnActionExpandListener actionExpandListener =
             new MenuItemCompat.OnActionExpandListener() {
@@ -287,12 +275,9 @@ public class PhotoMapFragment extends SupportMapFragment {
             Intent intent = getActivity().getIntent();
             final CameraUpdate update = handleIntent(intent);
             if(update!=null && getView()!=null) {
-                getView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.moveCamera(update);
-                        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                    }
+                getView().post(() -> {
+                    mMap.moveCamera(update);
+                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
                 });
             }
             else{
@@ -311,12 +296,7 @@ public class PhotoMapFragment extends SupportMapFragment {
 
 
     final Handler ab_handler = new Handler();
-    final Runnable runnable= new Runnable() {
-        @Override
-        public void run() {
-            hideActionBar();
-        }
-    };
+    final Runnable runnable= this::hideActionBar;
 
     private void showActionBar(boolean hide){
         mActionBar.show();
@@ -357,7 +337,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 }
                 showActionBar(false);
                 getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null,photoListLoaderCallback);
+                getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
             }
         };
 
@@ -396,23 +376,6 @@ public class PhotoMapFragment extends SupportMapFragment {
                 return true;
             }
         };
-
-    private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int count = photoCursor.getCount();
-            int status = intent.getIntExtra(PhotoGroupList.LOADER_STATUS,0);
-            switch(status){
-                case PhotoGroupList.MESSAGE_RESTART:
-                    progress = 0;
-                    break;
-                case PhotoGroupList.MESSAGE_APPEND:
-                    progress++;
-                    if(count!=0) listener.showProgress(progress * Window.PROGRESS_END/count);
-                    break;
-            }
-        }
-    };
 
     LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
