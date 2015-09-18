@@ -54,9 +54,6 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
     private void handleIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String searchQuery = intent.getStringExtra(SearchManager.QUERY);
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                MapSuggestionProvider.AUTHORITY, MapSuggestionProvider.MODE);
-            suggestions.saveRecentQuery(searchQuery, null);
             Observable.create((Subscriber<? super List<Address>> subscriber) -> {
                 List<Address> data = null;
                 try {
@@ -74,7 +71,14 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
                     if (list == null || list.size() == 0) {
                         Toast.makeText(getApplicationContext(), getString(R.string.location_not_found, searchQuery),
                             Toast.LENGTH_LONG).show();
-                    } else if (list.size() == 1) {
+                        return;
+                    }
+
+                    SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                        MapSuggestionProvider.AUTHORITY, MapSuggestionProvider.MODE);
+                    suggestions.saveRecentQuery(searchQuery, null);
+
+                    if (list.size() == 1) {
                         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
                         CameraUpdate update =
                             CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list.get(0)), PhotoMapFragment.DEFAULT_ZOOM);
