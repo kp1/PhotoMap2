@@ -51,8 +51,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     // progress
     private ProgressChangeListener listener;
-    private int progress;
-    private int group_count;
 
     // rxAndroid
     private Context context;
@@ -290,6 +288,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         }
     };
 
+    private int progress;
+    private int group_count;
     private Observable<PhotoGroup> groupObservable(int distance){
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
@@ -313,7 +313,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                     adapter.notifyDataSetChanged();
                 }
             })
-
             .doOnCompleted(listener::endProgress);
     }
 

@@ -67,9 +67,6 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     private PublishSubject<Integer> subject;
     private Subscription subscription;
-    private int progress;
-    private int group_count;
-    private Context context;
 
     public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -87,23 +84,8 @@ public class PhotoMapFragment extends SupportMapFragment {
             subscription =
                 subject
                     .onBackpressureLatest()
-                    .doOnNext(d ->{
-                        getMap().clear();
-                        progress = group_count = 0;
-                        listener.showProgress(0);
-                        groupList.clear();
-                    })
                     .concatMap(this::groupObservable)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(g ->{
-                        if(group_count!=0) {
-                            listener.showProgress(++progress*10000 / group_count);
-                            groupList.add(g);
-                            MarkerOptions ops = new MarkerOptions().position(g.getCenter());
-                            ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
-                            g.marker = mMap.addMarker(ops);
-                        }
-                    });
+                    .subscribe();
         }
     }
 
@@ -119,7 +101,6 @@ public class PhotoMapFragment extends SupportMapFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        context = activity;
         if(!(activity instanceof ProgressChangeListener)){
             throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
         }
@@ -438,6 +419,8 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
+    private int progress;
+    private int group_count;
     private Observable<PhotoGroup> groupObservable(int distance){
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
@@ -446,9 +429,25 @@ public class PhotoMapFragment extends SupportMapFragment {
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(() -> {
+                getMap().clear();
+                progress = group_count = 0;
+                listener.showProgress(0);
+                groupList.clear();
+            })
+            .doOnNext(g -> {
+                if (group_count != 0) {
+                    listener.showProgress(++progress * 10000 / group_count);
+                    groupList.add(g);
+                    MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                    ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
+                    g.marker = mMap.addMarker(ops);
+                }
+            })
             .doOnCompleted(() -> {
                 hideActionBarDelayed();
                 listener.endProgress();
             });
+
     }
 }
