@@ -25,8 +25,6 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.GridView;
 
-import net.mmho.photomap2.geohash.GeoHash;
-
 import java.util.ArrayList;
 
 import rx.Observable;
@@ -92,24 +90,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onStart() {
         super.onStart();
         if(subscription==null){
-            subscription =
-                subject
-                    .onBackpressureDrop()
-                    .doOnNext(aVoid ->{
-                        groupList.clear();
-                        listener.showProgress(0);
-                        progress = group_count = 0;
-                    })
-                    .concatMap(this::groupObservable)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                        g -> {
-                            if(group_count!=0) {
-                                listener.showProgress(++progress * 10000 / group_count);
-                                groupList.add(g);
-                                adapter.notifyDataSetChanged();
-                            }
-                        });
+            subscription = subject.concatMap(this::groupObservable).subscribe();
         }
     }
 
@@ -313,13 +294,26 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy(hash -> hash.getHash().toBase32()
-                .substring(0,DistanceActionProvider.getDistance(distance)))
+                .substring(0, DistanceActionProvider.getDistance(distance)))
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
             .takeUntil(subject)
             .map(g -> g.resolveAddress(context))
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(() -> {
+                groupList.clear();
+                listener.showProgress(0);
+                progress = group_count = 0;
+            })
+            .doOnNext(g -> {
+                if (group_count != 0) {
+                    listener.showProgress(++progress * 10000 / group_count);
+                    groupList.add(g);
+                    adapter.notifyDataSetChanged();
+                }
+            })
+
             .doOnCompleted(listener::endProgress);
     }
 
