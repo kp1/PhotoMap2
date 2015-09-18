@@ -36,7 +36,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
@@ -321,7 +320,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             else{
                 mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
-            mMap.setOnMarkerClickListener(photoGroupClickListener);
+            mMap.setOnMarkerClickListener(markerClick());
             mMap.setOnMapClickListener(photoMapClickListener);
             mMap.getUiSettings().setZoomControlsEnabled(false);
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
@@ -352,7 +351,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         ab_handler.postDelayed(runnable,DELAY);
     }
 
-    GoogleMap.OnMapClickListener photoMapClickListener =
+    private GoogleMap.OnMapClickListener photoMapClickListener =
         new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -364,7 +363,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     private final static int MAXIMUM_ZOOM = 17;
     private final static int MINIMUM_ZOOM = 4;
 
-    GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
+    private GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
@@ -381,7 +380,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    GoogleMap.CancelableCallback cancelableCallback =
+    private GoogleMap.CancelableCallback cancelableCallback =
             new GoogleMap.CancelableCallback() {
                 @Override
                 public void onFinish() {
@@ -394,28 +393,25 @@ public class PhotoMapFragment extends SupportMapFragment {
                 }
             };
 
-    GoogleMap.OnMarkerClickListener photoGroupClickListener =
-        new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                for(PhotoGroup group:groupList){
-                    if(group.marker.equals(marker)){
-                        Intent intent;
-                        if(group.size()==1){
-                            intent = new Intent(getActivity(),PhotoViewActivity.class);
-                            intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
-                        }
-                        else{
-                            intent = new Intent(getActivity(),ThumbnailActivity.class);
-                            intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
-                        }
-                        startActivity(intent);
-                        break;
+    private GoogleMap.OnMarkerClickListener markerClick() {
+        return marker -> {
+            Observable.from(groupList)
+                .filter(g -> g.marker.equals(marker))
+                .first()
+                .subscribe(g -> {
+                    Intent intent;
+                    if (g.size() == 1) {
+                        intent = new Intent(getActivity(), PhotoViewActivity.class);
+                        intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                    } else {
+                        intent = new Intent(getActivity(), ThumbnailActivity.class);
+                        intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
                     }
-                }
-                return true;
-            }
+                    startActivity(intent);
+                });
+            return true;
         };
+    }
 
     LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
