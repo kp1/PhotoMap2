@@ -88,7 +88,18 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onStart() {
         super.onStart();
         if(subscription==null){
-            subscription = subject.concatMap(this::groupObservable).subscribe();
+            subscription = subject
+                .concatMap(this::groupObservable)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext( g ->{
+                        if (group_count != 0) {
+                            listener.showProgress(++progress * 10000 / group_count);
+                            groupList.add(g);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                )
+                .subscribe();
         }
     }
 
@@ -290,6 +301,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private int progress;
     private int group_count;
+
     private Observable<PhotoGroup> groupObservable(int distance){
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
@@ -305,13 +317,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 groupList.clear();
                 listener.showProgress(0);
                 progress = group_count = 0;
-            })
-            .doOnNext(g -> {
-                if (group_count != 0) {
-                    listener.showProgress(++progress * 10000 / group_count);
-                    groupList.add(g);
-                    adapter.notifyDataSetChanged();
-                }
             })
             .doOnCompleted(listener::endProgress);
     }
