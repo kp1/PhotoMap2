@@ -58,6 +58,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     PublishSubject<Integer> subject;
 
 
+
     public void onBackPressed() {
         if(filtered) resetFilter(true);
         else getActivity().finish();
@@ -317,8 +318,12 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 groupList.clear();
                 listener.showProgress(0);
                 progress = group_count = 0;
+                loaded = false;
             })
-            .doOnCompleted(listener::endProgress);
+            .doOnCompleted(() -> {
+                listener.endProgress();
+                loaded = true;
+            });
     }
 
     private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
