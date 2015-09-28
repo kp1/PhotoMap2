@@ -1,32 +1,36 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private int resource;
     private LayoutInflater inflater;
 
-    private AddressFilter filter;
-    private ArrayList<PhotoGroup> mOriginalValues;
-    private ArrayList<PhotoGroup> mObjects;
+    private ArrayList<PhotoGroup> objects;
+    private ArrayList<PhotoGroup> original;
+
+    private PublishSubject<String> subject;
 
     public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);
         this.resource = resource;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mObjects = objects;
+        this.objects = objects;
+        subject = PublishSubject.create();
+        subject.concatMap(this::filterObservable).subscribe();
     }
 
     @Override
@@ -45,56 +49,26 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         return v;
     }
 
-    @Override
-    public AddressFilter getFilter() {
-        if(filter==null) filter = new AddressFilter();
-        return filter;
+    public void filter(String query){
+        if(original==null) original = new ArrayList<>(objects);
+        subject.onNext(query);
     }
 
-    public void clear(){
+    public void clearData() {
         super.clear();
-        mOriginalValues = null;
+        original = null;
     }
 
-    private void clearData(){
-        super.clear();
-    }
-
-    private class AddressFilter extends Filter{
-
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults result = new FilterResults();
-            if(mOriginalValues==null){
-                mOriginalValues = new ArrayList<>(mObjects);
-            }
-            if(constraint==null || constraint.length()==0){
-                result.count = mOriginalValues.size();
-                result.values = mOriginalValues;
-            }
-            else{
-                ArrayList<PhotoGroup> filtered = new ArrayList<>();
-                for(PhotoGroup group:mOriginalValues){
-                    if(group.getDescription().toLowerCase(Locale.getDefault()).contains(String.format("%s", constraint.toString().toLowerCase(Locale.getDefault())))){
-                        filtered.add(group);
-                    }
-                }
-                result.count = filtered.size();
-                result.values = filtered;
-            }
-            return result;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            if(mOriginalValues==null) return;
-            notifyDataSetInvalidated();
-            clearData();
-            ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;
-            for(PhotoGroup g:list) add(g);
-            notifyDataSetChanged();
-        }
+    private Observable<PhotoGroup> filterObservable(String query){
+        return Observable.from(original)
+            .subscribeOn(Schedulers.newThread())
+            .takeUntil(subject)
+            .filter(g -> (query==null || query.isEmpty()) ||
+                g.getDescription().toLowerCase(Locale.getDefault())
+                .contains(query.toLowerCase(Locale.getDefault())))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(this::clear)
+            .doOnNext(this::add);
     }
 
 }

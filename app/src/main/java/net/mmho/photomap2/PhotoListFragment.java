@@ -60,7 +60,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
     public void onBackPressed() {
-        if(filtered) resetFilter(true);
+        if(filtered) resetFilter();
         else getActivity().finish();
     }
 
@@ -144,7 +144,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item) {
-                    if(!filtered) resetFilter(true);
+                    if(!filtered) resetFilter();
                     return true;
                 }
             };
@@ -163,8 +163,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     if(!filtered) {
-                        Filter filter = ((Filterable) list.getAdapter()).getFilter();
-                        filter.filter(newText);
+                        adapter.filter(newText);
                     }
                     return true;
                 }
@@ -180,13 +179,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
 
 
-    private void resetFilter(boolean reQuery){
+    private void resetFilter(){
         query = "";
         getActivity().setTitle(getString(R.string.app_name));
-        if(reQuery) {
-            Filter filter = ((Filterable) list.getAdapter()).getFilter();
-            filter.filter(query);
-        }
+        adapter.filter(query);
         filtered = false;
     }
 
@@ -315,7 +311,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .map(g -> g.resolveAddress(context))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
-                groupList.clear();
+//                groupList.clear();
+                adapter.clearData();
                 listener.showProgress(0);
                 progress = group_count = 0;
                 loaded = false;
