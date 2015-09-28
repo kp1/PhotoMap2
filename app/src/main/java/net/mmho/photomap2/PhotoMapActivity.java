@@ -3,18 +3,13 @@ package net.mmho.photomap2;
 
 import android.app.Dialog;
 import android.app.SearchManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.WindowCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -35,15 +30,12 @@ import java.util.List;
 
 import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class PhotoMapActivity extends AppCompatActivity implements ProgressChangeListener{
 
     private static final String TAG_DIALOG = "dialog";
-    private final static int ADDRESS_LOADER_ID = 10;
-    private final static String SEARCH_QUERY = "query";
     private Dialog dialog = null;
     private ProgressBar progressBar;
 

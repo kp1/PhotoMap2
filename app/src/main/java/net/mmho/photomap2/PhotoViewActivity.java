@@ -46,7 +46,10 @@ public class PhotoViewActivity extends AppCompatActivity{
             bar.addOnMenuVisibilityListener(menuVisibilityListener);
         }
         PhotoGroup group = bundle.getParcelable(EXTRA_GROUP);
-        String title = group.getTitle();
+        String title = null;
+        if (group != null) {
+            title = group.getTitle();
+        }
         if(title!=null){
             setTitle(title);
         }
@@ -61,13 +64,9 @@ public class PhotoViewActivity extends AppCompatActivity{
         pager.setOnClickListener(onClickListener);
     }
 
+
     final private Handler handler = new Handler();
-    final private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            hideActionBar();
-        }
-    };
+    final private Runnable runnable = this::hideActionBar;
 
     private void showActionBar(boolean hide) {
         ActionBar bar = getSupportActionBar();
@@ -91,25 +90,19 @@ public class PhotoViewActivity extends AppCompatActivity{
 
 
     final private ActionBar.OnMenuVisibilityListener menuVisibilityListener =
-            new ActionBar.OnMenuVisibilityListener() {
-                @Override
-                public void onMenuVisibilityChanged(boolean isVisible) {
-                    if(isVisible) showActionBar(false);
-                    else hideActionBarDelayed();
-                }
-            };
+        isVisible -> {
+            if(isVisible) showActionBar(false);
+            else hideActionBarDelayed();
+        };
 
     final private View.OnClickListener onClickListener =
-            new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ActionBar bar = getSupportActionBar();
-                    if(bar!=null){
-                        if(bar.isShowing()) hideActionBar();
-                        else showActionBar(true);
-                    }
-                }
-            };
+        v -> {
+            ActionBar bar = getSupportActionBar();
+            if(bar!=null){
+                if(bar.isShowing()) hideActionBar();
+                else showActionBar(true);
+            }
+        };
 
     final private ViewPager.OnPageChangeListener onPageChangeListener =
             new ViewPager.OnPageChangeListener() {
@@ -136,12 +129,9 @@ public class PhotoViewActivity extends AppCompatActivity{
         MenuItem share = menu.findItem(R.id.share);
         shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(share);
         shareActionProvider.setShareIntent(setShareIntent(new Intent(),pager.getCurrentItem()));
-        shareActionProvider.setSubUiVisibilityListener(new ShareActionProvider.SubUiVisibilityListener() {
-            @Override
-            public void onSubUiVisibilityChanged(boolean visible) {
-                if(visible) showActionBar(false);
-                else hideActionBarDelayed();
-            }
+        shareActionProvider.setSubUiVisibilityListener(visible -> {
+            if(visible) showActionBar(false);
+            else hideActionBarDelayed();
         });
 
         return super.onCreateOptionsMenu(menu);

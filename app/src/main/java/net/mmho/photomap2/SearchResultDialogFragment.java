@@ -34,13 +34,13 @@ public class SearchResultDialogFragment extends DialogFragment{
         AddressListAdapter adapter = new AddressListAdapter(getActivity(),android.R.layout.simple_list_item_2,list);
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.search_title, title));
-        builder.setAdapter(adapter,new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
-                if(f instanceof PhotoMapFragment){
-                    CameraUpdate update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[which]),
-                            PhotoMapFragment.DEFAULT_ZOOM);
+        builder.setAdapter(adapter, (dialog, which) -> {
+            Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
+            if(f instanceof PhotoMapFragment){
+                CameraUpdate update = null;
+                if (list != null) {
+                    update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[which]),
+                        PhotoMapFragment.DEFAULT_ZOOM);
                     ((PhotoMapFragment)f).getMap().moveCamera(update);
                 }
             }

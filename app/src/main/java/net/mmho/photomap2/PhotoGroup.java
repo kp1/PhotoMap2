@@ -1,13 +1,10 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -38,7 +35,6 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
             return new PhotoGroup[size];
         }
     };
-    private final static String TAG = "PhotoGroup";
 
     public PhotoGroup(Parcel in){
         in.readTypedList(this,HashedPhoto.CREATOR);
@@ -50,11 +46,6 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public PhotoGroup(HashedPhoto p){
         geoHash = p.getHash();
-        add(p);
-    }
-
-    public void append(HashedPhoto p){
-        if(!p.getHash().within(geoHash)) geoHash = geoHash.extend(p.getHash());
         add(p);
     }
 
