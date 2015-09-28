@@ -111,6 +111,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             subscription.unsubscribe();
             subscription = null;
         }
+        if(adapter!=null && adapter.subscription!=null) adapter.subscription.unsubscribe();
     }
 
     @Override

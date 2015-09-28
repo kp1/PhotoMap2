@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import rx.Observable;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
@@ -23,6 +24,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private ArrayList<PhotoGroup> original;
 
     private PublishSubject<String> subject;
+    public Subscription subscription;
 
     public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);
@@ -30,7 +32,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.objects = objects;
         subject = PublishSubject.create();
-        subject.concatMap(this::filterObservable).subscribe();
+        subscription = subject.concatMap(this::filterObservable).subscribe();
     }
 
     @Override
