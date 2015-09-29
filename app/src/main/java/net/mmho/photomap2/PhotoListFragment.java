@@ -43,7 +43,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
     private MenuItem search;
-    private GridView list;
     private boolean loaded = false;
     private boolean filtered;
     private String query="";
@@ -119,7 +118,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         DistanceActionProvider distanceActionProvider
                 = (DistanceActionProvider) MenuItemCompat.getActionProvider(distance);
         distanceActionProvider.setDistanceIndex(distance_index);
-        distanceActionProvider.setOnDistanceChangeListener(onDistanceChangeListener);
+        distanceActionProvider.setOnDistanceChangeListener(index -> {
+            distance_index = index;
+            subject.onNext(index);
+        });
 
 
         search = menu.findItem(R.id.search);
@@ -216,10 +218,20 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
 
         // photo list
-        list = (GridView)parent.findViewById(R.id.list);
+        GridView list = (GridView) parent.findViewById(R.id.list);
         list.setAdapter(adapter);
-        list.setOnItemClickListener(onItemClickListener);
-        list.setTextFilterEnabled(true);
+        list.setOnItemClickListener((p, view, position, id) -> {
+            PhotoGroup group = adapter.getItem(position);
+            Intent intent;
+            if (group.size() == 1) {
+                intent = new Intent(getActivity(), PhotoViewActivity.class);
+                intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
+            } else {
+                intent = new Intent(getActivity(), ThumbnailActivity.class);
+                intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
+            }
+            startActivity(intent);
+        });
 
         return parent;
 
@@ -238,25 +250,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
         if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
     }
-
-    AdapterView.OnItemClickListener onItemClickListener=
-            new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    PhotoGroup group = adapter.getItem(position);
-                    Intent intent;
-                    if(group.size()==1){
-                        intent = new Intent(getActivity(),PhotoViewActivity.class);
-                        intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
-                    }
-                    else {
-                        intent = new Intent(getActivity(), ThumbnailActivity.class);
-                        intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
-                    }
-                    startActivity(intent);
-                }
-            };
-
 
     @Override
     public void onAttach(Context context) {
@@ -319,14 +312,5 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             });
     }
 
-    private final DistanceActionProvider.OnDistanceChangeListener onDistanceChangeListener =
-            new DistanceActionProvider.OnDistanceChangeListener() {
-                @Override
-                public void onDistanceChange(int index)
-                {
-                    distance_index = index;
-                    subject.onNext(index);
-                }
-            };
 
 }
