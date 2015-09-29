@@ -121,7 +121,9 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+        if(savedInstanceState==null){
+            supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
+        }
         setContentView(R.layout.activity_photo_map);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         ActionBar bar = getSupportActionBar();
