@@ -56,7 +56,6 @@ public class PhotoMapFragment extends SupportMapFragment {
     final public static float DEFAULT_ZOOM = 15;
 
     private GoogleMap mMap;
-    private MarkerOptions sharedMarker;
     private MenuItem searchMenuItem;
     private ActionBar mActionBar;
     private ArrayList<HashedPhoto> photoList;
@@ -84,7 +83,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             subscription =
                 subject
                     .onBackpressureLatest()
-                    .concatMap(this::groupObservable)
+                    .switchMap(this::groupObservable)
                     .subscribe();
         }
     }
@@ -209,28 +208,7 @@ public class PhotoMapFragment extends SupportMapFragment {
         return new LatLngBounds(southwest,northeast);
     }
 
-    private Bitmap createBitMap(int resource){
-        int height = getResources().getDimensionPixelSize(R.dimen.marker_height);
-        int width = getResources().getDimensionPixelSize(R.dimen.marker_width);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        Drawable shape;
-        if(Build.VERSION.SDK_INT >= 21) {
-            shape = getResources().getDrawable(resource, null);
-        }
-        else{
-            //noinspection deprecation
-            shape = getResources().getDrawable(resource);
-        }
-        if(shape!=null) {
-            shape.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            shape.draw(canvas);
-        }
-        return bitmap;
-    }
-
     private CameraUpdate handleIntent(Intent intent){
-        sharedMarker =null;
         if(Intent.ACTION_VIEW.equals(intent.getAction())){
             Uri uri = intent.getData();
             if(uri.getScheme().equals("geo")) {
@@ -269,9 +247,6 @@ public class PhotoMapFragment extends SupportMapFragment {
             c.moveToFirst();
             LatLng position = c.getLocation();
             c.close();
-            sharedMarker = new MarkerOptions();
-            sharedMarker.icon(BitmapDescriptorFactory.fromBitmap(createBitMap(R.drawable.dot)))
-                    .position(position);
             return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
         }
         else{
@@ -436,18 +411,15 @@ public class PhotoMapFragment extends SupportMapFragment {
                 groupList.clear();
             })
             .doOnNext(g -> {
-                if (group_count != 0) {
-                    listener.showProgress(++progress * 10000 / group_count);
-                    groupList.add(g);
-                    MarkerOptions ops = new MarkerOptions().position(g.getCenter());
-                    ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
-                    g.marker = mMap.addMarker(ops);
-                }
+                listener.showProgress(++progress * 10000 / group_count);
+                groupList.add(g);
+                MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
+                g.marker = mMap.addMarker(ops);
             })
             .doOnCompleted(() -> {
                 hideActionBarDelayed();
                 listener.endProgress();
             });
-
     }
 }
