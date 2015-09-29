@@ -109,7 +109,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             subscription.unsubscribe();
             subscription = null;
         }
-        if(adapter!=null && adapter.subscription!=null) adapter.subscription.unsubscribe();
     }
 
     @Override
@@ -309,7 +308,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .map(g -> g.resolveAddress(context))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
-                adapter.clearData();
+                adapter.clear();
                 listener.showProgress(0);
                 progress = group_count = 0;
                 loaded = false;

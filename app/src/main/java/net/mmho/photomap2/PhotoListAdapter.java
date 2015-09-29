@@ -23,7 +23,6 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private ArrayList<PhotoGroup> objects;
     private ArrayList<PhotoGroup> original;
 
-    private PublishSubject<String> subject;
     public Subscription subscription;
 
     public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
@@ -31,8 +30,6 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         this.resource = resource;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.objects = objects;
-        subject = PublishSubject.create();
-        subscription = subject.concatMap(this::filterObservable).subscribe();
     }
 
     @Override
@@ -53,10 +50,12 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     public void filter(String query){
         if(original==null) original = new ArrayList<>(objects);
-        subject.onNext(query);
+        if(subscription!=null) subscription.unsubscribe();
+        subscription = filterObservable(query).subscribe();
     }
 
-    public void clearData() {
+    @Override
+    public void clear() {
         super.clear();
         original = null;
     }
@@ -64,12 +63,11 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private Observable<PhotoGroup> filterObservable(String query){
         return Observable.from(original)
             .subscribeOn(Schedulers.newThread())
-            .takeUntil(subject)
-            .filter(g -> (query==null || query.isEmpty()) ||
+            .filter(g -> (query == null || query.isEmpty()) ||
                 g.getDescription().toLowerCase(Locale.getDefault())
-                .contains(query.toLowerCase(Locale.getDefault())))
+                    .contains(query.toLowerCase(Locale.getDefault())))
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe(this::clear)
+            .doOnSubscribe(super::clear)
             .doOnNext(this::add);
     }
 
