@@ -23,5 +23,7 @@
     <string name="overflow" translatable="false">overflow</string>
     <string-array name="oss">
         <item>ActiveAndroid</item>
+        <item>RxJava</item>
+        <item>RxAndroid</item>
     </string-array>
 </resources>

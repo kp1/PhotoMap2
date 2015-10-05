@@ -43,7 +43,7 @@ public class AboutActivity extends AppCompatActivity{
         b.append("\n\n");
         String[] list = getResources().getStringArray(R.array.oss);
         for(String oss:list){
-            b.append("\t").append("・").append(oss);
+            b.append("\t").append("・").append(oss).append("\n");
         }
         about.setText(b.toString());
     }
