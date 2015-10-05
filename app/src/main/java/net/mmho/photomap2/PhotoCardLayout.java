@@ -34,6 +34,7 @@ public class PhotoCardLayout extends RelativeLayout{
 
     @Override
     protected void onFinishInflate() {
+        super.onFinishInflate();
         thumbnail = (ThumbnailImageView)findViewById(R.id.thumbnail);
         title = (TextView)findViewById(R.id.title);
         description = (TextView)findViewById(R.id.description);

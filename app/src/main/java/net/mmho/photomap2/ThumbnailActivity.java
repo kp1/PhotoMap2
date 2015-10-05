@@ -26,7 +26,7 @@ public class ThumbnailActivity extends AppCompatActivity {
         }
         else{
             fragment = (ThumbnailFragment) getSupportFragmentManager().findFragmentById(R.id.list);
-            fragment.setList((PhotoGroup) bundle.getParcelable(EXTRA_GROUP));
+            fragment.setList(bundle.getParcelable(EXTRA_GROUP));
         }
 
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
