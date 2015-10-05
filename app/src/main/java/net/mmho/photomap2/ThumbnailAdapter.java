@@ -1,9 +1,6 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +12,11 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
 
     private int resource;
     private LayoutInflater inflater;
-    private LoaderManager manager;
-    private int loader_id;
-    private LruCache<java.lang.Long,Bitmap> mBitmapCache;
 
-    public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects,LoaderManager m,int loader_id_base,LruCache<java.lang.Long,Bitmap> cache) {
+    public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects) {
         super(c, resource, objects);
         this.resource = resource;
-        manager = m;
         inflater = (LayoutInflater)c.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        loader_id = loader_id_base;
-        mBitmapCache = cache;
     }
 
     private class ViewHolder{
@@ -36,22 +27,19 @@ public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
         ViewHolder holder;
-        int id;
-        if(convertView!=null){
+
+        if(convertView!=null && position!=0){
             v = convertView;
             holder = (ViewHolder) v.getTag();
-            id = (Integer)v.getTag(R.id.thumbnail);
         }
         else{
             v = inflater.inflate(resource,null);
             holder = new ViewHolder();
             holder.thumbnail = (ThumbnailImageView) v.findViewById(R.id.thumbnail);
             v.setTag(holder);
-            id=loader_id++;
-            v.setTag(R.id.thumbnail,id);
         }
 
-        holder.thumbnail.startLoading(manager,id,getItem(position).getPhotoId(),mBitmapCache);
+        holder.thumbnail.startLoading(getItem(position).getPhotoId());
 
         return v;
     }

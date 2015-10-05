@@ -111,7 +111,7 @@ public class GeoHash implements Parcelable {
         }
         final long mask_bits = ~0L>>>(MAX_SIGNIFICANT_BITS-BASE32_BITS);
         for(int i=0;i<significantBits/5;i++){
-            b.append(BASE32.charAt((int) ((bit>>>(MAX_SIGNIFICANT_BITS-i*BASE32_BITS))&mask_bits)));
+            b.append(BASE32.charAt((int) ((bit>>>(MAX_SIGNIFICANT_BITS-(i+1)*BASE32_BITS))&mask_bits)));
         }
         return b.toString();
     }
@@ -163,6 +163,10 @@ public class GeoHash implements Parcelable {
     public LatLng getCenter() {
         Divider[] dividers = getArea();
         return new LatLng(dividers[1].middle(),dividers[0].middle());
+    }
+
+    public boolean equals(GeoHash other){
+        return bit == other.bit && significantBits == other.significantBits;
     }
 
     @Override

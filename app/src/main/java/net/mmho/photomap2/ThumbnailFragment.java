@@ -29,16 +29,8 @@ public class ThumbnailFragment extends Fragment {
 
     public void setList(PhotoGroup g){
         group = g;
-        final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
-        final int cacheSize = maxMemory/8;
-        LruCache<Long, Bitmap> mBitMapCache = new LruCache<Long, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(Long key, Bitmap value) {
-                return value.getRowBytes() * value.getHeight() / 1024;
-            }
-        };
         ThumbnailAdapter adapter =
-            new ThumbnailAdapter(getActivity(), R.layout.adapter_thumbnail, group, getLoaderManager(), 0, mBitMapCache);
+            new ThumbnailAdapter(getActivity(), R.layout.adapter_thumbnail, group);
         list.setAdapter(adapter);
     }
 

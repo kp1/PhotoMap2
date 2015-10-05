@@ -1,111 +1,74 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private int resource;
     private LayoutInflater inflater;
-    private LoaderManager manager;
-    private int loader_id;
 
-    private AddressFilter filter;
-    private ArrayList<PhotoGroup> mOriginalValues;
-    private ArrayList<PhotoGroup> mObjects;
+    private ArrayList<PhotoGroup> objects;
+    private ArrayList<PhotoGroup> original;
 
-    private LruCache<Long,Bitmap> mBitmapCache;
+    public Subscription subscription;
 
-    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects,LoaderManager m,int loader_id_base,LruCache<Long,Bitmap> cache) {
+    public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);
         this.resource = resource;
-        manager = m;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        loader_id = loader_id_base;
-        mObjects = objects;
-        mBitmapCache = cache;
+        this.objects = objects;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v;
-        int id;
         if(convertView!=null){
             v = convertView;
-            id = (Integer)v.getTag();
         }
         else {
             v = inflater.inflate(resource,null);
-            id = loader_id++;
-            v.setTag(id);
         }
         if(position < getCount()) {
             PhotoGroup g = getItem(position);
-            ((PhotoCardLayout) v).setData(g, id, manager, mBitmapCache);
+            ((PhotoCardLayout) v).setData(g);
         }
         return v;
     }
 
+    public void filter(String query){
+        if(original==null) original = new ArrayList<>(objects);
+        if(subscription!=null) subscription.unsubscribe();
+        subscription = filterObservable(query).subscribe();
+    }
+
     @Override
-    public AddressFilter getFilter() {
-        if(filter==null) filter = new AddressFilter();
-        return filter;
-    }
-
-    public void clear(){
+    public void clear() {
         super.clear();
-        mOriginalValues = null;
+        original = null;
     }
 
-    private void clearData(){
-        super.clear();
-    }
-
-    private class AddressFilter extends Filter{
-
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults result = new FilterResults();
-            if(mOriginalValues==null){
-                mOriginalValues = new ArrayList<>(mObjects);
-            }
-            if(constraint==null || constraint.length()==0){
-                result.count = mOriginalValues.size();
-                result.values = mOriginalValues;
-            }
-            else{
-                ArrayList<PhotoGroup> filtered = new ArrayList<>();
-                for(PhotoGroup group:mOriginalValues){
-                    if(group.getDescription().toLowerCase(Locale.getDefault()).contains(String.format("%s", constraint.toString().toLowerCase(Locale.getDefault())))){
-                        filtered.add(group);
-                    }
-                }
-                result.count = filtered.size();
-                result.values = filtered;
-            }
-            return result;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            if(mOriginalValues==null) return;
-            notifyDataSetInvalidated();
-            clearData();
-            ArrayList<PhotoGroup> list = (ArrayList<PhotoGroup>)results.values;
-            for(PhotoGroup g:list) add(g);
-            notifyDataSetChanged();
-        }
+    private Observable<PhotoGroup> filterObservable(String query){
+        return Observable.from(original)
+            .subscribeOn(Schedulers.newThread())
+            .filter(g -> (query == null || query.isEmpty()) ||
+                g.getDescription().toLowerCase(Locale.getDefault())
+                    .contains(query.toLowerCase(Locale.getDefault())))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(super::clear)
+            .doOnNext(this::add);
     }
 
 }

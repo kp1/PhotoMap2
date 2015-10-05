@@ -2,13 +2,9 @@ package net.mmho.photomap2;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Parcelable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.util.LruCache;
 import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -63,25 +59,22 @@ public class PhotoCardLayout extends RelativeLayout{
         };
 
     final PopupMenu.OnMenuItemClickListener popupClickListener =
-        new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()){
-                case R.id.map:
-                    moveMap();
-                    return true;
-                default:
-                    return false;
-                }
+        item -> {
+            switch (item.getItemId()){
+            case R.id.map:
+                moveMap();
+                return true;
+            default:
+                return false;
             }
         };
 
-    public void setData(PhotoGroup g, int loader_id, LoaderManager manager,LruCache<Long,Bitmap> cache){
+    public void setData(PhotoGroup g){
         group = g;
 
         count.setText(String.format("%2d",g.size()));
 
-        thumbnail.startLoading(manager,loader_id,g.get(0).getPhotoId(),cache);
+        thumbnail.startLoading(g.get(0).getPhotoId());
 
         String address= g.getTitle();
         if(address==null) {

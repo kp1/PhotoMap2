@@ -2,16 +2,10 @@ package net.mmho.photomap2;
 
 import android.app.Activity;
 import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -20,17 +14,13 @@ import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -41,50 +31,65 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import rx.Observable;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+
 
 public class PhotoMapFragment extends SupportMapFragment {
     final static int PHOTO_CURSOR_LOADER = 0;
-    final static int PHOTO_GROUP_LOADER = 1;
 
     final public static String EXTRA_GROUP="group";
     final public static float DEFAULT_ZOOM = 15;
 
     private GoogleMap mMap;
-    private PhotoCursor photoCursor;
-    private PhotoGroupList mGroup;
-    private int progress;
-    private MarkerOptions sharedMarker;
     private MenuItem searchMenuItem;
     private ActionBar mActionBar;
     private ArrayList<HashedPhoto> photoList;
+    private ArrayList<PhotoGroup> groupList;
 
     private ProgressChangeListener listener;
+
+
+    private PublishSubject<Integer> subject;
+    private Subscription subscription;
 
     public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
         setHasOptionsMenu(true);
+        photoList = new ArrayList<>();
+        groupList = new ArrayList<>();
+        subject = PublishSubject.create();
 	}
 
     @Override
     public void onStart() {
         super.onStart();
-        LocalBroadcastManager.getInstance(getActivity())
-                .registerReceiver(progressReceiver,new IntentFilter(PhotoGroupList.PROGRESS_ACTION));
+        if(subscription==null){
+            subscription =
+                subject
+                    .onBackpressureLatest()
+                    .switchMap(this::groupObservable)
+                    .subscribe();
+        }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        LocalBroadcastManager.getInstance(getActivity())
-                .unregisterReceiver(progressReceiver);
+    public void onDestroy() {
+        super.onDestroy();
+        if(subscription!=null){
+            subscription.unsubscribe();
+            subscription = null;
+        }
     }
 
     @Override
@@ -114,8 +119,10 @@ public class PhotoMapFragment extends SupportMapFragment {
         SearchView searchView = (SearchView)MenuItemCompat.getActionView(menu.findItem(R.id.search));
         searchView.setOnQueryTextListener(onQueryTextListener);
         searchMenuItem = menu.findItem(R.id.search);
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem,actionExpandListener);
-        searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, actionExpandListener);
+        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem);
+        });
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setQueryRefinementEnabled(true);
 
@@ -132,19 +139,6 @@ public class PhotoMapFragment extends SupportMapFragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
-    final private ActionBar.OnMenuVisibilityListener onMenuVisibilityListener =
-            new ActionBar.OnMenuVisibilityListener() {
-                @Override
-                public void onMenuVisibilityChanged(boolean visible) {
-                    if(visible){
-                        showActionBar(false);
-                    }
-                    else{
-                        hideActionBarDelayed();
-                    }
-                }
-            };
 
     final private MenuItemCompat.OnActionExpandListener actionExpandListener =
             new MenuItemCompat.OnActionExpandListener() {
@@ -178,13 +172,6 @@ public class PhotoMapFragment extends SupportMapFragment {
                 }
             };
 
-    final private SearchView.OnFocusChangeListener onFocusChangeListener =
-            new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if(!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem);
-                }
-            };
 
     private void requestQuery(String query){
         Intent intent = new Intent(getActivity(),PhotoMapActivity.class);
@@ -194,37 +181,14 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
     private LatLngBounds expandLatLngBounds(LatLngBounds bounds, double percentile){
-        Log.d(TAG,bounds.toString());
         double lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude)*((percentile-1.0)/2);
         double lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude)*((percentile-1.0)/2);
         LatLng northeast = new LatLng(bounds.northeast.latitude+lat_distance,bounds.northeast.longitude+lng_distance);
         LatLng southwest = new LatLng(bounds.southwest.latitude-lat_distance,bounds.southwest.longitude-lng_distance);
-        Log.d(TAG, northeast.toString() + " , " + southwest);
         return new LatLngBounds(southwest,northeast);
     }
 
-    private Bitmap createBitMap(int resource){
-        int height = getResources().getDimensionPixelSize(R.dimen.marker_height);
-        int width = getResources().getDimensionPixelSize(R.dimen.marker_width);
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        Drawable shape;
-        if(Build.VERSION.SDK_INT >= 21) {
-            shape = getResources().getDrawable(resource, null);
-        }
-        else{
-            //noinspection deprecation
-            shape = getResources().getDrawable(resource);
-        }
-        if(shape!=null) {
-            shape.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
-            shape.draw(canvas);
-        }
-        return bitmap;
-    }
-
     private CameraUpdate handleIntent(Intent intent){
-        sharedMarker =null;
         if(Intent.ACTION_VIEW.equals(intent.getAction())){
             Uri uri = intent.getData();
             if(uri.getScheme().equals("geo")) {
@@ -263,9 +227,6 @@ public class PhotoMapFragment extends SupportMapFragment {
             c.moveToFirst();
             LatLng position = c.getLocation();
             c.close();
-            sharedMarker = new MarkerOptions();
-            sharedMarker.icon(BitmapDescriptorFactory.fromBitmap(createBitMap(R.drawable.dot)))
-                    .position(position);
             return CameraUpdateFactory.newLatLngZoom(position,DEFAULT_ZOOM);
         }
         else{
@@ -287,40 +248,55 @@ public class PhotoMapFragment extends SupportMapFragment {
             Intent intent = getActivity().getIntent();
             final CameraUpdate update = handleIntent(intent);
             if(update!=null && getView()!=null) {
-                getView().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mMap.moveCamera(update);
-                        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                    }
+                getView().post(() -> {
+                    mMap.moveCamera(update);
+                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
                 });
             }
             else{
                 mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
-            mMap.setOnMarkerClickListener(photoGroupClickListener);
-            mMap.setOnMapClickListener(photoMapClickListener);
+            mMap.setOnMarkerClickListener(marker -> {
+                Observable.from(groupList)
+                    .filter(g -> g.marker.equals(marker))
+                    .first()
+                    .subscribe(g -> {
+                        Intent i;
+                        if (g.size() == 1) {
+                            i = new Intent(getActivity(), PhotoViewActivity.class);
+                            i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                        } else {
+                            i = new Intent(getActivity(), ThumbnailActivity.class);
+                            i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
+                        }
+                        startActivity(i);
+                    });
+                return true;
+            });
+            mMap.setOnMapClickListener(latLng -> {
+                if(mActionBar.isShowing()) hideActionBar();
+                else showActionBar(true);
+            });
             mMap.getUiSettings().setZoomControlsEnabled(false);
             getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
+        
 
         mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(onMenuVisibilityListener);
+        if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(visible -> {
+            if(visible) showActionBar(false);
+            else hideActionBarDelayed();
+        });
 
     }
 
 
-    final Handler ab_handler = new Handler();
-    final Runnable runnable= new Runnable() {
-        @Override
-        public void run() {
-            hideActionBar();
-        }
-    };
+    final Handler handler = new Handler();
+    final Runnable runnable= this::hideActionBar;
 
     private void showActionBar(boolean hide){
         mActionBar.show();
-        if(!hide)ab_handler.removeCallbacks(runnable);
+        if(!hide) handler.removeCallbacks(runnable);
         else hideActionBarDelayed();
     }
 
@@ -330,25 +306,19 @@ public class PhotoMapFragment extends SupportMapFragment {
 
     private void hideActionBarDelayed(){
         final long DELAY = 3*1000;  // 3sec
-        ab_handler.removeCallbacks(runnable);
-        ab_handler.postDelayed(runnable,DELAY);
+        handler.removeCallbacks(runnable);
+        handler.postDelayed(runnable, DELAY);
     }
 
-    GoogleMap.OnMapClickListener photoMapClickListener =
-        new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                if(mActionBar.isShowing()) hideActionBar();
-                else showActionBar(true);
-            }
-        };
+    private final static int MAXIMUM_ZOOM = 17;
+    private final static int MINIMUM_ZOOM = 4;
 
-    GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
+    private GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
-                if(position.zoom>16 || position.zoom<3){
-                    float zoom = position.zoom>16?16:3;
+                if(position.zoom> MAXIMUM_ZOOM || position.zoom<MINIMUM_ZOOM){
+                    float zoom = position.zoom> MAXIMUM_ZOOM ? MAXIMUM_ZOOM :MINIMUM_ZOOM;
                     mMap.setOnCameraChangeListener(null);
                     CameraUpdate cameraUpdate =
                             CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(position.target,zoom));
@@ -356,63 +326,22 @@ public class PhotoMapFragment extends SupportMapFragment {
                     return;
                 }
                 showActionBar(false);
-                getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null,photoListLoaderCallback);
+                getLoaderManager().restartLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
             }
         };
 
-    GoogleMap.CancelableCallback cancelableCallback =
-            new GoogleMap.CancelableCallback() {
-                @Override
-                public void onFinish() {
-                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                }
-
-                @Override
-                public void onCancel() {
-                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                }
-            };
-
-    GoogleMap.OnMarkerClickListener photoGroupClickListener =
-        new GoogleMap.OnMarkerClickListener() {
+    private GoogleMap.CancelableCallback cancelableCallback =
+        new GoogleMap.CancelableCallback() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
-                for(PhotoGroup group:mGroup){
-                    if(group.marker.equals(marker)){
-                        Intent intent;
-                        if(group.size()==1){
-                            intent = new Intent(getActivity(),PhotoViewActivity.class);
-                            intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
-                        }
-                        else{
-                            intent = new Intent(getActivity(),ThumbnailActivity.class);
-                            intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
-                        }
-                        startActivity(intent);
-                        break;
-                    }
-                }
-                return true;
+            public void onFinish() {
+                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+            }
+
+            @Override
+            public void onCancel() {
+                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             }
         };
-
-    private BroadcastReceiver progressReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int count = photoCursor.getCount();
-            int status = intent.getIntExtra(PhotoGroupList.LOADER_STATUS,0);
-            switch(status){
-                case PhotoGroupList.MESSAGE_RESTART:
-                    progress = 0;
-                    break;
-                case PhotoGroupList.MESSAGE_APPEND:
-                    progress++;
-                    if(count!=0) listener.showProgress(progress * Window.PROGRESS_END/count);
-                    break;
-            }
-        }
-    };
 
     LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -428,18 +357,10 @@ public class PhotoMapFragment extends SupportMapFragment {
 
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-                photoCursor = new PhotoCursor(cursor);
-                if(photoCursor.getCount()!=0) {
-                    photoList = photoCursor.getHashedPhotoList();
-                    getLoaderManager().destroyLoader(PHOTO_GROUP_LOADER);
-                    getLoaderManager().restartLoader(PHOTO_GROUP_LOADER, null, photoGroupListLoaderCallbacks);
-                }
-                else{
-                    mMap.clear();
-                    if(sharedMarker!=null)mMap.addMarker(sharedMarker);
-                    hideActionBarDelayed();
-                    listener.endProgress();
-                }
+                photoList = new PhotoCursor(cursor).getHashedPhotoList();
+                int distance = (int)getMap().getCameraPosition().zoom*2+4;
+                if(distance>45) distance = 45;
+                subject.onNext(distance);
             }
 
             @Override
@@ -447,38 +368,32 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    private String TAG = "PhotoMapFragment";
-    LoaderManager.LoaderCallbacks<PhotoGroupList> photoGroupListLoaderCallbacks =
-        new LoaderManager.LoaderCallbacks<PhotoGroupList>() {
-            @Override
-            public Loader<PhotoGroupList> onCreateLoader(int id, Bundle args) {
-                int distance = (int)getMap().getCameraPosition().zoom*2+4;
-                if(distance>45) distance = 45;
-                return new PhotoGroupListLoader(getActivity(),
-                        new PhotoGroupList(),photoList,distance,false);
-            }
-
-            @Override
-            public void onLoadFinished(Loader<PhotoGroupList> loader, PhotoGroupList group) {
-                listener.endProgress();
+    private int progress;
+    private int group_count;
+    private Observable<PhotoGroup> groupObservable(int distance){
+        return Observable.from(photoList)
+            .subscribeOn(Schedulers.newThread())
+            .groupBy(hash -> Long.toBinaryString(hash.getHash().getLong()).substring(0, distance))
+            .doOnNext(g -> group_count++)
+            .concatMap(group -> group.map(PhotoGroup::new)
+                .reduce(PhotoGroup::append))
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe(() -> {
+                getMap().clear();
+                progress = group_count = 0;
+                listener.showProgress(0);
+                groupList.clear();
+            })
+            .doOnNext(g -> {
+                listener.showProgress(++progress * 10000 / group_count);
+                groupList.add(g);
+                MarkerOptions ops = new MarkerOptions().position(g.getCenter());
+                ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
+                g.marker = mMap.addMarker(ops);
+            })
+            .doOnCompleted(() -> {
                 hideActionBarDelayed();
-                Log.d(TAG,getMap().getCameraPosition().toString());
-                if(mGroup==null || !mGroup.equals(group)) {
-                    mMap.clear();
-                    mGroup = group;
-                    for (PhotoGroup g : mGroup) {
-                        MarkerOptions ops = new MarkerOptions().position(g.getCenter());
-                        ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
-                        g.marker = mMap.addMarker(ops);
-                    }
-                }
-                if(sharedMarker !=null)mMap.addMarker(sharedMarker);
-            }
-
-            @Override
-            public void onLoaderReset(Loader<PhotoGroupList> loader) {
-
-            }
-        };
-
+                listener.endProgress();
+            });
+    }
 }

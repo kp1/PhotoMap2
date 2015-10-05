@@ -1,5 +1,8 @@
 package net.mmho.photomap2;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,7 +12,9 @@ import com.google.android.gms.maps.model.Marker;
 
 import net.mmho.photomap2.geohash.GeoHash;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
@@ -44,9 +49,12 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         add(p);
     }
 
-    public void append(HashedPhoto p){
-        if(!p.getHash().within(geoHash)) geoHash = geoHash.extend(p.getHash());
-        add(p);
+    public PhotoGroup append(PhotoGroup o){
+        if(!o.getHash().within(geoHash)) geoHash = geoHash.extend(o.geoHash);
+        for(HashedPhoto p:o){
+            add(p);
+        }
+        return this;
     }
 
     public void setAddress(String title,String description){
@@ -71,7 +79,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public String locationToString() {
         LatLng p = geoHash.getCenter();
-        return String.format(Locale.getDefault(),"% 8.5f , % 8.5f", p.latitude, p.latitude);
+        return String.format(Locale.getDefault(),"% 8.5f , % 8.5f", p.latitude, p.longitude);
     }
 
     public String toString(){
@@ -91,6 +99,30 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         geoHash.writeToParcel(out, flags);
         out.writeString(address);
         out.writeString(description);
+    }
+
+    public PhotoGroup resolveAddress(Context context){
+        Geocoder geocoder = new Geocoder(context);
+        AddressRecord record = AddressRecord.getAddressByHash(getHash());
+        if(record!=null){
+            setAddress(record.getTitle(), record.getDescription());
+            return this;
+        }
+        LatLng p = getCenter();
+        List<Address> addresses;
+        if(NetworkUtils.networkCheck(context)) {
+            try {
+                addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1);
+                if (addresses != null && addresses.size() > 0) {
+                    Address a = addresses.get(0);
+                    setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
+                    new AddressRecord(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a), getHash()).save();
+                }
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+        return this;
     }
 
     static public float getMarkerColor(int size){
