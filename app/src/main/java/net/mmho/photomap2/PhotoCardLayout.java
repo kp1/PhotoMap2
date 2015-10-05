@@ -39,7 +39,20 @@ public class PhotoCardLayout extends RelativeLayout{
         title = (TextView)findViewById(R.id.title);
         description = (TextView)findViewById(R.id.description);
         ImageView menu = (ImageView) findViewById(R.id.overflow);
-        menu.setOnClickListener(onClickListener);
+        menu.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(getContext(),v);
+            popup.setOnMenuItemClickListener(item -> {
+                switch (item.getItemId()){
+                case R.id.map:
+                    moveMap();
+                    return true;
+                default:
+                    return false;
+                }
+            });
+            popup.inflate(R.menu.photo_list_popup_menu);
+            popup.show();
+        });
         count = (TextView)findViewById(R.id.count);
     }
 
@@ -48,27 +61,6 @@ public class PhotoCardLayout extends RelativeLayout{
         i.putExtra(PhotoMapFragment.EXTRA_GROUP, (Parcelable) group);
         getContext().startActivity(i);
     }
-    final ImageView.OnClickListener onClickListener =
-        new ImageView.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(getContext(),v);
-                popup.setOnMenuItemClickListener(popupClickListener);
-                popup.inflate(R.menu.photo_list_popup_menu);
-                popup.show();
-            }
-        };
-
-    final PopupMenu.OnMenuItemClickListener popupClickListener =
-        item -> {
-            switch (item.getItemId()){
-            case R.id.map:
-                moveMap();
-                return true;
-            default:
-                return false;
-            }
-        };
 
     public void setData(PhotoGroup g){
         group = g;
