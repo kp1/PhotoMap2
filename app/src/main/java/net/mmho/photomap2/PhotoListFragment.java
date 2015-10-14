@@ -192,18 +192,19 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         case R.id.oldest:
             newest = false;
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-            return true;
+            break;
         case R.id.newest:
             newest = true;
             getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-            return true;
+            break;
         case R.id.about:
             Intent i = new Intent(getActivity(),AboutActivity.class);
             startActivity(i);
-            return true;
+            break;
         default:
-            return true;
+            break;
         }
+        return true;
     }
 
     @Override
@@ -215,12 +216,16 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View parent = inflater.inflate(R.layout.fragment_photo_list,container,false);
+        return inflater.inflate(R.layout.fragment_photo_list,container,false);
+    }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         // photo list
-        GridView list = (GridView) parent.findViewById(R.id.list);
+        GridView list = (GridView) view.findViewById(R.id.list);
         list.setAdapter(adapter);
-        list.setOnItemClickListener((p, view, position, id) -> {
+        list.setOnItemClickListener((p, v, position, id) -> {
             PhotoGroup group = adapter.getItem(position);
             Intent intent;
             if (group.size() == 1) {
@@ -232,9 +237,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             }
             startActivity(intent);
         });
-
-        return parent;
-
     }
 
     @Override
