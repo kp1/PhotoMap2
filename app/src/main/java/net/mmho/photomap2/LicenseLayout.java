@@ -13,7 +13,7 @@ import java.util.Locale;
 public class LicenseLayout extends LinearLayout{
 
     public LicenseLayout(Context context) {
-        super(context);
+        this(context,null);
     }
 
     public LicenseLayout(Context context, AttributeSet attrs) {

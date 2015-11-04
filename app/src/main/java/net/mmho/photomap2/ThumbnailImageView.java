@@ -6,14 +6,11 @@ import android.util.AttributeSet;
 public class ThumbnailImageView extends LoadableImageView{
 
     public ThumbnailImageView(Context context) {
-        super(context);
-        super.thumbnail = true;
+        this(context,null);
     }
 
     public ThumbnailImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        super.thumbnail = true;
-
+        this(context, attrs,0);
     }
 
     public ThumbnailImageView(Context context, AttributeSet attrs, int defStyle) {

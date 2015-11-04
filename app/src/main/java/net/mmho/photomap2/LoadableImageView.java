@@ -18,18 +18,15 @@ import rx.subjects.PublishSubject;
 
 public class LoadableImageView extends ImageView{
 
-    private static final String TAG = "LoadableImageView";
     protected boolean thumbnail = false;
     private int width;
 
     public LoadableImageView(Context context) {
-        super(context);
-        subscribeSubject();
+        this(context,null);
     }
 
     public LoadableImageView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        subscribeSubject();
+        this(context, attrs,0);
     }
 
     public LoadableImageView(Context context, AttributeSet attrs, int defStyle) {

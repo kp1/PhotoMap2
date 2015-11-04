@@ -21,11 +21,11 @@ public class PhotoCardLayout extends RelativeLayout{
     private PhotoGroup group = null;
 
     public PhotoCardLayout(Context context) {
-        super(context);
+        this(context,null);
     }
 
     public PhotoCardLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs,0);
     }
 
     public PhotoCardLayout(Context context, AttributeSet attrs, int defStyle) {
