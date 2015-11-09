@@ -6,10 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but are recommended.
-    -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -38,17 +34,13 @@
             android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <data android:scheme="geo" />
-
                 <category android:name="android.intent.category.default" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <data android:mimeType="image/jpeg" />
                 <data android:mimeType="image/jpg" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
@@ -58,13 +50,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".PhotoListActivity" />
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -72,16 +61,10 @@
         <activity
             android:name="net.mmho.photomap2.ThumbnailActivity"
             android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PhotoListActivity" />
         </activity>
         <activity
             android:name="net.mmho.photomap2.PhotoViewActivity"
             android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".PhotoListActivity" />
         </activity>
 
         <activity android:name=".AboutActivity"/>
