@@ -10,14 +10,11 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name="com.activeandroid.app.Application"
+        android:name=".PhotoMapApplication"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <meta-data android:name="AA_DB_NAME" android:value="photomap.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="1" />
-        <meta-data android:name="AA_MODELS" android:value="net.mmho.photomap2.AddressRecord"/>
 
         <activity
             android:name="net.mmho.photomap2.PhotoListActivity"
