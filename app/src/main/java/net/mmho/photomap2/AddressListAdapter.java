@@ -12,8 +12,8 @@ import java.util.Locale;
 
 class AddressListAdapter extends ArrayAdapter<Address>{
 
-    private int resource;
-    private LayoutInflater inflater;
+    private final int resource;
+    private final LayoutInflater inflater;
 
     public AddressListAdapter(Context context, int resource,Address[] addresses) {
         super(context,resource,addresses);

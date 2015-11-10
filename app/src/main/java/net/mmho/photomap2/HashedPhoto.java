@@ -6,8 +6,8 @@ import android.os.Parcelable;
 import net.mmho.photomap2.geohash.GeoHash;
 
 public class HashedPhoto implements Parcelable {
-    private long id;
-    private GeoHash hash;
+    private final long id;
+    private final GeoHash hash;
 
     public HashedPhoto(long id, GeoHash hash){
         super();

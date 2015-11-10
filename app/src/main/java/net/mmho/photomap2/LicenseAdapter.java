@@ -8,8 +8,8 @@ import android.widget.ArrayAdapter;
 
 class LicenseAdapter extends ArrayAdapter<String> {
 
-    private int resource;
-    private LayoutInflater inflater;
+    private final int resource;
+    private final LayoutInflater inflater;
 
     public LicenseAdapter(Context context, int resource,String[] objects) {
         super(context, resource,objects);

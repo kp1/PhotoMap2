@@ -72,7 +72,7 @@ public class ThumbnailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private AdapterView.OnItemClickListener clickListener =
+    private final AdapterView.OnItemClickListener clickListener =
         new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

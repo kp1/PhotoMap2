@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 class PhotoViewAdapter extends FragmentPagerAdapter {
 
-    private PhotoGroup group;
+    private final PhotoGroup group;
 
     public PhotoViewAdapter(FragmentManager fm,PhotoGroup group) {
         super(fm);

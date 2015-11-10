@@ -10,8 +10,8 @@ import java.util.List;
 
 class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
 
-    private int resource;
-    private LayoutInflater inflater;
+    private final int resource;
+    private final LayoutInflater inflater;
 
     public ThumbnailAdapter(Context c, int resource, List<HashedPhoto> objects) {
         super(c, resource, objects);

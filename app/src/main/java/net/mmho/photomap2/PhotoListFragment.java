@@ -51,13 +51,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private Subscription subscription;
     private PublishSubject<Integer> subject;
 
-
-
     public void onBackPressed() {
         if(filtered) resetFilter();
         else getActivity().finish();
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

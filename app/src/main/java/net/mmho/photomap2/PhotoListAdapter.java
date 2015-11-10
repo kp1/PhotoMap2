@@ -16,10 +16,10 @@ import rx.schedulers.Schedulers;
 
 class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
-    private int resource;
-    private LayoutInflater inflater;
+    private final int resource;
+    private final LayoutInflater inflater;
 
-    private ArrayList<PhotoGroup> objects;
+    private final ArrayList<PhotoGroup> objects;
     private ArrayList<PhotoGroup> original;
 
     private Subscription subscription;

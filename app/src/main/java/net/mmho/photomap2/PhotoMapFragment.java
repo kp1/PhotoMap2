@@ -313,7 +313,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     private final static int MAXIMUM_ZOOM = 17;
     private final static int MINIMUM_ZOOM = 4;
 
-    private GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
+    private final GoogleMap.OnCameraChangeListener photoMapCameraChangeListener=
         new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition position) {
@@ -330,7 +330,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    private GoogleMap.CancelableCallback cancelableCallback =
+    private final GoogleMap.CancelableCallback cancelableCallback =
         new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
@@ -343,7 +343,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    private LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
+    private final LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
