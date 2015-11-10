@@ -7,7 +7,7 @@ import ollie.Ollie;
 public class PhotoMapApplication extends Application {
 
     private final static String DB_NAME="photomap.db";
-    private final static int DB_VERSION = 1;
+    private final static int DB_VERSION = 2;
 
     @Override
     public void onCreate() {

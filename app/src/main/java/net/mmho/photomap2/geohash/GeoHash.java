@@ -101,6 +101,10 @@ public class GeoHash implements Parcelable {
         return bit;
     }
 
+    public String getBinaryString() {
+        return Long.toBinaryString(getLong()).substring(0,getSignificantBits());
+    }
+
     public int getSignificantBits(){
         return significantBits;
     }

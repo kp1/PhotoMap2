@@ -15,9 +15,7 @@ public class AddressRecord extends Model {
     @Column("description")
     public String description;
     @Column("hash")
-    public Long hash;
-    @Column("length")
-    public Integer length;
+    public String hash;
 
     public AddressRecord(){
         super();
@@ -27,8 +25,7 @@ public class AddressRecord extends Model {
         super();
         address = title;
         description = desc;
-        hash = geoHash.getLong();
-        length = geoHash.getSignificantBits();
+        hash = geoHash.getBinaryString();
     }
 
     public String getTitle(){
@@ -41,7 +38,7 @@ public class AddressRecord extends Model {
 
     public static AddressRecord getAddressByHash(GeoHash hash){
         return Select.from(AddressRecord.class)
-                .where("hash = ? and length = ?", hash.getLong(),hash.getSignificantBits())
+                .where("hash = ?", hash.getBinaryString())
                 .fetchSingle();
     }
 
