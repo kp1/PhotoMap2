@@ -13,7 +13,6 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 
 public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 

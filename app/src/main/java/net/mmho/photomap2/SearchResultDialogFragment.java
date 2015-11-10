@@ -2,7 +2,6 @@ package net.mmho.photomap2;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.location.Address;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
