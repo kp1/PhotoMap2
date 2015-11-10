@@ -16,6 +16,7 @@ public class GeoHash implements Parcelable {
 
     private final static int MAX_SIGNIFICANT_BITS = 64;
     private final static int BASE32_BITS = 5;
+    @SuppressWarnings("SpellCheckingInspection")
     private final static String BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
     static class Divider{
