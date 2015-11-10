@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -19,7 +18,7 @@ import android.widget.ProgressBar;
 
 public class PhotoListActivity extends AppCompatActivity implements ProgressChangeListener{
 
-    public static final int PERMISSIONS_REQUEST = 1;
+    private static final int PERMISSIONS_REQUEST = 1;
     private ProgressBar progressBar;
 
 

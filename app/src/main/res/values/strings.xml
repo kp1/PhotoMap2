@@ -21,7 +21,7 @@
     <string name="about_software">%1$s is built using open source software.</string>
     <string name="about">about</string>
     <string name="overflow" translatable="false">overflow</string>
-    <string-array name="oss">
+    <string-array name="oss" translatable="false">
         <item>ActiveAndroid</item>
         <item>RxJava</item>
         <item>RxAndroid</item>

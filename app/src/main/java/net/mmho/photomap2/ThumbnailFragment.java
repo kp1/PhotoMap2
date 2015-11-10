@@ -1,11 +1,9 @@
 package net.mmho.photomap2;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.LruCache;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,7 +72,7 @@ public class ThumbnailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    AdapterView.OnItemClickListener clickListener =
+    private AdapterView.OnItemClickListener clickListener =
         new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

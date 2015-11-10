@@ -10,7 +10,6 @@ import android.util.Log;
 public class ThumbnailActivity extends AppCompatActivity {
 
     private final static String TAG="ThumbnailActivity";
-    private final static String TAG_THUMBNAIL="thumbnail";
     public static final String EXTRA_GROUP = "thumbnail_group";
     private ThumbnailFragment fragment;
 

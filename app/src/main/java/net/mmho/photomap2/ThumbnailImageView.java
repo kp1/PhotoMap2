@@ -22,6 +22,7 @@ public class ThumbnailImageView extends LoadableImageView{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        //noinspection SuspiciousNameCombination
         setMeasuredDimension(widthMeasureSpec,widthMeasureSpec);
     }
 
