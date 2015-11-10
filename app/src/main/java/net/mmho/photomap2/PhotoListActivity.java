@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 
 public class PhotoListActivity extends AppCompatActivity implements ProgressChangeListener{
 
-    public static final int PERMISSIONS_REQUEST = 1;
+    private static final int PERMISSIONS_REQUEST = 1;
     private ProgressBar progressBar;
 
 

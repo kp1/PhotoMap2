@@ -6,8 +6,8 @@ import android.support.v4.util.LruCache;
 public class ThumbnailCache extends LruCache<Long,Bitmap> {
 
     static private ThumbnailCache self;
-    static final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
-    static final int cacheSize = maxMemory/8;
+    private static final int maxMemory = (int)(Runtime.getRuntime().maxMemory()/1024);
+    private static final int cacheSize = maxMemory/8;
 
     private ThumbnailCache(int maxSize) {
         super(maxSize);

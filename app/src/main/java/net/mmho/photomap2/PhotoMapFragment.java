@@ -45,7 +45,7 @@ import rx.subjects.PublishSubject;
 
 
 public class PhotoMapFragment extends SupportMapFragment {
-    final static int PHOTO_CURSOR_LOADER = 0;
+    private final static int PHOTO_CURSOR_LOADER = 0;
 
     final public static String EXTRA_GROUP="group";
     final public static float DEFAULT_ZOOM = 15;
@@ -291,8 +291,8 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
 
-    final Handler handler = new Handler();
-    final Runnable runnable= this::hideActionBar;
+    private final Handler handler = new Handler();
+    private final Runnable runnable= this::hideActionBar;
 
     private void showActionBar(boolean hide){
         mActionBar.show();
@@ -343,7 +343,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
         };
 
-    LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
+    private LoaderManager.LoaderCallbacks<Cursor> photoListLoaderCallback =
         new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {

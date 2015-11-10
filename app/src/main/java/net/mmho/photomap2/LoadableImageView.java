@@ -34,8 +34,8 @@ public class LoadableImageView extends ImageView{
         subscribeSubject();
     }
 
-    PublishSubject<Long> subject;
-    Subscription subscription;
+    private PublishSubject<Long> subject;
+    private Subscription subscription;
     private void subscribeSubject(){
         subject = PublishSubject.create();
         subscription =

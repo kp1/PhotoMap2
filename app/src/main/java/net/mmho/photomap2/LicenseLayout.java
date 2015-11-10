@@ -30,7 +30,7 @@ public class LicenseLayout extends LinearLayout{
         }
     }
 
-    public String getStringResource(int id) throws IOException {
+    private String getStringResource(int id) throws IOException {
         InputStream is = getResources().openRawResource(id);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024*4]; // 4kB

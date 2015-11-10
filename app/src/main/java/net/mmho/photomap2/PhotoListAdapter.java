@@ -22,7 +22,7 @@ public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private ArrayList<PhotoGroup> objects;
     private ArrayList<PhotoGroup> original;
 
-    public Subscription subscription;
+    private Subscription subscription;
 
     public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);

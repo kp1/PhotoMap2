@@ -19,7 +19,7 @@ public class PhotoViewPager extends ViewPager{
 
 
     private float mLastTouchX,mLastTouchY;
-    final int slop = ViewConfiguration.get(getContext()).getScaledEdgeSlop();
+    private final int slop = ViewConfiguration.get(getContext()).getScaledEdgeSlop();
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {

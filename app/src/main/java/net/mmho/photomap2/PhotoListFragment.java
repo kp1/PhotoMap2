@@ -33,7 +33,6 @@ import rx.subjects.PublishSubject;
 public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
-    private static final String TAG = "PhotoListFragment";
 
     private ArrayList<PhotoGroup> groupList;
     private PhotoListAdapter adapter;
@@ -50,8 +49,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     // rxAndroid
     private Context context;
-    Subscription subscription;
-    PublishSubject<Integer> subject;
+    private Subscription subscription;
+    private PublishSubject<Integer> subject;
 
 
 

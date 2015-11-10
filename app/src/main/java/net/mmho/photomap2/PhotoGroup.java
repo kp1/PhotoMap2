@@ -57,7 +57,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
         return this;
     }
 
-    public void setAddress(String title,String description){
+    private void setAddress(String title, String description){
         address = title;
         this.description = description;
     }
