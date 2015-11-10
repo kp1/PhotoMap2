@@ -22,7 +22,7 @@
     <string name="about">about</string>
     <string name="overflow" translatable="false">overflow</string>
     <string-array name="oss" translatable="false">
-        <item>ActiveAndroid</item>
+        <item>Ollie</item>
         <item>RxJava</item>
         <item>RxAndroid</item>
     </string-array>
