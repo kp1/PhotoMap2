@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
-public class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
+class ThumbnailAdapter extends ArrayAdapter<HashedPhoto>{
 
     private int resource;
     private LayoutInflater inflater;

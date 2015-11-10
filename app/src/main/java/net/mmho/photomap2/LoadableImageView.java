@@ -18,7 +18,7 @@ import rx.subjects.PublishSubject;
 
 public class LoadableImageView extends ImageView{
 
-    protected boolean thumbnail = false;
+    boolean thumbnail = false;
     private int width;
 
     public LoadableImageView(Context context) {

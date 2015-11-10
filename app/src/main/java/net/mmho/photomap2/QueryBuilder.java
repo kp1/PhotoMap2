@@ -5,7 +5,7 @@ import android.provider.MediaStore;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
-public class QueryBuilder {
+class QueryBuilder {
     private final static String LATITUDE = MediaStore.Images.ImageColumns.LATITUDE;
     private final static String LONGITUDE = MediaStore.Images.ImageColumns.LONGITUDE;
     private final static String DATE_TAKEN = MediaStore.Images.ImageColumns.DATE_TAKEN;

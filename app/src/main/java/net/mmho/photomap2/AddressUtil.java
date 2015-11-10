@@ -5,7 +5,7 @@ import android.location.Address;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class AddressUtil {
+class AddressUtil {
     static public String getTitle(Address address, Context context){
         StringBuilder builder = new StringBuilder();
         final String separator = context.getString(R.string.address_separator);

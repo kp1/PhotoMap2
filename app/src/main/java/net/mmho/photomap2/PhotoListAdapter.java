@@ -14,7 +14,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
+class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 
     private int resource;
     private LayoutInflater inflater;

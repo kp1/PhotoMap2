@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
-public class AddressListAdapter extends ArrayAdapter<Address>{
+class AddressListAdapter extends ArrayAdapter<Address>{
 
     private int resource;
     private LayoutInflater inflater;

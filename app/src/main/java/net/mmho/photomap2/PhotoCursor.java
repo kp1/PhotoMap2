@@ -10,7 +10,7 @@ import net.mmho.photomap2.geohash.GeoHash;
 
 import java.util.ArrayList;
 
-public class PhotoCursor extends CursorWrapper{
+class PhotoCursor extends CursorWrapper{
 
     final public static String[] projection = new String[]{
             MediaStore.Images.Media._ID,

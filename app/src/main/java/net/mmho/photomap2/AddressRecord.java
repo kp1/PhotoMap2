@@ -17,6 +17,7 @@ public class AddressRecord extends Model {
     @Column("hash")
     public String hash;
 
+    @SuppressWarnings("unused")
     public AddressRecord(){
         super();
     }
