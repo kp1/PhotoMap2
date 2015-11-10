@@ -21,7 +21,7 @@ public class LicenseLayout extends LinearLayout{
     }
 
     public void setData(String oss){
-        ((TextView)findViewById(R.id.title)).setText(oss+"\n");
+        ((TextView)findViewById(R.id.title)).setText(oss);
         try{
             int id = getResources().getIdentifier("license_" + oss.toLowerCase(Locale.US),"raw", getContext().getPackageName());
             ((TextView)findViewById(R.id.license)).setText(getStringResource(id));

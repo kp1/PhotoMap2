@@ -10,7 +10,9 @@
         android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/layout_margin"/>
     <TextView
         android:id="@+id/license"
         android:layout_width="match_parent"
