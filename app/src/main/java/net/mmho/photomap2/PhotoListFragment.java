@@ -34,7 +34,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     private static final int CURSOR_LOADER_ID = 0;
 
-    private ArrayList<PhotoGroup> groupList;
     private PhotoListAdapter adapter;
     private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
@@ -67,9 +66,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         setRetainInstance(true);
         setHasOptionsMenu(true);
 
-        groupList = new ArrayList<>();
         photoList = new ArrayList<>();
-        adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card,groupList);
+        adapter= new PhotoListAdapter(getActivity(), R.layout.layout_photo_card, new ArrayList<>());
         if(savedInstanceState!=null) {
             distance_index = savedInstanceState.getInt("DISTANCE");
             getActivity().setTitle(savedInstanceState.getString("title"));
@@ -84,16 +82,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     public void onStart() {
         super.onStart();
         if(subscription==null){
-            subscription = subject
-                .switchMap(this::groupObservable)
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext( g ->{
-                        listener.showProgress(++progress * 10000 / group_count);
-                        groupList.add(g);
-                        adapter.notifyDataSetChanged();
-                    }
-                )
-                .subscribe();
+            subscription = subject.switchMap(this::groupObservable).subscribe();
         }
     }
 
@@ -303,6 +292,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 listener.showProgress(0);
                 progress = group_count = 0;
                 loaded = false;
+            })
+            .doOnNext(g -> {
+                listener.showProgress(++progress * 10000 / group_count);
+                adapter.add(g);
             })
             .doOnCompleted(() -> {
                 listener.endProgress();
