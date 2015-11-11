@@ -1,15 +1,14 @@
 package net.mmho.photomap2;
 
-import android.provider.MediaStore;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
+import static android.provider.MediaStore.Images.ImageColumns.LATITUDE;
+import static android.provider.MediaStore.Images.ImageColumns.LONGITUDE;
+import static android.provider.MediaStore.Images.ImageColumns.DATE_TAKEN;
+import static android.provider.MediaStore.Images.ImageColumns._ID;
+
 class QueryBuilder {
-    private final static String LATITUDE = MediaStore.Images.ImageColumns.LATITUDE;
-    private final static String LONGITUDE = MediaStore.Images.ImageColumns.LONGITUDE;
-    private final static String DATE_TAKEN = MediaStore.Images.ImageColumns.DATE_TAKEN;
-    private final static String IMAGE_ID = MediaStore.Images.ImageColumns._ID;
     static String createQuery(LatLngBounds bounds){
         LatLng start = bounds.southwest;
         LatLng end = bounds.northeast;
@@ -31,7 +30,7 @@ class QueryBuilder {
     }
 
     static String createQuery(long id){
-        return IMAGE_ID+" is "+id;
+        return _ID+" is "+id;
     }
 
     static String createQuery(){
