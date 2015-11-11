@@ -21,6 +21,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -239,49 +240,49 @@ public class PhotoMapFragment extends SupportMapFragment {
         return null;
     }
 
+    private void initMap(){
+        if(mMap!=null) return;
+        mMap = getMap();
+        Intent intent = getActivity().getIntent();
+        final CameraUpdate update = handleIntent(intent);
+        if(update!=null && getView()!=null) {
+            getView().post(() -> mMap.moveCamera(update));
+        }
+        mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
+        mMap.setOnMarkerClickListener(marker -> {
+            Observable.from(groupList)
+                .filter(g -> g.marker.equals(marker))
+                .first()
+                .subscribe(g -> {
+                    Intent i;
+                    if (g.size() == 1) {
+                        i = new Intent(getActivity(), PhotoViewActivity.class);
+                        i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                    } else {
+                        i = new Intent(getActivity(), ThumbnailActivity.class);
+                        i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
+                    }
+                    startActivity(i);
+                });
+            return true;
+        });
+        mMap.setOnMapClickListener(latLng -> {
+            if (mActionBar.isShowing()) hideActionBar();
+            else showActionBar(true);
+        });
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        initMap();
+        getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        if(mMap==null){
-            mMap = getMap();
-            Intent intent = getActivity().getIntent();
-            final CameraUpdate update = handleIntent(intent);
-            if(update!=null && getView()!=null) {
-                getView().post(() -> {
-                    mMap.moveCamera(update);
-                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                });
-            }
-            else{
-                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-            }
-            mMap.setOnMarkerClickListener(marker -> {
-                Observable.from(groupList)
-                    .filter(g -> g.marker.equals(marker))
-                    .first()
-                    .subscribe(g -> {
-                        Intent i;
-                        if (g.size() == 1) {
-                            i = new Intent(getActivity(), PhotoViewActivity.class);
-                            i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
-                        } else {
-                            i = new Intent(getActivity(), ThumbnailActivity.class);
-                            i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
-                        }
-                        startActivity(i);
-                    });
-                return true;
-            });
-            mMap.setOnMapClickListener(latLng -> {
-                if(mActionBar.isShowing()) hideActionBar();
-                else showActionBar(true);
-            });
-            mMap.getUiSettings().setZoomControlsEnabled(false);
-            getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
-        }
-        
-
         mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(visible -> {
             if(visible) showActionBar(false);
@@ -289,7 +290,6 @@ public class PhotoMapFragment extends SupportMapFragment {
         });
 
     }
-
 
     private final Handler handler = new Handler();
     private final Runnable runnable= this::hideActionBar;
