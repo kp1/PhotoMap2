@@ -52,7 +52,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private ProgressChangeListener listener;
 
     // rxAndroid
-    private Context context;
     private Subscription subscription;
     private PublishSubject<Integer> subject;
     private boolean permission_granted;
@@ -91,6 +90,10 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
                 ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PhotoListActivity.PERMISSIONS_REQUEST);
+            }
+            else{
+                View v = getView();
+                if(v!=null)PermissionUtils.requestPermission(v,getContext());
             }
         }
         else {
@@ -264,7 +267,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.context = context;
         Activity activity = getActivity();
         if(!(activity instanceof ProgressChangeListener)){
             throw new RuntimeException(activity.getLocalClassName()+" must implement ProgressChangeListener");
@@ -308,7 +310,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
-            .map(g -> g.resolveAddress(context))
+            .map(g -> g.resolveAddress(getContext()))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
                 adapter.clear();
@@ -326,9 +328,14 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             });
     }
 
-
-    public void grantedPermission(boolean b) {
-        if(b) getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
-        permission_granted = b;
+    public void grantedPermission(boolean granted) {
+        if(granted){
+            getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+        }
+        else{
+            View v = getView();
+            if(v!=null)PermissionUtils.requestPermission(v,getContext());
+        }
+        permission_granted = granted;
     }
 }

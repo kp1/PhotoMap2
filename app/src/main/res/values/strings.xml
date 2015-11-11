@@ -21,6 +21,8 @@
     <string name="about_software">%1$s is built using open source software.</string>
     <string name="about">about</string>
     <string name="overflow" translatable="false">overflow</string>
+    <string name="request_permission">Please enable Storage permission.</string>
+    <string name="setting">Setting</string>
     <string-array name="oss" translatable="false">
         <item>Ollie</item>
         <item>RxJava</item>

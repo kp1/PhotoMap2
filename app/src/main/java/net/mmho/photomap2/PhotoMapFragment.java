@@ -26,6 +26,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -290,6 +291,10 @@ public class PhotoMapFragment extends SupportMapFragment {
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PhotoMapActivity.PERMISSIONS_REQUEST);
             }
+            else{
+                View v = getView();
+                if(v!=null) PermissionUtils.requestPermission(v,getContext());
+            }
         }
         else {
             initMap();
@@ -414,6 +419,12 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
     public void grantedPermission(boolean granted) {
-        if(granted) initMap();
+        if(granted){
+            initMap();
+        }
+        else{
+            View v = getView();
+            if(v!=null)PermissionUtils.requestPermission(v,getContext());
+        }
     }
 }

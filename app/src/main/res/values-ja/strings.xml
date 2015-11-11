@@ -19,4 +19,6 @@
     <string name="show_about">アプリについて</string>
     <string name="about_software">%1$sは以下のオープンソースソフトウェアを使用しています。</string>
     <string name="about">約</string>
+    <string name="request_permission">ストレージの権限を許可してください</string>
+    <string name="setting">設定</string>
 </resources>
