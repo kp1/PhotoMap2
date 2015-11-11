@@ -1,17 +1,22 @@
 package net.mmho.photomap2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.SearchRecentSuggestions;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
@@ -21,6 +26,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -239,23 +245,15 @@ public class PhotoMapFragment extends SupportMapFragment {
         return null;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if(mMap==null){
+    private void initMap(){
+        if(mMap==null) {
             mMap = getMap();
             Intent intent = getActivity().getIntent();
             final CameraUpdate update = handleIntent(intent);
-            if(update!=null && getView()!=null) {
-                getView().post(() -> {
-                    mMap.moveCamera(update);
-                    mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-                });
+            if (update != null && getView() != null) {
+                getView().post(() -> mMap.moveCamera(update));
             }
-            else{
-                mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
-            }
+            mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             mMap.setOnMarkerClickListener(marker -> {
                 Observable.from(groupList)
                     .filter(g -> g.marker.equals(marker))
@@ -274,14 +272,38 @@ public class PhotoMapFragment extends SupportMapFragment {
                 return true;
             });
             mMap.setOnMapClickListener(latLng -> {
-                if(mActionBar.isShowing()) hideActionBar();
+                if (mActionBar.isShowing()) hideActionBar();
                 else showActionBar(true);
             });
             mMap.getUiSettings().setZoomControlsEnabled(false);
-            getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
         }
-        
+        getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Build.VERSION.SDK_INT >= 23
+            && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            if(!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PhotoMapActivity.PERMISSIONS_REQUEST);
+            }
+            else{
+                View v = getView();
+                if(v!=null) PermissionUtils.requestPermission(v,getContext());
+            }
+        }
+        else {
+            initMap();
+        }
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mActionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
         if(mActionBar!=null) mActionBar.addOnMenuVisibilityListener(visible -> {
             if(visible) showActionBar(false);
@@ -289,7 +311,6 @@ public class PhotoMapFragment extends SupportMapFragment {
         });
 
     }
-
 
     private final Handler handler = new Handler();
     private final Runnable runnable= this::hideActionBar;
@@ -395,5 +416,15 @@ public class PhotoMapFragment extends SupportMapFragment {
                 hideActionBarDelayed();
                 listener.endProgress();
             });
+    }
+
+    public void grantedPermission(boolean granted) {
+        if(granted){
+            initMap();
+        }
+        else{
+            View v = getView();
+            if(v!=null)PermissionUtils.requestPermission(v,getContext());
+        }
     }
 }

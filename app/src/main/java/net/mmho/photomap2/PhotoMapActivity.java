@@ -4,10 +4,12 @@ package net.mmho.photomap2;
 import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.WindowCompat;
@@ -38,6 +40,7 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
     private static final String TAG_DIALOG = "dialog";
     private Dialog dialog = null;
     private ProgressBar progressBar;
+    public static final int PERMISSIONS_REQUEST = 1;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -109,6 +112,20 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
         }
         else{
             finish();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
+        switch (requestCode){
+        case PERMISSIONS_REQUEST:
+            boolean granted = grantResults.length > 0 &&
+                grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if(fragment!=null && fragment instanceof PhotoMapFragment){
+                ((PhotoMapFragment)fragment).grantedPermission(granted);
+            }
         }
     }
 
