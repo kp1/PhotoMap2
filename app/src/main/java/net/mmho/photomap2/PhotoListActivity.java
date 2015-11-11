@@ -42,14 +42,10 @@ public class PhotoListActivity extends AppCompatActivity implements ProgressChan
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
         switch (requestCode){
         case PERMISSIONS_REQUEST:
-            if(grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                if(fragment!=null){
-                    ((PhotoListFragment)fragment).grantedPermission(true);
-                }
-            }
-            else{
-                ((PhotoListFragment)fragment).grantedPermission(false);
+            boolean granted = grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED;
+            if(fragment!=null){
+                ((PhotoListFragment)fragment).grantedPermission(granted);
             }
         }
     }
