@@ -1,15 +1,20 @@
 package net.mmho.photomap2;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
@@ -50,6 +55,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private Context context;
     private Subscription subscription;
     private PublishSubject<Integer> subject;
+    private boolean permission_granted;
 
     public void onBackPressed() {
         if(filtered) resetFilter();
@@ -73,6 +79,24 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             distance_index = DistanceActionProvider.initialIndex();
         }
         subject = PublishSubject.create();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(Build.VERSION.SDK_INT >= 23
+            && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            if(!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PhotoListActivity.PERMISSIONS_REQUEST);
+            }
+        }
+        else {
+            grantedPermission(true);
+        }
+        if (query.length() > 0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
     @Override
@@ -177,7 +201,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             break;
         case R.id.newest:
             newest = true;
-            getLoaderManager().restartLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
             break;
         case R.id.about:
             Intent i = new Intent(getActivity(),AboutActivity.class);
@@ -192,8 +216,16 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.newest).setEnabled(!newest);
-        menu.findItem(R.id.oldest).setEnabled(newest);
+        if(!permission_granted){
+            menu.findItem(R.id.newest).setEnabled(false);
+            menu.findItem(R.id.oldest).setEnabled(false);
+            menu.findItem(R.id.distance).setEnabled(false);
+        }
+        else {
+            menu.findItem(R.id.newest).setEnabled(!newest);
+            menu.findItem(R.id.oldest).setEnabled(newest);
+            menu.findItem(R.id.distance).setEnabled(true);
+        }
     }
 
     @Override
@@ -228,12 +260,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         outState.putString("title", getActivity().getTitle().toString());
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
-        if(query.length()>0) getActivity().setTitle(getString(R.string.filtered, query));
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -301,4 +327,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     }
 
 
+    public void grantedPermission(boolean b) {
+        if(b) getLoaderManager().initLoader(CURSOR_LOADER_ID,null,photoCursorCallbacks);
+        permission_granted = b;
+    }
 }
