@@ -19,6 +19,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -274,6 +275,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         listener = (ProgressChangeListener) activity;
     }
 
+    private final static String TAG = "PhotoListFragment";
     private final LoaderManager.LoaderCallbacks<Cursor> photoCursorCallbacks =
     new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
@@ -287,7 +289,8 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         private Cursor cursor = null;
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            if(cursor==null || !cursor.equals(data)) {
+            if(cursor==null || photoList.size() != data.getCount() ) {
+                Log.d(TAG, "reload cursor!!");
                 cursor = data;
                 photoList = new PhotoCursor(data).getHashedPhotoList();
                 subject.onNext(distance_index);
