@@ -36,17 +36,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.PublishSubject;
 
-public class PhotoListFragment extends Fragment implements BackPressedListener{
+public class PhotoListFragment extends Fragment{
 
     private static final int CURSOR_LOADER_ID = 0;
 
     private PhotoListAdapter adapter;
     private ArrayList<HashedPhoto> photoList;
     private boolean newest = true;
-    private MenuItem search;
-    private boolean loaded = false;
-    private boolean filtered;
-    private String query="";
     private int distance_index;
 
     // progress
@@ -56,11 +52,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
     private Subscription subscription;
     private PublishSubject<Integer> subject;
     private boolean permission_granted;
-
-    public void onBackPressed() {
-        if(filtered) resetFilter();
-        else getActivity().finish();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,7 +91,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         else {
             grantedPermission(true);
         }
-        if (query.length() > 0) getActivity().setTitle(getString(R.string.filtered, query));
     }
 
     @Override
@@ -133,67 +123,6 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             subject.onNext(index);
         });
 
-
-        search = menu.findItem(R.id.search);
-        MenuItemCompat.setOnActionExpandListener(search, onActionExpandListener);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(search);
-        searchView.setQueryHint(getString(R.string.search_list));
-        searchView.setOnQueryTextListener(onQueryTextListener);
-        searchView.setOnQueryTextFocusChangeListener(onFocusChangeListener);
-
-    }
-
-    final private MenuItemCompat.OnActionExpandListener onActionExpandListener =
-            new MenuItemCompat.OnActionExpandListener() {
-                @Override
-                public boolean onMenuItemActionExpand(MenuItem item) {
-                    if(!loaded) return false;
-                    filtered = false;
-                    return true;
-                }
-
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem item) {
-                    if(!filtered) resetFilter();
-                    return true;
-                }
-            };
-
-    final private SearchView.OnQueryTextListener onQueryTextListener =
-            new SearchView.OnQueryTextListener() {
-                @Override
-                public boolean onQueryTextSubmit(String query) {
-                    filtered = true;
-                    PhotoListFragment.this.query = query;
-                    getActivity().setTitle(getString(R.string.filtered,query));
-                    MenuItemCompat.collapseActionView(search);
-                    return true;
-                }
-
-                @Override
-                public boolean onQueryTextChange(String newText) {
-                    if(!filtered) {
-                        adapter.filter(newText);
-                    }
-                    return true;
-                }
-            };
-
-    final private SearchView.OnFocusChangeListener onFocusChangeListener =
-            new SearchView.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if(!hasFocus) MenuItemCompat.collapseActionView(search);
-                }
-            };
-
-
-
-    private void resetFilter(){
-        query = "";
-        getActivity().setTitle(getString(R.string.app_name));
-        adapter.filter(query);
-        filtered = false;
     }
 
     @Override
@@ -309,26 +238,22 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy(hash -> hash.getHash().toBase32()
-                .substring(0, DistanceActionProvider.getDistance(distance)))
+                    .substring(0, DistanceActionProvider.getDistance(distance)))
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
-                .reduce(PhotoGroup::append))
+                    .reduce(PhotoGroup::append))
 //            .map(g -> g.resolveAddress(getContext()))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
                 adapter.clear();
                 listener.showProgress(0);
                 progress = group_count = 0;
-                loaded = false;
             })
             .doOnNext(g -> {
                 listener.showProgress(++progress * 10000 / group_count);
                 adapter.add(g);
             })
-            .doOnCompleted(() -> {
-                listener.endProgress();
-                loaded = true;
-            });
+            .doOnCompleted(listener::endProgress);
     }
 
     public void grantedPermission(boolean granted) {
