@@ -22,5 +22,5 @@
         android:name="net.mmho.photomap2.PhotoListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout="@layout/fragment_photo_list" />
+        tools:layout="@layout/fragment_thumbnail" />
 </LinearLayout>

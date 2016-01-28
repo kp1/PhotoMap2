@@ -234,14 +234,14 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_photo_list,container,false);
+        return inflater.inflate(R.layout.fragment_thumbnail,container,false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // photo list
-        GridView list = (GridView) view.findViewById(R.id.list);
+        GridView list = (GridView) view.findViewById(R.id.thumbnail_grid);
         list.setAdapter(adapter);
         list.setOnItemClickListener((p, v, position, id) -> {
             PhotoGroup group = adapter.getItem(position);
@@ -313,7 +313,7 @@ public class PhotoListFragment extends Fragment implements BackPressedListener{
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
-            .map(g -> g.resolveAddress(getContext()))
+//            .map(g -> g.resolveAddress(getContext()))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
                 adapter.clear();
