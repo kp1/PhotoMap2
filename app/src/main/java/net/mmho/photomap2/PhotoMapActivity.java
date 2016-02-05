@@ -23,7 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 
@@ -78,7 +78,7 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
                         CameraUpdate update =
                             CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list.get(0)), PhotoMapFragment.DEFAULT_ZOOM);
                         if (fragment instanceof PhotoMapFragment)
-                            ((PhotoMapFragment) fragment).getMap().moveCamera(update);
+                            ((PhotoMapFragment) fragment).getMapAsync(map -> map.moveCamera(update));
                     } else {
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         Fragment prev = getSupportFragmentManager().findFragmentByTag(TAG_DIALOG);
@@ -97,7 +97,8 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
     @Override
     protected void onResume() {
         super.onResume();
-        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int result = api.isGooglePlayServicesAvailable(this);
         if(result == ConnectionResult.SUCCESS){
             Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
             if(!(fragment instanceof PhotoMapFragment)){
@@ -106,8 +107,8 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
                 fragmentTransaction.replace(R.id.map,mapFragment).commit();
             }
         }
-        else if(GooglePlayServicesUtil.isUserRecoverableError(result)){
-            dialog = GooglePlayServicesUtil.getErrorDialog(result,this,1, dialog -> finish());
+        else if(api.isUserResolvableError(result)){
+            dialog = api.getErrorDialog(this,result,1, dialog -> finish());
             dialog.show();
         }
         else{

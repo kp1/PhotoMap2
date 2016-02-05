@@ -1,12 +1,7 @@
 package net.mmho.photomap2;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Parcelable;
-import android.support.v7.widget.PopupMenu;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 

@@ -7,12 +7,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.util.ArrayList;
-import java.util.Locale;
-
-import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
 

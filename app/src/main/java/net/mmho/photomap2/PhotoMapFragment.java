@@ -246,8 +246,14 @@ public class PhotoMapFragment extends SupportMapFragment {
     }
 
     private void initMap(){
-        if(mMap==null) {
-            mMap = getMap();
+
+        if(mMap!=null){
+            getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+            return;
+        }
+
+        getMapAsync(map -> {
+            mMap = map;
             Intent intent = getActivity().getIntent();
             final CameraUpdate update = handleIntent(intent);
             if (update != null && getView() != null) {
@@ -255,20 +261,20 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
             mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             mMap.setOnMarkerClickListener(marker -> {
-                Observable.from(groupList)
-                    .filter(g -> g.marker.equals(marker))
-                    .first()
-                    .subscribe(g -> {
-                        Intent i;
-                        if (g.size() == 1) {
-                            i = new Intent(getActivity(), PhotoViewActivity.class);
-                            i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
-                        } else {
-                            i = new Intent(getActivity(), ThumbnailActivity.class);
-                            i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
-                        }
-                        startActivity(i);
-                    });
+            Observable.from(groupList)
+                .filter(g -> g.marker.equals(marker))
+                .first()
+                .subscribe(g -> {
+                    Intent i;
+                    if (g.size() == 1) {
+                        i = new Intent(getActivity(), PhotoViewActivity.class);
+                        i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                    } else {
+                        i = new Intent(getActivity(), ThumbnailActivity.class);
+                        i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
+                    }
+                    startActivity(i);
+                });
                 return true;
             });
             mMap.setOnMapClickListener(latLng -> {
@@ -276,8 +282,8 @@ public class PhotoMapFragment extends SupportMapFragment {
                 else showActionBar(true);
             });
             mMap.getUiSettings().setZoomControlsEnabled(false);
-        }
-        getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+            getLoaderManager().initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback);
+        });
     }
 
     @Override
@@ -379,7 +385,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
                 photoList = new PhotoCursor(cursor).getHashedPhotoList();
-                int distance = (int)getMap().getCameraPosition().zoom*2+4;
+                int distance = (int)(mMap.getCameraPosition().zoom*2+4);
                 if(distance>45) distance = 45;
                 subject.onNext(distance);
             }
@@ -400,7 +406,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 .reduce(PhotoGroup::append))
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe(() -> {
-                getMap().clear();
+                mMap.clear();
                 progress = group_count = 0;
                 listener.showProgress(0);
                 groupList.clear();
