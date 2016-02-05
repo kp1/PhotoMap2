@@ -103,11 +103,6 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
 
     public PhotoGroup resolveAddress(Context context){
         Geocoder geocoder = new Geocoder(context);
-        AddressRecord record = AddressRecord.getAddressByHash(getHash());
-        if(record!=null){
-            setAddress(record.getTitle(), record.getDescription());
-            return this;
-        }
         LatLng p = getCenter();
         List<Address> addresses;
         if(NetworkUtils.networkCheck(context)) {
@@ -116,7 +111,6 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
                 if (addresses != null && addresses.size() > 0) {
                     Address a = addresses.get(0);
                     setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
-                    new AddressRecord(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a), getHash()).save();
                 }
             } catch (IOException e) {
                 // do nothing

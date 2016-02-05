@@ -20,22 +20,6 @@ public class AboutActivity extends AppCompatActivity{
         ((ListView)findViewById(R.id.list)).setAdapter(adapter);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.about_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.clear_cache:
-                AddressRecord.clearCache();
-                return true;
-        }
-        return false;
-    }
-
     private void showAbout() {
         TextView about = (TextView)findViewById(R.id.about);
         StringBuilder b = new StringBuilder();

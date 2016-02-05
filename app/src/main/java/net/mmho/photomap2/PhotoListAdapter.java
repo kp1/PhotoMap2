@@ -19,16 +19,10 @@ class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
     private final int resource;
     private final LayoutInflater inflater;
 
-    private final ArrayList<PhotoGroup> objects;
-    private ArrayList<PhotoGroup> original;
-
-    private Subscription subscription;
-
     public PhotoListAdapter(Context context, int resource, ArrayList<PhotoGroup> objects) {
         super(context, resource, objects);
         this.resource = resource;
         inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.objects = objects;
     }
 
     @Override
@@ -46,28 +40,4 @@ class PhotoListAdapter extends ArrayAdapter<PhotoGroup> {
         }
         return v;
     }
-
-    public void filter(String query){
-        if(original==null) original = new ArrayList<>(objects);
-        if(subscription!=null) subscription.unsubscribe();
-        subscription = filterObservable(query).subscribe();
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-        original = null;
-    }
-
-    private Observable<PhotoGroup> filterObservable(String query){
-        return Observable.from(original)
-            .subscribeOn(Schedulers.newThread())
-            .filter(g -> (query == null || query.isEmpty()) ||
-                g.getDescription().toLowerCase(Locale.getDefault())
-                    .contains(query.toLowerCase(Locale.getDefault())))
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe(super::clear)
-            .doOnNext(this::add);
-    }
-
 }
