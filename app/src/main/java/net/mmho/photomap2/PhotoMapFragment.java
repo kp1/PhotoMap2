@@ -261,21 +261,21 @@ public class PhotoMapFragment extends SupportMapFragment {
             }
             mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             mMap.setOnMarkerClickListener(marker -> {
-            Observable.from(groupList)
-                .filter(g -> g.marker.equals(marker))
-                .first()
-                .subscribe(g -> {
-                    Intent i;
-                    if (g.size() == 1) {
-                        i = new Intent(getActivity(), PhotoViewActivity.class);
-                        i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
-                    } else {
-                        i = new Intent(getActivity(), ThumbnailActivity.class);
-                        i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
-                    }
-                    startActivity(i);
-                });
-                return true;
+                Observable.from(groupList)
+                    .filter(g -> g.marker.equals(marker))
+                    .first()
+                    .subscribe(g -> {
+                        Intent i;
+                        if (g.size() == 1) {
+                            i = new Intent(getActivity(), PhotoViewActivity.class);
+                            i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                        } else {
+                            i = new Intent(getActivity(), ThumbnailActivity.class);
+                            i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
+                        }
+                        startActivity(i);
+                    });
+                    return true;
             });
             mMap.setOnMapClickListener(latLng -> {
                 if (mActionBar.isShowing()) hideActionBar();
