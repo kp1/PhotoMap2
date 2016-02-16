@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import net.mmho.photomap2.geohash.GeoHash;
+import geohash.GeoHash;
 
 import java.io.IOException;
 import java.util.ArrayList;

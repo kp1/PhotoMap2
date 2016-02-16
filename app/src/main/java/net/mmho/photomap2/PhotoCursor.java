@@ -6,7 +6,7 @@ import android.provider.MediaStore;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import net.mmho.photomap2.geohash.GeoHash;
+import geohash.GeoHash;
 
 import java.util.ArrayList;
 
@@ -40,7 +40,7 @@ class PhotoCursor extends CursorWrapper{
     }
 
     public GeoHash getGeoHash(int character){
-        return GeoHash.createWithCharacterCount(getLocation(),character);
+        return GeoHash.Companion.createWithCharacterCount(getLocation(), character);
     }
 
     public HashedPhoto getHashedPhoto(int character){

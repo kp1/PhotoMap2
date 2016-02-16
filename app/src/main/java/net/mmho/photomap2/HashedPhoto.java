@@ -3,7 +3,7 @@ package net.mmho.photomap2;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import net.mmho.photomap2.geohash.GeoHash;
+import geohash.GeoHash;
 
 public class HashedPhoto implements Parcelable {
     private final long id;

@@ -400,7 +400,7 @@ public class PhotoMapFragment extends SupportMapFragment {
     private Observable<PhotoGroup> groupObservable(int distance){
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
-            .groupBy(hash -> Long.toBinaryString(hash.getHash().getLong()).substring(0, distance))
+            .groupBy(hash -> hash.getHash().getBinaryString().substring(0, distance))
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                 .reduce(PhotoGroup::append))
