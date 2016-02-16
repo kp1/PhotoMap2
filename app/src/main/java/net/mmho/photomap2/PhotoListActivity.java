@@ -26,17 +26,6 @@ public class PhotoListActivity extends AppCompatActivity implements ProgressChan
     }
 
     @Override
-    public void onBackPressed() {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
-        if(fragment!=null && fragment instanceof BackPressedListener){
-            ((BackPressedListener) fragment).onBackPressed();
-        }
-        else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode,@NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
