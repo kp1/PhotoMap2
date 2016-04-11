@@ -136,7 +136,7 @@ public class PhotoListFragment extends Fragment{
             getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks);
             break;
         case R.id.about:
-            Intent i = new Intent(getActivity(),AboutActivity.class);
+            Intent i = new Intent(getActivity(), AboutActivity.class);
             startActivity(i);
             break;
         default:
