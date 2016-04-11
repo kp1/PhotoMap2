@@ -24,7 +24,6 @@
     <string name="request_permission">Please enable Storage permission.</string>
     <string name="setting">Setting</string>
     <string-array name="oss" translatable="false">
-        <item>Ollie</item>
         <item>RxJava</item>
         <item>RxAndroid</item>
     </string-array>
