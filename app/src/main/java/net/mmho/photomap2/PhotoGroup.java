@@ -110,7 +110,7 @@ public class PhotoGroup extends ArrayList<HashedPhoto> implements Parcelable{
                 addresses = geocoder.getFromLocation(p.latitude, p.longitude, 1);
                 if (addresses != null && addresses.size() > 0) {
                     Address a = addresses.get(0);
-                    setAddress(AddressUtil.getTitle(a, context), AddressUtil.getDescription(a));
+                    setAddress(AddressUtil.INSTANCE.getTitle(a, context), AddressUtil.INSTANCE.getDescription(a));
                 }
             } catch (IOException e) {
                 // do nothing

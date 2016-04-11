@@ -76,7 +76,7 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
                     if (list.size() == 1) {
                         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.map);
                         CameraUpdate update =
-                            CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list.get(0)), PhotoMapFragment.DEFAULT_ZOOM);
+                            CameraUpdateFactory.newLatLngZoom(AddressUtil.INSTANCE.addressToLatLng(list.get(0)), PhotoMapFragment.DEFAULT_ZOOM);
                         if (fragment instanceof PhotoMapFragment)
                             ((PhotoMapFragment) fragment).getMapAsync(map -> map.moveCamera(update));
                     } else {
