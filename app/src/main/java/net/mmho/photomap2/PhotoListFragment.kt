@@ -16,7 +16,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
 import android.support.v4.view.MenuItemCompat
-import android.util.Log
 import android.view.*
 import android.widget.GridView
 import rx.Observable
@@ -98,7 +97,7 @@ class PhotoListFragment : Fragment() {
         distanceActionProvider.setOnDistanceChangeListener(object : DistanceActionProvider.OnDistanceChangeListener {
             override fun onDistanceChange(index: Int) {
                 distance_index = index
-                subject!!.onNext(index)
+                subject?.onNext(index)
             }
         })
 
@@ -108,11 +107,11 @@ class PhotoListFragment : Fragment() {
         when (item?.itemId) {
             R.id.oldest -> {
                 newest = false
-                loaderManager.restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks)
+                loaderManager.restartLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
             }
             R.id.newest -> {
                 newest = true
-                loaderManager.restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks)
+                loaderManager.restartLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
             }
             R.id.about -> {
                 val i = Intent(activity, AboutActivity::class.java)
@@ -162,9 +161,9 @@ class PhotoListFragment : Fragment() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState!!.putInt("DISTANCE", distance_index)
+        outState.putInt("DISTANCE", distance_index)
         outState.putString("title", activity.title.toString())
     }
 
@@ -186,14 +185,9 @@ class PhotoListFragment : Fragment() {
             return CursorLoader(activity, uri, PhotoCursor.projection, q, null, o)
         }
 
-        private var cursor: Cursor? = null
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
-            if (cursor == null || photoList!!.size != data.count) {
-                Log.d(TAG, "reload cursor!!")
-                cursor = data
-                photoList = PhotoCursor(data).hashedPhotoList
-                subject!!.onNext(distance_index)
-            }
+            photoList = PhotoCursor(data).hashedPhotoList
+            subject?.onNext(distance_index)
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
@@ -236,9 +230,6 @@ class PhotoListFragment : Fragment() {
     }
 
     companion object {
-
         private val CURSOR_LOADER_ID = 0
-
-        private val TAG = "PhotoListFragment"
     }
 }
