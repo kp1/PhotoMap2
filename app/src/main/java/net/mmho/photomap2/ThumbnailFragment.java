@@ -77,8 +77,8 @@ public class ThumbnailFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent i = new Intent(getActivity(),PhotoViewActivity.class);
-                i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
-                i.putExtra(PhotoViewActivity.EXTRA_POSITION,position);
+                i.putExtra(PhotoViewActivity.Companion.getEXTRA_GROUP(), (Parcelable) group);
+                i.putExtra(PhotoViewActivity.Companion.getEXTRA_POSITION(),position);
                 startActivityForResult(i,0);
             }
         };

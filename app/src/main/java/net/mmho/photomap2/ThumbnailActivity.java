@@ -40,7 +40,7 @@ public class ThumbnailActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(data!=null) {
             Bundle b = data.getExtras();
-            if (b != null) fragment.setPosition(b.getInt(PhotoViewActivity.EXTRA_POSITION));
+            if (b != null) fragment.setPosition(b.getInt(PhotoViewActivity.Companion.getEXTRA_GROUP()));
         }
     }
 }

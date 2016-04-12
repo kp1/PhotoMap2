@@ -269,7 +269,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                         Intent i;
                         if (g.size() == 1) {
                             i = new Intent(getActivity(), PhotoViewActivity.class);
-                            i.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) g);
+                            i.putExtra(PhotoViewActivity.Companion.getEXTRA_GROUP(), (Parcelable) g);
                         } else {
                             i = new Intent(getActivity(), ThumbnailActivity.class);
                             i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);

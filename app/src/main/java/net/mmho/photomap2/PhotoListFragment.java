@@ -176,7 +176,7 @@ public class PhotoListFragment extends Fragment{
             Intent intent;
             if (group.size() == 1) {
                 intent = new Intent(getActivity(), PhotoViewActivity.class);
-                intent.putExtra(PhotoViewActivity.EXTRA_GROUP, (Parcelable) group);
+                intent.putExtra(PhotoViewActivity.Companion.getEXTRA_GROUP(), (Parcelable) group);
             } else {
                 intent = new Intent(getActivity(), ThumbnailActivity.class);
                 intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
