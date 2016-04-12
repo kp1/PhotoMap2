@@ -18,7 +18,7 @@ internal class AddressListAdapter(context: Context, private val resource: Int, a
         inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v: View = convertView ?: inflater.inflate(resource, null)
         val text1 = v.findViewById(android.R.id.text1) as TextView
         val text2 = v.findViewById(android.R.id.text2) as TextView
