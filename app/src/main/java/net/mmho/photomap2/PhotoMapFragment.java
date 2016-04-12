@@ -139,7 +139,8 @@ public class PhotoMapFragment extends SupportMapFragment {
         switch (item.getItemId()){
             case R.id.clear_history:
                 SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
-                        MapSuggestionProvider.AUTHORITY,MapSuggestionProvider.MODE);
+                        MapSuggestionProvider.Companion.getAUTHORITY(),
+                        MapSuggestionProvider.Companion.getMODE());
                 suggestions.clearHistory();
                 return true;
         }

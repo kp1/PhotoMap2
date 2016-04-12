@@ -70,7 +70,8 @@ public class PhotoMapActivity extends AppCompatActivity implements ProgressChang
                     }
 
                     SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
-                        MapSuggestionProvider.AUTHORITY, MapSuggestionProvider.MODE);
+                        MapSuggestionProvider.Companion.getAUTHORITY(),
+                        MapSuggestionProvider.Companion.getMODE());
                     suggestions.saveRecentQuery(searchQuery, null);
 
                     if (list.size() == 1) {
