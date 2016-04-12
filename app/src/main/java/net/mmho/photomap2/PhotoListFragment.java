@@ -211,7 +211,7 @@ public class PhotoListFragment extends Fragment{
             String q = QueryBuilder.createQuery();  // all list
             String o = newest?QueryBuilder.sortDateNewest():QueryBuilder.sortDateOldest();
             Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            return new CursorLoader(getActivity(),uri,PhotoCursor.projection,q,null,o);
+            return new CursorLoader(getActivity(),uri,PhotoCursor.Companion.getProjection(),q,null,o);
         }
 
         private Cursor cursor = null;

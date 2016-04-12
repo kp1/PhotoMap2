@@ -262,7 +262,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             mMap.setOnCameraChangeListener(photoMapCameraChangeListener);
             mMap.setOnMarkerClickListener(marker -> {
                 Observable.from(groupList)
-                    .filter(g -> g.marker.equals(marker))
+                    .filter(g -> g.getMarker().equals(marker))
                     .first()
                     .subscribe(g -> {
                         Intent i;
@@ -378,7 +378,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                 String q = QueryBuilder.createQuery(mapBounds);
                 String o = QueryBuilder.sortDateNewest();
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                return new CursorLoader(getActivity(),uri, PhotoCursor.projection, q, null, o);
+                return new CursorLoader(getActivity(),uri, PhotoCursor.Companion.getProjection(), q, null, o);
 
             }
 
@@ -415,8 +415,8 @@ public class PhotoMapFragment extends SupportMapFragment {
                 listener.showProgress(++progress * 10000 / group_count);
                 groupList.add(g);
                 MarkerOptions ops = new MarkerOptions().position(g.getCenter());
-                ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size())));
-                g.marker = mMap.addMarker(ops);
+                ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.Companion.getMarkerColor(g.size())));
+                g.setMarker(mMap.addMarker(ops));
             })
             .doOnCompleted(() -> {
                 hideActionBarDelayed();
