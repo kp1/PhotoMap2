@@ -66,7 +66,7 @@ public class PhotoListFragment extends Fragment{
             getActivity().setTitle(savedInstanceState.getString("title"));
         }
         else{
-            distance_index = DistanceActionProvider.initialIndex();
+            distance_index = DistanceActionProvider.Companion.initialIndex();
         }
         subject = PublishSubject.create();
     }
@@ -237,7 +237,7 @@ public class PhotoListFragment extends Fragment{
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy(hash -> hash.getHash().toBase32()
-                    .substring(0, DistanceActionProvider.getDistance(distance)))
+                    .substring(0, DistanceActionProvider.Companion.getDistance(distance)))
             .doOnNext(g -> group_count++)
             .concatMap(group -> group.map(PhotoGroup::new)
                     .reduce(PhotoGroup::append))
