@@ -15,8 +15,7 @@ internal class LicenseAdapter(context: Context, private val resource: Int, objec
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var v: View? = convertView
-        if (v == null) v = inflater.inflate(resource, null)
+        val v: View = convertView ?: inflater.inflate(resource, null)
         (v as LicenseLayout).setData(getItem(position))
         return v
     }
