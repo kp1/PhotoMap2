@@ -80,7 +80,7 @@ public class PhotoListFragment extends Fragment{
             if(!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    PhotoListActivity.PERMISSIONS_REQUEST);
+                    PhotoListActivity.Companion.getPERMISSIONS_REQUEST());
             }
             else{
                 View v = getView();
