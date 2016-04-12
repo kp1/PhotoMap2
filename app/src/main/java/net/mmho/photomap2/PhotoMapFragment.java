@@ -272,7 +272,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                             i.putExtra(PhotoViewActivity.Companion.getEXTRA_GROUP(), (Parcelable) g);
                         } else {
                             i = new Intent(getActivity(), ThumbnailActivity.class);
-                            i.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) g);
+                            i.putExtra(ThumbnailActivity.Companion.getEXTRA_GROUP(), (Parcelable) g);
                         }
                         startActivity(i);
                     });

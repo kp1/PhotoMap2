@@ -179,7 +179,7 @@ public class PhotoListFragment extends Fragment{
                 intent.putExtra(PhotoViewActivity.Companion.getEXTRA_GROUP(), (Parcelable) group);
             } else {
                 intent = new Intent(getActivity(), ThumbnailActivity.class);
-                intent.putExtra(ThumbnailActivity.EXTRA_GROUP, (Parcelable) group);
+                intent.putExtra(ThumbnailActivity.Companion.getEXTRA_GROUP(), (Parcelable) group);
             }
             startActivity(intent);
         });
