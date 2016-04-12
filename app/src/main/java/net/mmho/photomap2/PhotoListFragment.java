@@ -84,7 +84,7 @@ public class PhotoListFragment extends Fragment{
             }
             else{
                 View v = getView();
-                if(v!=null)PermissionUtils.requestPermission(v,getContext());
+                if(v!=null) PermissionUtils.INSTANCE.requestPermission(v,getContext());
             }
         }
         else {
@@ -261,7 +261,7 @@ public class PhotoListFragment extends Fragment{
         }
         else{
             View v = getView();
-            if(v!=null)PermissionUtils.requestPermission(v,getContext());
+            if(v!=null) PermissionUtils.INSTANCE.requestPermission(v,getContext());
         }
         permission_granted = granted;
     }
