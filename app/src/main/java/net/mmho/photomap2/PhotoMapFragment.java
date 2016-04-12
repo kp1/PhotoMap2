@@ -225,7 +225,7 @@ public class PhotoMapFragment extends SupportMapFragment {
                     MediaStore.Images.Media.LATITUDE,
                     MediaStore.Images.Media.LONGITUDE,
             };
-            PhotoCursor c = new PhotoCursor(MediaStore.Images.Media.query(getActivity().getContentResolver(),uri,projection,QueryBuilder.createQuery(),null,null));
+            PhotoCursor c = new PhotoCursor(MediaStore.Images.Media.query(getActivity().getContentResolver(),uri,projection, QueryBuilder.INSTANCE.createQuery(),null,null));
             if(c.getCount()==0){
                 Toast.makeText(getActivity(),getString(R.string.no_position_data),Toast.LENGTH_LONG).show();
                 getActivity().finish();
@@ -376,8 +376,8 @@ public class PhotoMapFragment extends SupportMapFragment {
             @Override
             public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
                 LatLngBounds mapBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-                String q = QueryBuilder.createQuery(mapBounds);
-                String o = QueryBuilder.sortDateNewest();
+                String q = QueryBuilder.INSTANCE.createQuery(mapBounds);
+                String o = QueryBuilder.INSTANCE.sortDateNewest();
                 Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
                 return new CursorLoader(getActivity(),uri, PhotoCursor.Companion.getProjection(), q, null, o);
 
