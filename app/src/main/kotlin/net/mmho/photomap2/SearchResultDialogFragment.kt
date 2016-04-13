@@ -1,5 +1,6 @@
 package net.mmho.photomap2
 
+import android.R
 import android.app.AlertDialog
 import android.app.Dialog
 import android.location.Address
@@ -12,11 +13,11 @@ class SearchResultDialogFragment : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val title = arguments.getString("title")
         val list = arguments.getParcelableArray("address") as Array<Address>
-        val adapter = AddressListAdapter(activity, android.R.layout.simple_list_item_2, list)
+        val adapter = AddressListAdapter(activity, R.layout.simple_list_item_2, list)
         val builder = AlertDialog.Builder(activity)
-        builder.setTitle(getString(R.string.search_title, title))
+        builder.setTitle(getString(net.mmho.photomap2.R.string.search_title, title))
         builder.setAdapter(adapter) { dialog, which ->
-            val f = this@SearchResultDialogFragment.activity.supportFragmentManager.findFragmentById(R.id.map)
+            val f = this@SearchResultDialogFragment.activity.supportFragmentManager.findFragmentById(net.mmho.photomap2.R.id.map)
             if (f is PhotoMapFragment) {
                 val update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[which]),
                     PhotoMapFragment.DEFAULT_ZOOM)

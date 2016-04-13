@@ -6,7 +6,7 @@ import android.provider.MediaStore
 
 import com.google.android.gms.maps.model.LatLng
 
-import geohash.GeoHash
+import net.mmho.photomap2.geohash.GeoHash
 
 import java.util.ArrayList
 

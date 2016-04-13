@@ -9,7 +9,7 @@ class MapSuggestionProvider : SearchRecentSuggestionsProvider() {
     }
 
     companion object {
-        val AUTHORITY = "net.mmho.MapSuggestionProvider"
+        val AUTHORITY = "net.mmho.net.mmho.photomap2.MapSuggestionProvider"
         val MODE = SearchRecentSuggestionsProvider.DATABASE_MODE_QUERIES
     }
 }

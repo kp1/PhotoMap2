@@ -5,7 +5,7 @@ import android.os.Parcelable
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
-import geohash.GeoHash
+import net.mmho.photomap2.geohash.GeoHash
 import java.util.*
 
 class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {

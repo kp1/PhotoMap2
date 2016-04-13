@@ -1,4 +1,4 @@
-package geohash
+package net.mmho.photomap2.geohash
 
 import android.os.Parcel
 import android.os.Parcelable

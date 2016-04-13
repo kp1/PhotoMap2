@@ -81,7 +81,7 @@ class PhotoMapFragment : SupportMapFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (activity !is ProgressChangeListener) {
-            throw RuntimeException(activity.localClassName + " must implement ProgressChangeListener")
+            throw RuntimeException(activity.localClassName + " must implement net.mmho.photomap2.ProgressChangeListener")
         }
         listener = activity as ProgressChangeListener?
     }

@@ -12,7 +12,7 @@ class AboutActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar) as Toolbar?)
         showAbout()
         list.adapter = LicenseAdapter(this, R.layout.layout_license,
-                resources.getStringArray(R.array.oss))
+            resources.getStringArray(R.array.oss))
     }
 
     private fun showAbout() {

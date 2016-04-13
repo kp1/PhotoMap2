@@ -3,7 +3,7 @@ package net.mmho.photomap2
 import android.os.Parcel
 import android.os.Parcelable
 
-import geohash.GeoHash
+import net.mmho.photomap2.geohash.GeoHash
 
 class HashedPhoto : Parcelable {
     val photoId: Long

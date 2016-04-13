@@ -171,7 +171,7 @@ class PhotoListFragment : Fragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (activity !is ProgressChangeListener) {
-            throw RuntimeException(activity.localClassName + " must implement ProgressChangeListener")
+            throw RuntimeException(activity.localClassName + " must implement net.mmho.photomap2.ProgressChangeListener")
         }
         listener = activity as ProgressChangeListener
     }
@@ -181,7 +181,7 @@ class PhotoListFragment : Fragment() {
             val q = QueryBuilder.createQuery()  // all list
             val o = if (newest) QueryBuilder.sortDateNewest() else QueryBuilder.sortDateOldest()
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            return CursorLoader(activity, uri, PhotoCursor.projection, q, null, o)
+            return CursorLoader(activity, uri, PhotoCursor.Companion.projection, q, null, o)
         }
 
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {

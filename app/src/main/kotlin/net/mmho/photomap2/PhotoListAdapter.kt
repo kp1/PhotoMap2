@@ -17,7 +17,7 @@ internal class PhotoListAdapter(context: Context, private val resource: Int, obj
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val v:View = convertView ?: inflater.inflate(resource, null)
+        val v: View = convertView ?: inflater.inflate(resource, null)
         if (position < count) (v as PhotoCardLayout).setData(getItem(position))
         return v
     }
