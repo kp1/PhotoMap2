@@ -14,7 +14,7 @@ internal object QueryBuilder {
         if (start.longitude < end.longitude)
             "$LONGITUDE between %f and %f".format(Locale.US,start.longitude,end.longitude)
         else "($LONGITUDE between -180.0 and %f or $LONGITUDE between %f and 180.0)"
-            .format(Locale.US,end.longitude, LONGITUDE,start.longitude)
+            .format(Locale.US,end.longitude,start.longitude)
 
         return latitude + longitude
 
