@@ -16,7 +16,7 @@
         android:theme="@style/AppTheme" >
 
         <activity
-            android:name="net.mmho.photomap2.PhotoListActivity"
+            android:name=".PhotoListActivity"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,9 +25,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.mmho.photomap2.PhotoMapActivity"
+            android:name=".PhotoMapActivity"
             android:launchMode="singleTop"
-            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
+            android:parentActivityName=".PhotoListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <data android:scheme="geo" />
@@ -55,18 +55,18 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name="net.mmho.photomap2.ThumbnailActivity"
-            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
+            android:name=".ThumbnailActivity"
+            android:parentActivityName=".PhotoListActivity" >
         </activity>
         <activity
-            android:name="net.mmho.photomap2.PhotoViewActivity"
-            android:parentActivityName="net.mmho.photomap2.PhotoListActivity" >
+            android:name=".PhotoViewActivity"
+            android:parentActivityName=".PhotoListActivity" >
         </activity>
 
         <activity android:name=".AboutActivity"/>
 
         <provider
-            android:name="net.mmho.photomap2.MapSuggestionProvider"
+            android:name=".MapSuggestionProvider"
             android:authorities="net.mmho.MapSuggestionProvider"
             android:exported="false"/>
 
