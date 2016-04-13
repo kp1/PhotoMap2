@@ -18,6 +18,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     internal var thumbnail = false
     private var w: Int = 0
+    private var id: Long = -1L
 
     init {
         subscribeSubject()
@@ -25,21 +26,28 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     private var subject: PublishSubject<Long>? = null
     private var subscription: Subscription? = null
+
     private fun subscribeSubject() {
         subject = PublishSubject.create<Long>()
-        subscription = subject?.onBackpressureLatest()?.
-            subscribeOn(Schedulers.newThread())?.
-            switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }?.
-            observeOn(AndroidSchedulers.mainThread())?.
+        subscription = subject!!.onBackpressureLatest().
+            subscribeOn(Schedulers.newThread()).
+            switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }.
+            observeOn(AndroidSchedulers.mainThread()).
             subscribe { bmp -> setImageBitmap(bmp) }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         subscription?.unsubscribe()
+        subscription = null
     }
 
     fun startLoading(image_id: Long) {
+
+        when (id) {
+            image_id -> return
+            else -> id = image_id
+        }
 
         var bitmap: Bitmap? = if(thumbnail) ThumbnailCache.instance.get(image_id) else null
         setImageBitmap(bitmap)
@@ -48,7 +56,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
         post {
             w = Math.min(this@LoadableImageView.width, this@LoadableImageView.height)
-            subject?.onNext(image_id)
+            subject!!.onNext(image_id)
         }
     }
 
