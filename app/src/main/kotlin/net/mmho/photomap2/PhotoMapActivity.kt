@@ -36,47 +36,54 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
     private fun handleIntent(intent: Intent) {
         if (Intent.ACTION_SEARCH == intent.action) {
             val searchQuery = intent.getStringExtra(SearchManager.QUERY)
-            Observable.create { subscriber: Subscriber<in List<Address>> ->
-                var data: List<Address>? = null
-                try {
-                    data = Geocoder(applicationContext).getFromLocationName(searchQuery, 5)
-                } catch (e: IOException) {
-                    subscriber.onError(e)
-                }
+            Observable
+                .create { subscriber: Subscriber<in List<Address>> ->
+                    var data: List<Address>? = null
+                    try {
+                        data = Geocoder(applicationContext).getFromLocationName(searchQuery, 5)
+                    } catch (e: IOException) {
+                        subscriber.onError(e)
+                    }
 
-                subscriber.onNext(data)
-                subscriber.onCompleted()
-            }.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).doOnNext(Action1<List<Address>> { list ->
-                if (list == null || list.size == 0) {
+                    subscriber.onNext(data)
+                    subscriber.onCompleted()
+                }
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(next@ { list ->
+                    if (list == null || list.size == 0) {
+                        Toast.makeText(this@PhotoMapActivity.applicationContext,
+                            this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
+                            Toast.LENGTH_LONG).show()
+                        return@next
+                    }
+
+                    val suggestions = SearchRecentSuggestions(this@PhotoMapActivity,
+                        MapSuggestionProvider.Companion.AUTHORITY,
+                        MapSuggestionProvider.Companion.MODE)
+                    suggestions.saveRecentQuery(searchQuery, null)
+
+                    if (list.size == 1) {
+                        val fragment = this@PhotoMapActivity.supportFragmentManager.findFragmentById(R.id.map)
+                        val update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[0]), PhotoMapFragment.Companion.DEFAULT_ZOOM)
+                        if (fragment is PhotoMapFragment)
+                            fragment.getMapAsync { map -> map.moveCamera(update) }
+                    } else {
+                        val transaction = this@PhotoMapActivity.supportFragmentManager.beginTransaction()
+                        val prev = this@PhotoMapActivity.supportFragmentManager.findFragmentByTag(TAG_DIALOG)
+                        if (prev != null) transaction.remove(prev)
+                        transaction.addToBackStack(null)
+                        transaction.commit()
+
+                        val fragment = SearchResultDialogFragment.Companion.newInstance(searchQuery, list)
+                        fragment.show(this@PhotoMapActivity.supportFragmentManager, TAG_DIALOG)
+                    }
+                })
+                .doOnError {
                     Toast.makeText(this@PhotoMapActivity.applicationContext, this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
                         Toast.LENGTH_LONG).show()
-                    return@Action1
                 }
-
-                val suggestions = SearchRecentSuggestions(this@PhotoMapActivity,
-                    MapSuggestionProvider.Companion.AUTHORITY,
-                    MapSuggestionProvider.Companion.MODE)
-                suggestions.saveRecentQuery(searchQuery, null)
-
-                if (list.size == 1) {
-                    val fragment = this@PhotoMapActivity.supportFragmentManager.findFragmentById(R.id.map)
-                    val update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[0]), PhotoMapFragment.Companion.DEFAULT_ZOOM)
-                    if (fragment is PhotoMapFragment)
-                        fragment.getMapAsync { map -> map.moveCamera(update) }
-                } else {
-                    val transaction = this@PhotoMapActivity.supportFragmentManager.beginTransaction()
-                    val prev = this@PhotoMapActivity.supportFragmentManager.findFragmentByTag(TAG_DIALOG)
-                    if (prev != null) transaction.remove(prev)
-                    transaction.addToBackStack(null)
-                    transaction.commit()
-
-                    val fragment = SearchResultDialogFragment.Companion.newInstance(searchQuery, list)
-                    fragment.show(this@PhotoMapActivity.supportFragmentManager, TAG_DIALOG)
-                }
-            }).doOnError {
-                Toast.makeText(this@PhotoMapActivity.applicationContext, this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
-                    Toast.LENGTH_LONG).show()
-            }.subscribe()
+                .subscribe()
         }
     }
 
