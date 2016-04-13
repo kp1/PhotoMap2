@@ -183,7 +183,6 @@ class PhotoListFragment : Fragment() {
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             return CursorLoader(activity, uri, PhotoCursor.Companion.projection, q, null, o)
         }
-
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
             photoList = PhotoCursor(data).hashedPhotoList
             subject?.onNext(distance_index)
@@ -220,7 +219,8 @@ class PhotoListFragment : Fragment() {
 
     fun grantedPermission(granted: Boolean) {
         if (granted) {
-            loaderManager.initLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
+            if(loaderManager.getLoader<Cursor>(CURSOR_LOADER_ID)==null)
+                loaderManager.initLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
         } else {
             val v = view
             if (v != null) PermissionUtils.requestPermission(v, context)
