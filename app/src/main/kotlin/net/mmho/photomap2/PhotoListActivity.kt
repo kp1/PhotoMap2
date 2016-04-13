@@ -23,9 +23,7 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
         when (requestCode) {
             PERMISSIONS_REQUEST -> {
                 val granted = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                if (fragment != null) {
-                    (fragment as PhotoListFragment).grantedPermission(granted)
-                }
+                (fragment as PhotoListFragment)?.grantedPermission(granted)
             }
         }
     }
@@ -37,8 +35,7 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
 
     override fun endProgress() {
         progress.progress = progress.max
-        val fadeout: AlphaAnimation
-        fadeout = AlphaAnimation(1f, 0f)
+        val fadeout = AlphaAnimation(1f, 0f)
         fadeout.duration = 300
         fadeout.fillAfter = true
         fadeout.setAnimationListener(object : Animation.AnimationListener {
@@ -61,6 +58,4 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
     companion object {
         val PERMISSIONS_REQUEST = 1
     }
-
-
 }
