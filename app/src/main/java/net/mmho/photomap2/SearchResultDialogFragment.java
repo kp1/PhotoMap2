@@ -36,11 +36,9 @@ public class SearchResultDialogFragment extends DialogFragment{
         builder.setAdapter(adapter, (dialog, which) -> {
             Fragment f = getActivity().getSupportFragmentManager().findFragmentById(R.id.map);
             if(f instanceof PhotoMapFragment){
-                if (list != null) {
-                    final CameraUpdate update = CameraUpdateFactory.newLatLngZoom(AddressUtil.INSTANCE.addressToLatLng(list[which]),
-                        PhotoMapFragment.DEFAULT_ZOOM);
-                    ((PhotoMapFragment)f).getMapAsync(map->map.moveCamera(update));
-                }
+                final CameraUpdate update = CameraUpdateFactory.newLatLngZoom(AddressUtil.INSTANCE.addressToLatLng(list[which]),
+                    PhotoMapFragment.Companion.getDEFAULT_ZOOM());
+                ((PhotoMapFragment)f).getMapAsync(map->map.moveCamera(update));
             }
         });
         return builder.create();

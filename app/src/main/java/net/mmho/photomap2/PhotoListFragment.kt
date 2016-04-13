@@ -170,11 +170,10 @@ class PhotoListFragment : Fragment() {
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        val activity = activity
         if (activity !is ProgressChangeListener) {
             throw RuntimeException(activity.localClassName + " must implement ProgressChangeListener")
         }
-        listener = activity
+        listener = activity as ProgressChangeListener
     }
 
     private val photoCursorCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
