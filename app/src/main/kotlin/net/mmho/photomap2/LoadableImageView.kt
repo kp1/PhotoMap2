@@ -20,16 +20,12 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
     private var w: Int = 0
     private var id: Long = -1L
 
-    init {
-        subscribeSubject()
-    }
-
-    private var subject: PublishSubject<Long>? = null
+    private var subject: PublishSubject<Long>
     private var subscription: Subscription? = null
 
-    private fun subscribeSubject() {
+    init {
         subject = PublishSubject.create<Long>()
-        subscription = subject!!.onBackpressureLatest().
+        subscription = subject.onBackpressureLatest().
             subscribeOn(Schedulers.newThread()).
             switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }.
             observeOn(AndroidSchedulers.mainThread()).
@@ -56,7 +52,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
         post {
             w = Math.min(this@LoadableImageView.width, this@LoadableImageView.height)
-            subject!!.onNext(image_id)
+            subject.onNext(image_id)
         }
     }
 

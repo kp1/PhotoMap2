@@ -10,7 +10,7 @@ class PhotoCardLayout @JvmOverloads constructor(context: Context, attrs: Attribu
         : RelativeLayout(context, attrs, defStyle) {
 
     fun setData(g: PhotoGroup) {
-        count.text = String.format("%2d", g.size)
+        count.text = "%2d".format(g.size)
         thumbnail.startLoading(g[0].photoId)
     }
 

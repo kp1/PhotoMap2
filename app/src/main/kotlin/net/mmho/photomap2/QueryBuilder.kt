@@ -3,29 +3,25 @@ package net.mmho.photomap2
 import android.provider.BaseColumns
 import android.provider.MediaStore.Images.ImageColumns.*
 import com.google.android.gms.maps.model.LatLngBounds
+import java.util.*
 
 internal object QueryBuilder {
     fun createQuery(bounds: LatLngBounds): String {
         val start = bounds.southwest
         val end = bounds.northeast
-        val latitude = String.format("%s between %s and %s and ",
-            LATITUDE, java.lang.Double.toString(start.latitude), java.lang.Double.toString(end.latitude))
-        val longitude: String
-        if (start.longitude < end.longitude) {
-            longitude = String.format("%s between %s and %s",
-                LONGITUDE, java.lang.Double.toString(start.longitude), java.lang.Double.toString(end.longitude))
-        } else {
-            longitude = String.format("(%s between -180.0 and %s or %s between %s and 180.0)",
-                LONGITUDE, java.lang.Double.toString(end.longitude), LONGITUDE, java.lang.Double.toString(start.longitude))
-
-        }
+        val latitude = "$LATITUDE between %f and %f and ".format(Locale.US,start.latitude,end.latitude)
+        val longitude: String =
+        if (start.longitude < end.longitude)
+            "$LONGITUDE between %f and %f".format(Locale.US,start.longitude,end.longitude)
+        else "($LONGITUDE between -180.0 and %f or $LONGITUDE between %f and 180.0)"
+            .format(Locale.US,end.longitude, LONGITUDE,start.longitude)
 
         return latitude + longitude
 
     }
 
     fun createQuery(id: Long): String {
-        return BaseColumns._ID + " is " + id
+        return "${BaseColumns._ID} is $id"
     }
 
     fun createQuery(): String {

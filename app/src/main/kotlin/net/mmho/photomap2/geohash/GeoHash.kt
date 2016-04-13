@@ -158,7 +158,7 @@ class GeoHash : Parcelable {
         fun create(latitude: Double, longitude: Double, significant: Int): GeoHash {
 
             if (significant > MAX_SIGNIFICANT_BITS) {
-                throw IllegalArgumentException(String.format("significant bit must under %d.", MAX_SIGNIFICANT_BITS))
+                throw IllegalArgumentException("significant bit must under $MAX_SIGNIFICANT_BITS")
             }
 
             val hash = GeoHash()
