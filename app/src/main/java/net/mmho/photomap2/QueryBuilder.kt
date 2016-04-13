@@ -9,7 +9,7 @@ internal object QueryBuilder {
         val start = bounds.southwest
         val end = bounds.northeast
         val latitude = String.format("%s between %s and %s and ",
-            LATITUDE, Double.toString(), java.lang.Double.toString(end.latitude))
+            LATITUDE, java.lang.Double.toString(start.latitude), java.lang.Double.toString(end.latitude))
         val longitude: String
         if (start.longitude < end.longitude) {
             longitude = String.format("%s between %s and %s",

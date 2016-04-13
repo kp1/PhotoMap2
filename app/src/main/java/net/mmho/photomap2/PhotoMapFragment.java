@@ -296,7 +296,7 @@ public class PhotoMapFragment extends SupportMapFragment {
             if(!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    PhotoMapActivity.PERMISSIONS_REQUEST);
+                    PhotoMapActivity.Companion.getPERMISSIONS_REQUEST());
             }
             else{
                 View v = getView();
