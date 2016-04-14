@@ -4,41 +4,39 @@ import android.content.Context
 import android.location.Address
 import com.google.android.gms.maps.model.LatLng
 
-internal object AddressUtil {
+private fun removePostalCode(source: String): String {
+    return source.replaceFirst("〒[0-9¥-]*".toRegex(), "")
+}
 
-    private fun removePostalCode(source: String): String {
-        return source.replaceFirst("〒[0-9¥-]*".toRegex(), "")
+fun Address.getTitle(c:Context):String{
+    return buildString {
+        val sep = c.getString(R.string.address_separator)
+        if(this@getTitle.adminArea!=null) append(this@getTitle.adminArea,sep)
+        if(this@getTitle.subAdminArea!=null) append(this@getTitle.subAdminArea,sep)
+        if(this@getTitle.locality!=null) append(this@getTitle.locality)
+        if(length==0) append(this@getTitle.featureName)
     }
+}
 
-    fun getTitle(a:Address?,c: Context) :String {
-        if(a==null) return ""
-        return buildString {
-            val sep = c.getString(R.string.address_separator)
-            if(a.adminArea!=null) append(a.adminArea,sep)
-            if(a.subAdminArea!=null) append(a.subAdminArea,sep)
-            if(a.locality!=null) append(a.locality)
-            if(length==0) append(a.featureName)
-        }
-    }
+fun Address.getDescription() : String {
 
-    fun getDescription(address: Address): String {
-        val description = StringBuilder()
-        if (address.maxAddressLineIndex == 0) {
-            description.append(address.getAddressLine(0))
-        } else {
-            var i = 1
-            val l = address.maxAddressLineIndex
-            while (i <= l) {
-                description.append(address.getAddressLine(i)).append(" ")
-                i++
+    return removePostalCode(buildString {
+        when (this@getDescription.maxAddressLineIndex) {
+            0 -> {
+                append(this@getDescription.getAddressLine(0))
+            }
+            else -> {
+                var i = 1
+                do {
+                    val line = this@getDescription.getAddressLine(i)
+                    append(line)
+                    i++
+                } while (line != null)
             }
         }
-        return removePostalCode(description.toString())
-    }
+    });
+}
 
-    fun addressToLatLng(address: Address): LatLng {
-        return LatLng(address.latitude, address.longitude)
-    }
-
-
+fun Address.toLatLng():LatLng{
+    return LatLng(latitude,longitude)
 }

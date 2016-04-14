@@ -19,7 +19,7 @@ class SearchResultDialogFragment : DialogFragment() {
         builder.setAdapter(adapter) { dialog, which ->
             val f = this@SearchResultDialogFragment.activity.supportFragmentManager.findFragmentById(net.mmho.photomap2.R.id.map)
             if (f is PhotoMapFragment) {
-                val update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[which]),
+                val update = CameraUpdateFactory.newLatLngZoom(list[which].toLatLng(),
                     PhotoMapFragment.DEFAULT_ZOOM)
                 f.getMapAsync { map -> map.moveCamera(update) }
             }

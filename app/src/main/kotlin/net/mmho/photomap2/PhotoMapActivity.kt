@@ -1,6 +1,5 @@
 package net.mmho.photomap2
 
-import android.app.Dialog
 import android.app.SearchManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -63,7 +62,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
 
                     if (list.size == 1) {
                         val fragment = this@PhotoMapActivity.supportFragmentManager.findFragmentById(R.id.map)
-                        val update = CameraUpdateFactory.newLatLngZoom(AddressUtil.addressToLatLng(list[0]), PhotoMapFragment.Companion.DEFAULT_ZOOM)
+                        val update = CameraUpdateFactory.newLatLngZoom(list[0].toLatLng(), PhotoMapFragment.Companion.DEFAULT_ZOOM)
                         if (fragment is PhotoMapFragment)
                             fragment.getMapAsync { map -> map.moveCamera(update) }
                     } else {

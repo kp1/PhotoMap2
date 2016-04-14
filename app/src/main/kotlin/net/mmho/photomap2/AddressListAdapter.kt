@@ -23,7 +23,7 @@ internal class AddressListAdapter(context: Context, private val resource: Int, a
         val text1 = v.findViewById(android.R.id.text1) as TextView
         val text2 = v.findViewById(android.R.id.text2) as TextView
         val address = getItem(position)
-        text1.text = AddressUtil.getDescription(address)
+        text1.text = address.getDescription()
         text2.text = "%6.4f,%6.4f".format(Locale.getDefault(), address.latitude, address.longitude)
         return v
     }
