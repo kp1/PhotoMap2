@@ -8,6 +8,9 @@ import android.view.*
 import android.widget.AdapterView
 import android.widget.GridView
 import kotlinx.android.synthetic.main.layout_thumbnail.view.*
+import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 
 class ThumbnailFragment : Fragment() {
 
@@ -29,7 +32,13 @@ class ThumbnailFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activity.title = group?.title
+        Observable
+            .just(group)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { g -> g?.resolveAddress(activity)}
+            .doOnCompleted { activity.title = group?.title }
+            .subscribe()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

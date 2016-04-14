@@ -1,11 +1,15 @@
 package net.mmho.photomap2
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import net.mmho.photomap2.geohash.GeoHash
+import java.io.IOException
 import java.util.*
 
 class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
@@ -38,13 +42,30 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         return this
     }
 
+    fun resolveAddress(context: Context):Boolean{
+        if(NetworkUtils.networkCheck(context)){
+            try {
+                val addresses: List<Address>? =
+                    Geocoder(context).getFromLocation(center.latitude, center.longitude, 1)
+                when (addresses?.size) {
+                    1 -> {
+                        title = AddressUtil.getTitle(addresses?.first(), context)
+                        return true
+                    }
+                }
+            }
+            catch (_: IOException){
+            }
+        }
+        return false
+    }
+
     val center: LatLng
         get() = hash.center
 
     override fun toString(): String {
         return description
     }
-
 
     override fun describeContents(): Int {
         return 0
