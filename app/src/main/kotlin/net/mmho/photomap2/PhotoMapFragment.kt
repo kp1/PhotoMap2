@@ -42,16 +42,16 @@ import java.util.regex.Pattern
 
 class PhotoMapFragment : SupportMapFragment() {
 
-    private var mMap: GoogleMap? = null
+    private var googleMap: GoogleMap? = null
     private var searchMenuItem: MenuItem? = null
-    private var mActionBar: ActionBar? = null
+    private lateinit var actionBar: ActionBar
     private var photoList: ArrayList<HashedPhoto>? = null
     private var groupList: ArrayList<PhotoGroup>? = null
 
     private var listener: ProgressChangeListener? = null
 
 
-    private var subject: PublishSubject<Int>? = null
+    private lateinit var subject: PublishSubject<Int>
     private var subscription: Subscription? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,16 +66,14 @@ class PhotoMapFragment : SupportMapFragment() {
     override fun onStart() {
         super.onStart()
         if (subscription == null) {
-            subscription = subject!!.onBackpressureLatest().switchMap { this.groupObservable(it) }.subscribe()
+            subscription = subject.onBackpressureLatest().switchMap { this.groupObservable(it) }.subscribe()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (subscription != null) {
-            subscription!!.unsubscribe()
-            subscription = null
-        }
+        subscription?.unsubscribe()
+        subscription = null
     }
 
     override fun onAttach(context: Context?) {
@@ -86,17 +84,17 @@ class PhotoMapFragment : SupportMapFragment() {
         listener = activity as ProgressChangeListener?
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                val position = data!!.extras.getParcelable<LatLng>("location")
-                mMap!!.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM))
+                val position = data.extras.getParcelable<LatLng>("location")
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM))
             }
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.photo_map_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+        inflater.inflate(R.menu.photo_map_menu, menu)
 
         val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
         val searchView = MenuItemCompat.getActionView(menu!!.findItem(R.id.search)) as SearchView
@@ -109,8 +107,8 @@ class PhotoMapFragment : SupportMapFragment() {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.clear_history -> {
                 val suggestions = SearchRecentSuggestions(activity,
                     MapSuggestionProvider.AUTHORITY,
@@ -165,46 +163,51 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     private fun handleIntent(intent: Intent): CameraUpdate? {
-        if (Intent.ACTION_VIEW == intent.action) {
-            val uri = intent.data
-            if (uri.scheme == "geo") {
-                val position = uri.toString()
-                val pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?([zq])=(.*))?")
-                val matcher = pattern.matcher(position)
-                if (matcher.find() && matcher.groupCount() >= 2) {
-                    val latitude = java.lang.Double.parseDouble(matcher.group(1))
-                    val longitude = java.lang.Double.parseDouble(matcher.group(2))
-                    var zoom = DEFAULT_ZOOM
+        when(intent.action){
+            Intent.ACTION_VIEW ->{
+                val uri = intent.data
+                if (uri.scheme == "geo") {
+                    val position = uri.toString()
+                    val pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?([zq])=(.*))?")
+                    val matcher = pattern.matcher(position)
+                    if (matcher.find() && matcher.groupCount() >= 2) {
+                        val latitude = matcher.group(1).toDouble()
+                        val longitude = matcher.group(2).toDouble()
+                        var zoom = DEFAULT_ZOOM
 
-                    if (matcher.groupCount() == 5 && matcher.group(4) != null) {
-                        if (matcher.group(4) == "z") {
-                            zoom = Integer.parseInt(matcher.group(5)).toFloat()
-                        } else if (matcher.group(4) == "q") {
-                            requestQuery(matcher.group(5))
-                            return null
+                        if (matcher.groupCount() == 5 && matcher.group(4) != null) {
+                            if (matcher.group(4) == "z") {
+                                zoom = Integer.parseInt(matcher.group(5)).toFloat()
+                            } else if (matcher.group(4) == "q") {
+                                requestQuery(matcher.group(5))
+                                return null
+                            }
                         }
+                        return CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), zoom)
                     }
-                    return CameraUpdateFactory.newLatLngZoom(LatLng(latitude, longitude), zoom)
                 }
             }
-        } else if (Intent.ACTION_SEND == intent.action) {
-            val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-            val projection = arrayOf(MediaStore.Images.Media.LATITUDE, MediaStore.Images.Media.LONGITUDE)
-            val c = PhotoCursor(MediaStore.Images.Media.query(activity.contentResolver, uri, projection, QueryBuilder.createQuery(), null, null))
-            if (c.count == 0) {
-                Toast.makeText(activity, getString(R.string.no_position_data), Toast.LENGTH_LONG).show()
-                activity.finish()
-                return null
+            Intent.ACTION_SEND ->{
+                val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                val projection = arrayOf(MediaStore.Images.Media.LATITUDE, MediaStore.Images.Media.LONGITUDE)
+                val c = PhotoCursor(MediaStore.Images.Media.query(activity.contentResolver, uri, projection,
+                        QueryBuilder.createQuery(), null, null))
+                if (c.count == 0) {
+                    Toast.makeText(activity, getString(R.string.no_position_data), Toast.LENGTH_LONG).show()
+                    activity.finish()
+                    return null
+                }
+                c.moveToFirst()
+                val position = c.location
+                c.close()
+                return CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM)
             }
-            c.moveToFirst()
-            val position = c.location
-            c.close()
-            return CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM)
-        } else {
-            val bundle = intent.extras
-            val group = bundle.getParcelable<PhotoGroup>(EXTRA_GROUP)
-            if (group != null) {
-                return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.hash.bounds, 1.2), 0)
+            else ->{
+                val bundle = intent.extras
+                val group = bundle.getParcelable<PhotoGroup>(EXTRA_GROUP)
+                if (group != null) {
+                    return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.hash.bounds, 1.2), 0)
+                }
             }
         }
         return null
@@ -212,40 +215,45 @@ class PhotoMapFragment : SupportMapFragment() {
 
     private fun initMap() {
 
-        if (mMap != null) {
+        if (googleMap != null) {
             loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
             return
         }
 
         getMapAsync { map ->
-            mMap = map
-            val intent = this@PhotoMapFragment.activity.intent
-            val update = this@PhotoMapFragment.handleIntent(intent)
-            if (update != null && this@PhotoMapFragment.view != null) {
-                this@PhotoMapFragment.view!!.post { mMap!!.moveCamera(update) }
-            }
-            mMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
-            mMap?.setOnMarkerClickListener { marker ->
-                Observable.from(groupList).filter { g -> g.marker == marker }.first().subscribe { g ->
-                    val i: Intent
-                    if (g.size == 1) {
-                        i = Intent(this@PhotoMapFragment.activity, PhotoViewActivity::class.java)
-                        i.putExtra(PhotoViewActivity.EXTRA_GROUP, g as Parcelable)
-                    } else {
-                        i = Intent(this@PhotoMapFragment.activity, ThumbnailActivity::class.java)
-                        i.putExtra(ThumbnailActivity.EXTRA_GROUP, g as Parcelable)
+            googleMap = map
+
+            val update = this@PhotoMapFragment.handleIntent(this@PhotoMapFragment.activity.intent)
+            if(update!=null) this@PhotoMapFragment.view?.post{ googleMap?.moveCamera(update) }
+
+            googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+            googleMap?.setOnMarkerClickListener { marker ->
+                Observable.from(groupList)
+                    .filter { g -> g.marker == marker }
+                    .first()
+                    .subscribe { g ->
+                        val i: Intent
+                        when(g.size) {
+                            1 -> {
+                                i = Intent(this@PhotoMapFragment.activity, PhotoViewActivity::class.java)
+                                i.putExtra(PhotoViewActivity.EXTRA_GROUP, g as Parcelable)
+                            }
+                            else -> {
+                                i = Intent(this@PhotoMapFragment.activity, ThumbnailActivity::class.java)
+                                i.putExtra(ThumbnailActivity.EXTRA_GROUP, g as Parcelable)
+                            }
+                        }
+                        this@PhotoMapFragment.startActivity(i)
                     }
-                    this@PhotoMapFragment.startActivity(i)
-                }
                 true
             }
-            mMap?.setOnMapClickListener {
-                if (mActionBar!!.isShowing)
+            googleMap?.setOnMapClickListener {
+                if (actionBar.isShowing)
                     this@PhotoMapFragment.hideActionBar()
                 else
                     this@PhotoMapFragment.showActionBar(true)
             }
-            mMap?.uiSettings?.isZoomControlsEnabled = false
+            googleMap?.uiSettings?.isZoomControlsEnabled = false
             this@PhotoMapFragment.loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
         }
     }
@@ -268,14 +276,14 @@ class PhotoMapFragment : SupportMapFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mActionBar = (activity as AppCompatActivity).supportActionBar
-        if (mActionBar != null)
-            mActionBar?.addOnMenuVisibilityListener { visible ->
-                if (visible)
-                    showActionBar(false)
-                else
-                    hideActionBarDelayed()
-            }
+        if(activity !is AppCompatActivity) throw RuntimeException("activity must extends AppCompatActivity")
+        actionBar = (activity as AppCompatActivity).supportActionBar as ActionBar
+        actionBar.addOnMenuVisibilityListener { visible ->
+            if (visible)
+                showActionBar(false)
+            else
+                hideActionBarDelayed()
+        }
 
     }
 
@@ -283,7 +291,7 @@ class PhotoMapFragment : SupportMapFragment() {
     private val runnable = Runnable { this.hideActionBar() }
 
     private fun showActionBar(hide: Boolean) {
-        mActionBar!!.show()
+        actionBar.show()
         if (!hide)
             handler.removeCallbacks(runnable)
         else
@@ -291,7 +299,7 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     private fun hideActionBar() {
-        mActionBar!!.hide()
+        actionBar.hide()
     }
 
     private fun hideActionBarDelayed() {
@@ -303,9 +311,9 @@ class PhotoMapFragment : SupportMapFragment() {
     private val photoMapCameraChangeListener = GoogleMap.OnCameraChangeListener { position ->
         if (position.zoom > MAXIMUM_ZOOM || position.zoom < MINIMUM_ZOOM) {
             val zoom = (if (position.zoom > MAXIMUM_ZOOM) MAXIMUM_ZOOM else MINIMUM_ZOOM).toFloat()
-            mMap?.setOnCameraChangeListener(null)
+            googleMap?.setOnCameraChangeListener(null)
             val cameraUpdate = CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(position.target, zoom))
-            mMap?.animateCamera(cameraUpdate, cancelableCallback)
+            googleMap?.animateCamera(cameraUpdate, cancelableCallback)
             return@OnCameraChangeListener
         }
         showActionBar(false)
@@ -315,17 +323,17 @@ class PhotoMapFragment : SupportMapFragment() {
     private val cancelableCallback: GoogleMap.CancelableCallback
         get() = object : GoogleMap.CancelableCallback {
             override fun onFinish() {
-                mMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+                googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
             }
 
             override fun onCancel() {
-                mMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+                googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
             }
         }
 
     private val photoListLoaderCallback = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(i: Int, bundle: Bundle): Loader<Cursor> {
-            val mapBounds = mMap!!.projection.visibleRegion.latLngBounds
+            val mapBounds = googleMap!!.projection.visibleRegion.latLngBounds
             val q = QueryBuilder.createQuery(mapBounds)
             val o = QueryBuilder.sortDateNewest()
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -335,9 +343,9 @@ class PhotoMapFragment : SupportMapFragment() {
 
         override fun onLoadFinished(cursorLoader: Loader<Cursor>, cursor: Cursor) {
             photoList = PhotoCursor(cursor).hashedPhotoList
-            var distance = (mMap!!.cameraPosition.zoom * 2 + 4).toInt()
+            var distance = (googleMap!!.cameraPosition.zoom * 2 + 4).toInt()
             if (distance > 45) distance = 45
-            subject?.onNext(distance)
+            subject.onNext(distance)
         }
 
         override fun onLoaderReset(objectLoader: Loader<Cursor>) {
@@ -355,7 +363,7 @@ class PhotoMapFragment : SupportMapFragment() {
                 .reduce { hashedPhotos, o -> hashedPhotos.append(o) } }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                mMap?.clear()
+                googleMap?.clear()
                 progress = 0
                 group_count = 0
                 listener?.showProgress(0)
@@ -366,7 +374,7 @@ class PhotoMapFragment : SupportMapFragment() {
                 groupList?.add(g)
                 val ops = MarkerOptions().position(g.center)
                 ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size)))
-                g.marker = mMap?.addMarker(ops)
+                g.marker = googleMap?.addMarker(ops)
             }
             .doOnCompleted {
                 this@PhotoMapFragment.hideActionBarDelayed()
