@@ -22,12 +22,10 @@ import kotlinx.android.synthetic.main.activity_photo_map.*
 import rx.Observable
 import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
-import rx.functions.Action1
 import rx.schedulers.Schedulers
 import java.io.IOException
 
 class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
-    private var dialog: Dialog? = null
 
     override fun onNewIntent(intent: Intent) {
         handleIntent(intent)
@@ -99,8 +97,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                 fragmentTransaction.replace(R.id.map, mapFragment).commit()
             }
         } else if (api.isUserResolvableError(result)) {
-            dialog = api.getErrorDialog(this, result, 1) { dialog -> finish() }
-            dialog?.show()
+            api.showErrorDialogFragment(this, result, 1) { dialog -> finish() }
         } else {
             finish()
         }
@@ -121,7 +118,6 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
 
     override fun onPause() {
         super.onPause()
-        if (dialog != null && dialog!!.isShowing) dialog!!.dismiss()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

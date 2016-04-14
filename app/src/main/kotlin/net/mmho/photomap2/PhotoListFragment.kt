@@ -18,6 +18,7 @@ import android.support.v4.content.Loader
 import android.support.v4.view.MenuItemCompat
 import android.view.*
 import android.widget.GridView
+import kotlinx.android.synthetic.main.fragment_photo_list.view.*
 import rx.Observable
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
@@ -88,10 +89,10 @@ class PhotoListFragment : Fragment() {
         subscription = null
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.photo_list_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.photo_list_menu, menu)
 
-        val distance = menu!!.findItem(R.id.distance)
+        val distance = menu.findItem(R.id.distance)
         val distanceActionProvider = MenuItemCompat.getActionProvider(distance) as DistanceActionProvider
         distanceActionProvider.setDistanceIndex(distance_index)
         distanceActionProvider.setOnDistanceChangeListener(object : DistanceActionProvider.OnDistanceChangeListener {
@@ -145,17 +146,21 @@ class PhotoListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // photo list
-        val list = view.findViewById(R.id.thumbnail_grid) as GridView
+        val list = view.thumbnail_grid as GridView
         list.adapter = adapter
-        list.setOnItemClickListener { p, v, position, id ->
-            val group = adapter!!.getItem(position)
+        list.setOnItemClickListener listener@ { p, v, position, id ->
+            val group = adapter?.getItem(position)
             val intent: Intent
-            if (group.size == 1) {
-                intent = Intent(activity, PhotoViewActivity::class.java)
-                intent.putExtra(PhotoViewActivity.EXTRA_GROUP, group as Parcelable)
-            } else {
-                intent = Intent(activity, ThumbnailActivity::class.java)
-                intent.putExtra(ThumbnailActivity.EXTRA_GROUP, group as Parcelable)
+            when(group?.size){
+                null -> return@listener
+                1 ->{
+                    intent = Intent(activity, PhotoViewActivity::class.java)
+                    intent.putExtra(PhotoViewActivity.EXTRA_GROUP, group as Parcelable)
+                }
+                else->{
+                    intent = Intent(activity, ThumbnailActivity::class.java)
+                    intent.putExtra(ThumbnailActivity.EXTRA_GROUP, group as Parcelable)
+                }
             }
             startActivity(intent)
         }

@@ -37,8 +37,8 @@ class DistanceActionProvider(context: Context) : ActionProvider(context), MenuIt
         return true
     }
 
-    override fun onPrepareSubMenu(subMenu: SubMenu?) {
-        subMenu!!.clear()
+    override fun onPrepareSubMenu(subMenu: SubMenu) {
+        subMenu.clear()
 
         for (i in distance.indices) {
             val s = subMenu.add(0, i, i, pretty(i))

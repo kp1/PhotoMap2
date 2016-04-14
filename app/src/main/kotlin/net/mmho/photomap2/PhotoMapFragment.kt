@@ -93,11 +93,11 @@ class PhotoMapFragment : SupportMapFragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.photo_map_menu, menu)
 
         val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = MenuItemCompat.getActionView(menu!!.findItem(R.id.search)) as SearchView
+        val searchView = MenuItemCompat.getActionView(menu.findItem(R.id.search)) as SearchView
         searchView.setOnQueryTextListener(onQueryTextListener)
         searchMenuItem = menu.findItem(R.id.search)
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, actionExpandListener)
