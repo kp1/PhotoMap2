@@ -11,7 +11,7 @@ class PhotoCardLayout @JvmOverloads constructor(context: Context, attrs: Attribu
 
     fun setData(g: PhotoGroup) {
         count.text = "%2d".format(g.size)
-        thumbnail.startLoading(g[0].photoId)
+        thumbnail.startLoading(g[0].photo_id)
     }
 
 }

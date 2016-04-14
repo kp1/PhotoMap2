@@ -11,7 +11,7 @@ internal class PhotoViewAdapter(fm: FragmentManager, private val group: PhotoGro
     override fun getItem(i: Int): Fragment {
         val f = PhotoViewFragment()
         val b = Bundle()
-        b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID, group[i].photoId)
+        b.putLong(PhotoViewFragment.EXTRA_IMAGE_ID, group[i].photo_id)
         f.arguments = b
         return f
     }
@@ -21,7 +21,7 @@ internal class PhotoViewAdapter(fm: FragmentManager, private val group: PhotoGro
     }
 
     fun getItemID(i: Int): Long {
-        return group[i].photoId
+        return group[i].photo_id
     }
 
 }
