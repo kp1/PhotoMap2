@@ -181,6 +181,7 @@ class PhotoListFragment : Fragment() {
         listener = activity as ProgressChangeListener
     }
 
+    private var order :String? = null
     private val photoCursorCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor> {
             val q = QueryBuilder.createQuery()  // all list
@@ -189,8 +190,12 @@ class PhotoListFragment : Fragment() {
             return CursorLoader(activity, uri, PhotoCursor.Companion.projection, q, null, o)
         }
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
-            photoList = PhotoCursor(data).hashedPhotoList
-            subject?.onNext(distance_index)
+            val new_order = (loader as CursorLoader).sortOrder
+            if(order!=new_order || photoList?.size!=data.count) {
+                order = new_order
+                photoList = PhotoCursor(data).hashedPhotoList
+                subject?.onNext(distance_index)
+            }
         }
 
         override fun onLoaderReset(loader: Loader<Cursor>) {
