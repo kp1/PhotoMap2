@@ -9,15 +9,13 @@ class ThumbnailCache private constructor(maxSize: Int) : LruCache<Long, Bitmap>(
         return bitmap.rowBytes * bitmap.height / 1024
     }
 
-    companion object {
+    private object Self { val INSTANCE = ThumbnailCache(cacheSize) }
 
-        private var self: ThumbnailCache? = null
+    companion object {
+        val instance:ThumbnailCache by lazy { Self.INSTANCE }
+
         private val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
         private val cacheSize = maxMemory / 8
 
-        val instance: ThumbnailCache
-            get() {
-                return self ?: ThumbnailCache(cacheSize)
-            }
     }
 }
