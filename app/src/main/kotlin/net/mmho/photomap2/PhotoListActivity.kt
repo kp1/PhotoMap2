@@ -23,7 +23,7 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
         when (requestCode) {
             PERMISSIONS_REQUEST -> {
                 val granted = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                (fragment as PhotoListFragment)?.grantedPermission(granted)
+                (fragment as PhotoListFragment).grantedPermission(granted)
             }
         }
     }

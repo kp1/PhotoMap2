@@ -17,11 +17,11 @@ fun Address.getTitle(c:Context):String{
 fun Address.getDescription() : String {
 
     return buildString {
-        var i = 0
-        do{
-            val line = this@getDescription.getAddressLine(i++)
-            append(line?:""," ")
-        }while(line!=null)
+        val lines = this@getDescription.maxAddressLineIndex
+
+        repeat(lines){
+            append(this@getDescription.getAddressLine(it))
+        }
     }
 }
 

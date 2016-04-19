@@ -16,13 +16,12 @@ class AboutActivity : AppCompatActivity() {
     }
 
     private fun showAbout() {
-        val b = StringBuilder()
-        b.append(getString(R.string.about_software, getString(R.string.app_name)))
-        b.append("\n\n")
-        val list = resources.getStringArray(R.array.oss)
-        for (oss in list) {
-            b.append("\t").append("・").append(oss).append("\n")
+        about.text = buildString{
+            append(getString(R.string.about_software,getString(R.string.app_name)))
+            append("\n\n")
+            for(oss in resources.getStringArray(R.array.oss)){
+                append("\t・$oss\n")
+            }
         }
-        about.text = b.toString()
     }
 }
