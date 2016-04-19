@@ -46,10 +46,15 @@ class PhotoViewActivity : AppCompatActivity() {
         adapter = PhotoViewAdapter(supportFragmentManager, group)
 
         photo_pager.adapter = adapter
-        photo_pager.setOnPageChangeListener(onPageChangeListener)
+        photo_pager.addOnPageChangeListener(onPageChangeListener)
         photo_pager.currentItem = position
         photo_pager.pageMargin = 30
         photo_pager.setOnClickListener(onClickListener)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        photo_pager.removeOnPageChangeListener(onPageChangeListener)
     }
 
 
@@ -91,17 +96,9 @@ class PhotoViewActivity : AppCompatActivity() {
         }
     }
 
-    private val onPageChangeListener = object : ViewPager.OnPageChangeListener {
-        override fun onPageScrolled(i: Int, v: Float, i2: Int) {
-
-        }
-
+    private val onPageChangeListener = object : ViewPager.SimpleOnPageChangeListener() {
         override fun onPageSelected(i: Int) {
             shareActionProvider?.setShareIntent(setShareIntent(Intent(), i))
-        }
-
-        override fun onPageScrollStateChanged(i: Int) {
-
         }
     }
 
@@ -155,7 +152,6 @@ class PhotoViewActivity : AppCompatActivity() {
     }
 
     companion object {
-
         val EXTRA_GROUP = "photo_group"
         val EXTRA_POSITION = "position"
     }
