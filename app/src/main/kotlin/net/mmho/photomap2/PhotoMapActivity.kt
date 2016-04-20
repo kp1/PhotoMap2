@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.provider.SearchRecentSuggestions
 import android.support.v4.view.WindowCompat
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
@@ -125,7 +124,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
             supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY)
         }
         setContentView(R.layout.activity_photo_map)
-        setSupportActionBar(findViewById(R.id.toolbar) as Toolbar?)
+        setSupportActionBar(toolbar)
         val bar = supportActionBar
         bar?.setDisplayHomeAsUpEnabled(true)
 
