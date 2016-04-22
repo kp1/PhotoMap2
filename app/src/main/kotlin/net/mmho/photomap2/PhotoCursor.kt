@@ -2,23 +2,20 @@ package net.mmho.photomap2
 
 import android.database.Cursor
 import android.database.CursorWrapper
-import android.provider.MediaStore
-
+import android.provider.MediaStore.Images.Media.*
 import com.google.android.gms.maps.model.LatLng
-
 import net.mmho.photomap2.geohash.GeoHash
-
-import java.util.ArrayList
+import java.util.*
 
 internal class PhotoCursor(cursor: Cursor) : CursorWrapper(cursor) {
 
     val id: Long
-        get() = getLong(getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+        get() = getLong(getColumnIndexOrThrow(_ID))
 
     val location: LatLng
         get() {
-            val latitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LATITUDE))
-            val longitude = getFloat(getColumnIndexOrThrow(MediaStore.Images.Media.LONGITUDE))
+            val latitude = getFloat(getColumnIndexOrThrow(LATITUDE))
+            val longitude = getFloat(getColumnIndexOrThrow(LONGITUDE))
             return LatLng(latitude.toDouble(), longitude.toDouble())
         }
 
@@ -41,9 +38,7 @@ internal class PhotoCursor(cursor: Cursor) : CursorWrapper(cursor) {
         }
 
     companion object {
-
-        val projection = arrayOf(MediaStore.Images.Media._ID, MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.LATITUDE, MediaStore.Images.Media.LONGITUDE, MediaStore.Images.Media.DATE_TAKEN, MediaStore.Images.Media.ORIENTATION)
-
+        val projection = arrayOf(_ID, DATA, DISPLAY_NAME, LATITUDE, LONGITUDE, DATE_TAKEN, ORIENTATION)
         private val HASH_CHARACTER_LENGTH = 9
     }
 

@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.provider.MediaStore
+import android.provider.MediaStore.Images.ImageColumns.*
 import android.util.AttributeSet
 import android.widget.ImageView
 import rx.Observable
@@ -58,9 +59,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     private fun loadImage(image_id: Long): Observable<Bitmap> {
         return Observable.create { subscriber ->
-            val projection = arrayOf(MediaStore.Images.ImageColumns._ID,
-                MediaStore.Images.ImageColumns.ORIENTATION,
-                MediaStore.Images.ImageColumns.DATA)
+            val projection = arrayOf(_ID,ORIENTATION,DATA)
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
             val c = MediaStore.Images.Media.query(this@LoadableImageView.context.contentResolver, uri, projection,
                 QueryBuilder.createQuery(image_id), null, null)
