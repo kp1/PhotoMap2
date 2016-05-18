@@ -92,17 +92,20 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         }
 
         fun getMarkerColor(size: Int): Float {
-            val color: Float
-            if (size >= 100) {
-                color = BitmapDescriptorFactory.HUE_RED
-            } else if (size >= 10) {
-                color = BitmapDescriptorFactory.HUE_ROSE
-            } else if (size > 1) {
-                color = BitmapDescriptorFactory.HUE_ORANGE
-            } else {
-                color = BitmapDescriptorFactory.HUE_GREEN
+            return when {
+                size >= 100 -> {
+                    BitmapDescriptorFactory.HUE_RED
+                }
+                size >= 10 -> {
+                    BitmapDescriptorFactory.HUE_ROSE
+                }
+                size > 1 -> {
+                    BitmapDescriptorFactory.HUE_ORANGE
+                }
+                else -> {
+                    BitmapDescriptorFactory.HUE_GREEN
+                }
             }
-            return color
         }
     }
 }
