@@ -31,11 +31,10 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
             subscribeOn(Schedulers.newThread()).
             switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }.
             observeOn(AndroidSchedulers.mainThread()).
-            subscribe { bmp -> setBitmap(bmp) }
+            subscribe { setBitmap(it) }
     }
 
-    private fun setBitmap(bitmap: Bitmap?) {
-        if(bitmap==null) return
+    private fun setBitmap(bitmap: Bitmap) {
         setImageBitmap(bitmap)
         if(thumbnail) return
         val matrix = imageMatrix
@@ -105,7 +104,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
                 }
             }
             if (thumbnail && bmp != null) ThumbnailCache.instance.put(image_id, bmp)
-            subscriber.onNext(bmp)
+            if(bmp!=null) subscriber.onNext(bmp)
             subscriber.onCompleted()
             c.close()
         }
