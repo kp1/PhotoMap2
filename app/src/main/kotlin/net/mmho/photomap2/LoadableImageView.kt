@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.RectF
 import android.provider.MediaStore
 import android.provider.MediaStore.Images.ImageColumns.*
 import android.util.AttributeSet
@@ -30,7 +31,18 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
             subscribeOn(Schedulers.newThread()).
             switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }.
             observeOn(AndroidSchedulers.mainThread()).
-            subscribe { bmp -> setImageBitmap(bmp) }
+            subscribe { bmp -> setBitmap(bmp) }
+    }
+
+    private fun setBitmap(bitmap: Bitmap?) {
+        if(bitmap==null) return
+        setImageBitmap(bitmap)
+        if(thumbnail) return
+        val matrix = imageMatrix
+        val drawRect = RectF(0.0f,0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+        val viewRect = RectF(0.0f,0.0f,width.toFloat(),height.toFloat())
+        matrix.setRectToRect(drawRect,viewRect,Matrix.ScaleToFit.CENTER)
+        imageMatrix = matrix
     }
 
     override fun onDetachedFromWindow() {
@@ -46,7 +58,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
             else -> id = image_id
         }
 
-        var bitmap: Bitmap? = if(thumbnail) ThumbnailCache.instance.get(image_id) else null
+        val bitmap: Bitmap? = if(thumbnail) ThumbnailCache.instance.get(image_id) else null
         setImageBitmap(bitmap)
 
         if (bitmap != null) return
@@ -79,16 +91,6 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
                     val option = BitmapFactory.Options()
                     val path = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
 
-                    // get only size
-                    option.inJustDecodeBounds = true
-                    BitmapFactory.decodeFile(path, option)
-
-
-                    val s = Math.max(option.outHeight, option.outWidth) / w + 1
-                    var scale = 1
-                    while (scale < s) scale *= 2
-
-                    option.inSampleSize = scale
                     option.inJustDecodeBounds = false
                     option.inPreferredConfig = Bitmap.Config.RGB_565
                     bmp = BitmapFactory.decodeFile(path, option)
