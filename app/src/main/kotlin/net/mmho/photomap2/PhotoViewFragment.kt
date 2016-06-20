@@ -27,7 +27,7 @@ class PhotoViewFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        (image?.drawable as BitmapDrawable).bitmap?.recycle()
+        image?.setImageDrawable(null)
     }
 
     companion object {
