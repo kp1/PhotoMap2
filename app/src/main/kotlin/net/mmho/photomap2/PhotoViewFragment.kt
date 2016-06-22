@@ -20,7 +20,7 @@ class PhotoViewFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.photo_view, container, false)
         image = v.photo
-        image?.startLoading(image_id)
+        image?.load(image_id)
         return v
     }
 
