@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.graphics.RectF
 import android.provider.MediaStore.Images.Media.*
 import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.provider.MediaStore.Images.Thumbnails.getThumbnail
@@ -34,14 +33,8 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
             .subscribe { setBitmap(it) }
     }
 
-    private fun setBitmap(bitmap: Bitmap) {
+    open fun setBitmap(bitmap: Bitmap) {
         setImageBitmap(bitmap)
-        if(thumbnail) return
-        val matrix = imageMatrix
-        val drawRect = RectF(0.0f,0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
-        val viewRect = RectF(0.0f,0.0f,width.toFloat(),height.toFloat())
-        matrix.setRectToRect(drawRect,viewRect,Matrix.ScaleToFit.CENTER)
-        imageMatrix = matrix
     }
 
     override fun onDetachedFromWindow() {
