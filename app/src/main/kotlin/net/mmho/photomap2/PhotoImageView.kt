@@ -9,39 +9,74 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 
 open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     :LoadableImageView(context,attrs,defStyle){
 
     private var detector: GestureDetectorCompat
+    private var scaleDetector:ScaleGestureDetector
     private val TAG = "PhotoImageView"
+
+    private val MAX_SCALE = 3f
+    private val MIN_SCALE = 1f
+    private var base_scale:Float = 1f
 
     init{
         scaleType = ScaleType.MATRIX
         detector = GestureDetectorCompat(context,object :GestureDetector.SimpleOnGestureListener(){
             override fun onDown(e: MotionEvent?): Boolean {
-                Log.d(TAG,"onDown")
                 return true
             }
 
-            override fun onDoubleTap(e: MotionEvent?): Boolean {
-                Log.d(TAG,"onDoubleTap")
-                return false
-            }
-
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
-                Log.d(TAG,"dx:$distanceX,dy:$distanceY")
                 val matrix = imageMatrix
                 matrix.postTranslate(-distanceX,-distanceY)
                 imageMatrix = matrix
                 invalidate()
                 return true
             }
+
+        })
+        scaleDetector = ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
+            private var currentScale = 1f
+            override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
+                Log.d(TAG,"onScaleBegin")
+                currentScale = 1f
+                return true
+            }
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                Log.d(TAG,"onScale:${detector.scaleFactor}")
+
+                val scale = detector.scaleFactor / currentScale
+                imageMatrix.postScale(scale,scale)
+                currentScale = detector.scaleFactor
+
+                invalidate()
+                return false
+            }
+
+            override fun onScaleEnd(detector: ScaleGestureDetector?) {
+                val cur = currentScale()
+                val scale = cur/base_scale
+                when{
+                    scale > MAX_SCALE ->{
+                        val s = base_scale*MAX_SCALE/cur
+                        imageMatrix.postScale(s,s)
+                    }
+                    scale < MIN_SCALE ->{
+                        val s = base_scale*MIN_SCALE/cur
+                        imageMatrix.postScale(s,s)
+                    }
+                }
+                invalidate()
+                Log.d(TAG,"onScaleEnd")
+            }
         })
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-
+        scaleDetector.onTouchEvent(event)
         return detector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
@@ -52,5 +87,12 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         val viewRect = RectF(0.0f, 0.0f, width.toFloat(), height.toFloat())
         matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
         imageMatrix = matrix
+        base_scale = currentScale()
+        Log.d(TAG,"scale:${currentScale()}")
+    }
+    private fun currentScale():Float{
+        val values = FloatArray(9)
+        imageMatrix.getValues(values)
+        return values[Matrix.MSCALE_X]
     }
 }
