@@ -1,5 +1,6 @@
 package net.mmho.photomap2
 
+import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -11,6 +12,7 @@ import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import kotlinx.android.synthetic.main.fragment_photo_view.*
 
 open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     :LoadableImageView(context,attrs,defStyle){
@@ -47,6 +49,11 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
                 imageMatrix = matrix
                 invalidate()
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                (context as Activity).photo_pager?.performClick()
                 return true
             }
 
