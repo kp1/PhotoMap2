@@ -7,7 +7,6 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -32,7 +31,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
             }
 
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
-                Log.d(TAG,"onScroll: dx($dx), dy($dy)")
                 val matrix = imageMatrix
                 matrix.postTranslate(-dx,-dy)
                 imageMatrix = matrix
@@ -41,7 +39,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
             }
 
             override fun onDoubleTap(e: MotionEvent?): Boolean {
-                Log.d(TAG,"onDoubleTap")
                 imageMatrix = baseMatrix
                 invalidate()
                 return true
@@ -55,7 +52,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         })
         scaleDetector = ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
             private var currentScale = 1f
-            override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
                 currentScale = 1f
                 return true
             }
@@ -72,16 +69,13 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 val cur = currentScale()
                 val base_scale = baseMatrix.scale()
                 val scale = cur/base_scale
-                when{
-                    scale > MAX_SCALE ->{
-                        val s = base_scale*MAX_SCALE/cur
-                        imageMatrix.postScale(s,s)
+                val s =
+                    when{
+                        scale > MAX_SCALE -> base_scale*MAX_SCALE/cur
+                        scale < MIN_SCALE -> base_scale*MIN_SCALE/cur
+                        else -> 1f
                     }
-                    scale < MIN_SCALE ->{
-                        val s = base_scale*MIN_SCALE/cur
-                        imageMatrix.postScale(s,s)
-                    }
-                }
+                imageMatrix.postScale(s,s)
                 invalidate()
             }
         })
