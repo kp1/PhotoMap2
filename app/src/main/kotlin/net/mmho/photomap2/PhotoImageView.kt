@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
-import android.graphics.drawable.BitmapDrawable
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.util.Log
@@ -23,7 +22,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
     private val MAX_SCALE = 3f
     private val MIN_SCALE = 1f
-    private var base_scale:Float = 1f
+    private lateinit var baseMatrix:Matrix
 
     init{
         scaleType = ScaleType.MATRIX
@@ -33,6 +32,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
             }
 
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
+                Log.d(TAG,"onScroll: dx($dx), dy($dy)")
                 val matrix = imageMatrix
                 matrix.postTranslate(-dx,-dy)
                 imageMatrix = matrix
@@ -42,12 +42,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
             override fun onDoubleTap(e: MotionEvent?): Boolean {
                 Log.d(TAG,"onDoubleTap")
-                val bitmap = (drawable as BitmapDrawable).bitmap
-                val matrix = imageMatrix
-                val drawRect = RectF(0.0f, 0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
-                val viewRect = RectF(0.0f, 0.0f, width.toFloat(), height.toFloat())
-                matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
-                imageMatrix = matrix
+                imageMatrix = baseMatrix
                 invalidate()
                 return true
             }
@@ -75,6 +70,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
             override fun onScaleEnd(detector: ScaleGestureDetector?) {
                 val cur = currentScale()
+                val base_scale = baseMatrix.scale()
                 val scale = cur/base_scale
                 when{
                     scale > MAX_SCALE ->{
@@ -98,16 +94,20 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
     override fun setBitmap(bitmap: Bitmap){
         super.setBitmap(bitmap)
-        val matrix = imageMatrix
+        baseMatrix = Matrix()
         val drawRect = RectF(0.0f, 0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
         val viewRect = RectF(0.0f, 0.0f, width.toFloat(), height.toFloat())
-        matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
-        imageMatrix = matrix
-        base_scale = currentScale()
+        baseMatrix.setRectToRect(drawRect, viewRect, Matrix.ScaleToFit.CENTER)
+        imageMatrix = baseMatrix
     }
+
     private fun currentScale():Float{
-        val values = FloatArray(9)
-        imageMatrix.getValues(values)
-        return values[Matrix.MSCALE_X]
+        return imageMatrix.scale()
     }
+}
+
+fun Matrix.scale():Float{
+    val values = FloatArray(9)
+    this.getValues(values)
+    return values[Matrix.MSCALE_X]
 }
