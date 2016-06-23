@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.RectF
+import android.graphics.drawable.BitmapDrawable
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
 import android.util.Log
@@ -29,9 +30,21 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 return true
             }
 
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
                 val matrix = imageMatrix
-                matrix.postTranslate(-distanceX,-distanceY)
+                matrix.postTranslate(-dx,-dy)
+                imageMatrix = matrix
+                invalidate()
+                return true
+            }
+
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                Log.d(TAG,"onDoubleTap")
+                val bitmap = (drawable as BitmapDrawable).bitmap
+                val matrix = imageMatrix
+                val drawRect = RectF(0.0f, 0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+                val viewRect = RectF(0.0f, 0.0f, width.toFloat(), height.toFloat())
+                matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
                 imageMatrix = matrix
                 invalidate()
                 return true
@@ -41,13 +54,10 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         scaleDetector = ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
             private var currentScale = 1f
             override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
-                Log.d(TAG,"onScaleBegin")
                 currentScale = 1f
                 return true
             }
             override fun onScale(detector: ScaleGestureDetector): Boolean {
-                Log.d(TAG,"onScale:${detector.scaleFactor}")
-
                 val scale = detector.scaleFactor / currentScale
                 imageMatrix.postScale(scale,scale)
                 currentScale = detector.scaleFactor
@@ -70,7 +80,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                     }
                 }
                 invalidate()
-                Log.d(TAG,"onScaleEnd")
             }
         })
     }
@@ -88,7 +97,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         matrix.setRectToRect(drawRect,viewRect, Matrix.ScaleToFit.CENTER)
         imageMatrix = matrix
         base_scale = currentScale()
-        Log.d(TAG,"scale:${currentScale()}")
     }
     private fun currentScale():Float{
         val values = FloatArray(9)
