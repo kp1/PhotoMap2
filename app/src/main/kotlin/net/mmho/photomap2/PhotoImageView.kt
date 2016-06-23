@@ -7,6 +7,7 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -22,34 +23,10 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
     private val MAX_SCALE = 3f
     private val MIN_SCALE = 1f
     private lateinit var baseMatrix:Matrix
+    private lateinit var bitmap:Bitmap
 
     init{
         scaleType = ScaleType.MATRIX
-        detector = GestureDetectorCompat(context,object :GestureDetector.SimpleOnGestureListener(){
-            override fun onDown(e: MotionEvent?): Boolean {
-                return true
-            }
-
-            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
-                val matrix = imageMatrix
-                matrix.postTranslate(-dx,-dy)
-                imageMatrix = matrix
-                invalidate()
-                return true
-            }
-
-            override fun onDoubleTap(e: MotionEvent?): Boolean {
-                imageMatrix = baseMatrix
-                invalidate()
-                return true
-            }
-
-            override fun onSingleTapUp(e: MotionEvent?): Boolean {
-                (context as Activity).photo_pager?.performClick()
-                return true
-            }
-
-        })
         scaleDetector = ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
             private var currentScale = 1f
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
@@ -79,6 +56,35 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 invalidate()
             }
         })
+        detector = GestureDetectorCompat(context,object :GestureDetector.SimpleOnGestureListener(){
+            override fun onDown(e: MotionEvent?): Boolean {
+                return true
+            }
+
+            override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
+                if(scaleDetector.isInProgress) return false
+
+                val matrix = imageMatrix
+                Log.d(TAG,"onScroll DX:$dx,DY:$dy")
+
+                matrix.postTranslate(-dx,-dy)
+
+                invalidate()
+                return true
+            }
+
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                imageMatrix = baseMatrix
+                invalidate()
+                return true
+            }
+
+            override fun onSingleTapUp(e: MotionEvent?): Boolean {
+                (context as Activity).photo_pager?.performClick()
+                return true
+            }
+
+        })
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -86,7 +92,8 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         return detector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
-    override fun setBitmap(bitmap: Bitmap){
+    override fun setBitmap(bmp: Bitmap){
+        bitmap = bmp
         super.setBitmap(bitmap)
         baseMatrix = Matrix()
         val drawRect = RectF(0.0f, 0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
