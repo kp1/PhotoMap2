@@ -66,8 +66,35 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
                 val matrix = imageMatrix
                 Log.d(TAG,"onScroll DX:$dx,DY:$dy")
+                val values = FloatArray(9)
+                matrix.getValues(values)
+                val tx = values[Matrix.MTRANS_X]
+                val ty = values[Matrix.MTRANS_Y]
+                val scale = values[Matrix.MSCALE_X]
 
-                matrix.postTranslate(-dx,-dy)
+                val x = when{
+                    // 左
+                    dx > 0 -> {
+                        val right = tx + bitmap.width * scale - width
+                        if (right > 0f) Math.min(dx, right) else 0f
+                    }
+                    // 右
+                    else -> if(tx < 0f) Math.max(dx,tx) else 0f
+                }
+
+                val y = when{
+                    // 上
+                    dy > 0 -> {
+                        val bottom = ty+bitmap.height*scale-height
+                        if(bottom > 0f) Math.min(dy,bottom) else 0f
+                    }
+                    // 下
+                    else -> if(ty < 0f) Math.max(dy,ty) else 0f
+
+                }
+
+
+                matrix.postTranslate(-x,-y)
 
                 invalidate()
                 return true
