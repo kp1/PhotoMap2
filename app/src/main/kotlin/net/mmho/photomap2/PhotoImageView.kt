@@ -29,13 +29,17 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         scaleType = ScaleType.MATRIX
         scaleDetector = ScaleGestureDetector(context,object:ScaleGestureDetector.SimpleOnScaleGestureListener(){
             private var currentScale = 1f
+            private var focusX = 0f
+            private var focusY = 0f
             override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
                 currentScale = 1f
+                focusX = detector.focusX
+                focusY = detector.focusY
                 return true
             }
             override fun onScale(detector: ScaleGestureDetector): Boolean {
                 val scale = detector.scaleFactor / currentScale
-                imageMatrix.postScale(scale,scale)
+                imageMatrix.postScale(scale,scale,focusX,focusY)
                 currentScale = detector.scaleFactor
 
                 invalidate()
@@ -43,8 +47,11 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
             }
 
             override fun onScaleEnd(detector: ScaleGestureDetector?) {
-                val cur = currentScale()
                 val base_scale = baseMatrix.scale()
+                val values = FloatArray(9)
+                imageMatrix.getValues(values)
+                var cur = values[Matrix.MSCALE_X]
+
                 val scale = cur/base_scale
                 val s =
                     when{
@@ -52,7 +59,27 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                         scale < MIN_SCALE -> base_scale*MIN_SCALE/cur
                         else -> 1f
                     }
+                cur *= s
                 imageMatrix.postScale(s,s)
+
+                imageMatrix.getValues(values)
+                val tx = values[Matrix.MTRANS_X]
+                val ty = values[Matrix.MTRANS_Y]
+
+                val x = when {
+                    bitmap.width*cur < width -> (width - bitmap.width*cur)/2-tx
+                    tx>0 -> -tx
+                    bitmap.width*cur +tx < width -> width-bitmap.width*cur-tx
+                    else -> 0f
+                }
+                val y = when {
+                    bitmap.height*cur < height -> (height-bitmap.height*cur)/2-ty
+                    ty>0 -> -ty
+                    bitmap.height*cur + tx < height -> height-bitmap.height*cur-ty
+                    else -> 0f
+                }
+                imageMatrix.postTranslate(x,y)
+
                 invalidate()
             }
         })
@@ -93,7 +120,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
                 }
 
-
                 matrix.postTranslate(-x,-y)
 
                 invalidate()
@@ -129,9 +155,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         imageMatrix = baseMatrix
     }
 
-    private fun currentScale():Float{
-        return imageMatrix.scale()
-    }
 }
 
 fun Matrix.scale():Float{
