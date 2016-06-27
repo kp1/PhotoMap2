@@ -122,6 +122,8 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
                 matrix.postTranslate(-x,-y)
 
+                if(x!=0f) (context as Activity).photo_pager.requestDisallowInterceptTouchEvent(true)
+
                 invalidate()
                 return true
             }
@@ -145,8 +147,8 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
         return detector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
-    override fun setBitmap(bmp: Bitmap){
-        bitmap = bmp
+    override fun setBitmap(bitmap: Bitmap){
+        this.bitmap = bitmap
         super.setBitmap(bitmap)
         baseMatrix = Matrix()
         val drawRect = RectF(0.0f, 0.0f, bitmap.width.toFloat(), bitmap.height.toFloat())
