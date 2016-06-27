@@ -75,7 +75,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 val y = when {
                     bitmap.height*cur < height -> (height-bitmap.height*cur)/2-ty
                     ty>0 -> -ty
-                    bitmap.height*cur + tx < height -> height-bitmap.height*cur-ty
+                    bitmap.height*cur + ty < height -> height-bitmap.height*cur-ty
                     else -> 0f
                 }
                 imageMatrix.postTranslate(x,y)
