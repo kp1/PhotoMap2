@@ -7,7 +7,6 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.support.v4.view.GestureDetectorCompat
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -18,12 +17,11 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
     private var detector: GestureDetectorCompat
     private var scaleDetector:ScaleGestureDetector
-    private val TAG = "PhotoImageView"
 
     private val MAX_SCALE = 3f
     private val MIN_SCALE = 1f
     private lateinit var baseMatrix:Matrix
-    private lateinit var bitmap:Bitmap
+    private var bitmap:Bitmap? = null
 
     init{
         scaleType = ScaleType.MATRIX
@@ -47,6 +45,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
             }
 
             override fun onScaleEnd(detector: ScaleGestureDetector?) {
+                val bmp = bitmap ?: return
                 val base_scale = baseMatrix.scale()
                 val values = FloatArray(9)
                 imageMatrix.getValues(values)
@@ -67,15 +66,15 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 val ty = values[Matrix.MTRANS_Y]
 
                 val x = when {
-                    bitmap.width*cur < width -> (width - bitmap.width*cur)/2-tx
+                    bmp.width*cur < width -> (width - bmp.width*cur)/2-tx
                     tx>0 -> -tx
-                    bitmap.width*cur +tx < width -> width-bitmap.width*cur-tx
+                    bmp.width*cur +tx < width -> width-bmp.width*cur-tx
                     else -> 0f
                 }
                 val y = when {
-                    bitmap.height*cur < height -> (height-bitmap.height*cur)/2-ty
+                    bmp.height*cur < height -> (height-bmp.height*cur)/2-ty
                     ty>0 -> -ty
-                    bitmap.height*cur + ty < height -> height-bitmap.height*cur-ty
+                    bmp.height*cur + ty < height -> height-bmp.height*cur-ty
                     else -> 0f
                 }
                 imageMatrix.postTranslate(x,y)
@@ -90,9 +89,9 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
             override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, dx: Float, dy: Float): Boolean {
                 if(scaleDetector.isInProgress) return false
+                val bmp = bitmap ?: return false
 
                 val matrix = imageMatrix
-                Log.d(TAG,"onScroll DX:$dx,DY:$dy")
                 val values = FloatArray(9)
                 matrix.getValues(values)
                 val tx = values[Matrix.MTRANS_X]
@@ -102,7 +101,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 val x = when{
                     // 左
                     dx > 0 -> {
-                        val right = tx + bitmap.width * scale - width
+                        val right = tx + (bmp.width) * scale - width
                         if (right > 0f) Math.min(dx, right) else 0f
                     }
                     // 右
@@ -112,7 +111,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 val y = when{
                     // 上
                     dy > 0 -> {
-                        val bottom = ty+bitmap.height*scale-height
+                        val bottom = ty+bmp.height*scale-height
                         if(bottom > 0f) Math.min(dy,bottom) else 0f
                     }
                     // 下
@@ -122,7 +121,7 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
                 matrix.postTranslate(-x,-y)
 
-                if(x!=0f) (context as Activity).photo_pager.requestDisallowInterceptTouchEvent(true)
+                if(x!=0f) (context as Activity).photo_pager?.requestDisallowInterceptTouchEvent(true)
 
                 invalidate()
                 return true

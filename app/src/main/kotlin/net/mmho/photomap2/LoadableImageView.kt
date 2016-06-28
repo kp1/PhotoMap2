@@ -26,10 +26,12 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     init {
         subject = PublishSubject.create<Long>()
-        subscription = subject.onBackpressureLatest()
-            .subscribeOn(Schedulers.newThread())
-            .switchMap { id -> loadImageObservable(id).subscribeOn(Schedulers.newThread()) }
-            .observeOn(AndroidSchedulers.mainThread())
+        subscription = subject
+            .switchMap { id ->
+                loadImageObservable(id)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+            }
             .subscribe { setBitmap(it) }
     }
 
