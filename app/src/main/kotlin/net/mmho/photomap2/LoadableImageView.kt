@@ -4,8 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.provider.MediaStore
-import android.provider.MediaStore.Images.ImageColumns.*
+import android.provider.MediaStore.Images.Media.*
+import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
+import android.provider.MediaStore.Images.Thumbnails.getThumbnail
 import android.util.AttributeSet
 import android.widget.ImageView
 import rx.Observable
@@ -18,7 +19,6 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
         : ImageView(context, attrs, defStyle) {
 
     internal var thumbnail = false
-    private var w: Int = 0
     private var id: Long = -1L
 
     private var subject: PublishSubject<Long>
@@ -26,11 +26,17 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     init {
         subject = PublishSubject.create<Long>()
-        subscription = subject.onBackpressureLatest().
-            subscribeOn(Schedulers.newThread()).
-            switchMap { id -> this@LoadableImageView.loadImage(id).subscribeOn(Schedulers.newThread()) }.
-            observeOn(AndroidSchedulers.mainThread()).
-            subscribe { bmp -> setImageBitmap(bmp) }
+        subscription = subject
+            .switchMap { id ->
+                loadImageObservable(id)
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+            }
+            .subscribe { setBitmap(it) }
+    }
+
+    open fun setBitmap(bitmap: Bitmap) {
+        setImageBitmap(bitmap)
     }
 
     override fun onDetachedFromWindow() {
@@ -39,56 +45,40 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
         subscription = null
     }
 
-    fun startLoading(image_id: Long) {
+    fun load(image_id: Long) {
 
         when (id) {
             image_id -> return
             else -> id = image_id
         }
 
-        var bitmap: Bitmap? = if(thumbnail) ThumbnailCache.instance.get(image_id) else null
+        val bitmap: Bitmap? = if(thumbnail) ThumbnailCache.instance.get(image_id) else null
         setImageBitmap(bitmap)
 
         if (bitmap != null) return
 
-        post {
-            w = Math.min(this@LoadableImageView.width, this@LoadableImageView.height)
-            subject.onNext(image_id)
-        }
+        post { subject.onNext(image_id) }
     }
 
-    private fun loadImage(image_id: Long): Observable<Bitmap> {
+    private fun loadImageObservable(image_id: Long): Observable<Bitmap> {
         return Observable.create { subscriber ->
-            val projection = arrayOf(_ID,ORIENTATION,DATA)
-            val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            val c = MediaStore.Images.Media.query(this@LoadableImageView.context.contentResolver, uri, projection,
+            val c = query(context.contentResolver, EXTERNAL_CONTENT_URI,arrayOf(_ID,ORIENTATION,DATA),
                 QueryBuilder.createQuery(image_id), null, null)
 
             var bmp: Bitmap? = null
 
             if (thumbnail) {
-                bmp = MediaStore.Images.Thumbnails.getThumbnail(this@LoadableImageView.context.contentResolver, image_id,
-                    MediaStore.Images.Thumbnails.MINI_KIND, null)
+                bmp = getThumbnail(context.contentResolver, image_id, MINI_KIND, null)
             }
 
             if (c.count > 0) {
                 c.moveToFirst()
-                val orientation = c.getInt(c.getColumnIndexOrThrow(MediaStore.Images.Media.ORIENTATION))
+                val orientation = c.getInt(c.getColumnIndexOrThrow(ORIENTATION))
 
                 if (!thumbnail) {
                     val option = BitmapFactory.Options()
-                    val path = c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
+                    val path = c.getString(c.getColumnIndexOrThrow(DATA))
 
-                    // get only size
-                    option.inJustDecodeBounds = true
-                    BitmapFactory.decodeFile(path, option)
-
-
-                    val s = Math.max(option.outHeight, option.outWidth) / w + 1
-                    var scale = 1
-                    while (scale < s) scale *= 2
-
-                    option.inSampleSize = scale
                     option.inJustDecodeBounds = false
                     option.inPreferredConfig = Bitmap.Config.RGB_565
                     bmp = BitmapFactory.decodeFile(path, option)
@@ -103,7 +93,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
                 }
             }
             if (thumbnail && bmp != null) ThumbnailCache.instance.put(image_id, bmp)
-            subscriber.onNext(bmp)
+            if(bmp!=null) subscriber.onNext(bmp)
             subscriber.onCompleted()
             c.close()
         }
