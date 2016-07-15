@@ -127,12 +127,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
                 return true
             }
 
-            override fun onDoubleTap(e: MotionEvent?): Boolean {
-                imageMatrix = baseMatrix
-                invalidate()
-                return true
-            }
-
             override fun onSingleTapUp(e: MotionEvent?): Boolean {
                 (context as Activity).photo_pager?.performClick()
                 return true
