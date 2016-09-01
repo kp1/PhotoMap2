@@ -226,7 +226,8 @@ class PhotoMapFragment : SupportMapFragment() {
             val update = this@PhotoMapFragment.handleIntent(this@PhotoMapFragment.activity.intent)
             if(update!=null) this@PhotoMapFragment.view?.post{ googleMap?.moveCamera(update) }
 
-            googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+            googleMap?.setOnCameraMoveStartedListener { googleMap?.clear() }
+            googleMap?.setOnCameraIdleListener(photoMapCameraIdleListener)
             googleMap?.setOnMarkerClickListener { marker ->
                 Observable.from(groupList)
                     .filter { g -> g.marker == marker }
@@ -308,13 +309,15 @@ class PhotoMapFragment : SupportMapFragment() {
         handler.postDelayed(runnable, DELAY)
     }
 
-    private val photoMapCameraChangeListener = GoogleMap.OnCameraChangeListener { position ->
-        if (position.zoom > MAXIMUM_ZOOM || position.zoom < MINIMUM_ZOOM) {
+    private val photoMapCameraIdleListener = GoogleMap.OnCameraIdleListener { ->
+        val position = googleMap?.cameraPosition
+
+        if (position !=null && (position.zoom > MAXIMUM_ZOOM || position.zoom < MINIMUM_ZOOM)) {
             val zoom = (if (position.zoom > MAXIMUM_ZOOM) MAXIMUM_ZOOM else MINIMUM_ZOOM).toFloat()
-            googleMap?.setOnCameraChangeListener(null)
+            googleMap?.setOnCameraIdleListener(null)
             val cameraUpdate = CameraUpdateFactory.newCameraPosition(CameraPosition.fromLatLngZoom(position.target, zoom))
             googleMap?.animateCamera(cameraUpdate, cancelableCallback)
-            return@OnCameraChangeListener
+            return@OnCameraIdleListener
         }
         showActionBar(false)
         loaderManager.restartLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
@@ -323,11 +326,11 @@ class PhotoMapFragment : SupportMapFragment() {
     private val cancelableCallback: GoogleMap.CancelableCallback
         get() = object : GoogleMap.CancelableCallback {
             override fun onFinish() {
-                googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+                googleMap?.setOnCameraIdleListener(photoMapCameraIdleListener)
             }
 
             override fun onCancel() {
-                googleMap?.setOnCameraChangeListener(photoMapCameraChangeListener)
+                googleMap?.setOnCameraIdleListener(photoMapCameraIdleListener)
             }
         }
 
@@ -363,7 +366,6 @@ class PhotoMapFragment : SupportMapFragment() {
                 .reduce { hashedPhotos, o -> hashedPhotos.append(o) } }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
-                googleMap?.clear()
                 progress = 0
                 group_count = 0
                 listener?.showProgress(0)
