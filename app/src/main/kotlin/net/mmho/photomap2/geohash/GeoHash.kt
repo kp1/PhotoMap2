@@ -28,7 +28,7 @@ class GeoHash : Parcelable {
         }
     }
 
-    protected constructor() {
+    private constructor() {
 
     }
 

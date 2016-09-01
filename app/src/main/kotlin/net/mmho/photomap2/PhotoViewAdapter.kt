@@ -10,8 +10,8 @@ internal class PhotoViewAdapter(fm: FragmentManager, private val group: PhotoGro
         : FragmentPagerAdapter(fm) {
 
     override fun destroyItem(container: ViewGroup?, position: Int, obj:Any) {
-        var manager = (obj as Fragment).fragmentManager;
-        var transaction = manager.beginTransaction();
+        val manager = (obj as Fragment).fragmentManager
+        val transaction = manager.beginTransaction()
         transaction.remove(obj)
         transaction.commit()
     }
