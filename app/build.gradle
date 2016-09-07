@@ -10,8 +10,8 @@ android {
         applicationId "net.mmho.photomap2"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 108
-        versionName "1.0.8"
+        versionCode 109
+        versionName "1.0.9"
         multiDexEnabled true
     }
     buildTypes {
@@ -22,6 +22,9 @@ android {
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+    }
+    dexOptions{
+        javaMaxHeapSize = "2g"
     }
 }
 
