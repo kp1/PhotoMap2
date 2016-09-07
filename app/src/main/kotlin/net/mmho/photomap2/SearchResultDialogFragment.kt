@@ -12,6 +12,7 @@ class SearchResultDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val title = arguments.getString("title")
+        @Suppress("UNCHECKED_CAST")
         val list = arguments.getParcelableArray("address") as Array<Address>
         val adapter = AddressListAdapter(activity, R.layout.simple_list_item_2, list)
         val builder = AlertDialog.Builder(activity)
