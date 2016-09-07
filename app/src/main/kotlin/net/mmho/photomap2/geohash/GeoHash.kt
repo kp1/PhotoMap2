@@ -102,18 +102,16 @@ class GeoHash : Parcelable {
         return long == other.long && significantBits == other.significantBits
     }
 
-    override fun describeContents(): Int {
-        return 0
+    override fun describeContents() = 0
+
+    override fun writeToParcel(dest: Parcel?, flags: Int) {
+        dest?.writeLong(long)
+        dest?.writeInt(significantBits)
     }
 
-    override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeLong(this.long)
-        dest.writeInt(this.significantBits)
-    }
-
-    private constructor(`in`: Parcel) {
-        this.long = `in`.readLong()
-        this.significantBits = `in`.readInt()
+    private constructor(source: Parcel) {
+        long = source.readLong()
+        significantBits = source.readInt()
     }
 
     companion object {
@@ -183,15 +181,9 @@ class GeoHash : Parcelable {
             return hash
         }
 
-        @JvmField
-        val CREATOR = object : Parcelable.Creator<GeoHash> {
-            override fun createFromParcel(`in`: Parcel): GeoHash {
-                return GeoHash(`in`)
-            }
-
-            override fun newArray(size: Int): Array<GeoHash?> {
-                return arrayOfNulls(size)
-            }
+        @JvmField val CREATOR = object : Parcelable.Creator<GeoHash> {
+            override fun createFromParcel(source: Parcel): GeoHash = GeoHash(source)
+            override fun newArray(size: Int): Array<GeoHash?> = arrayOfNulls(size)
         }
     }
 }
