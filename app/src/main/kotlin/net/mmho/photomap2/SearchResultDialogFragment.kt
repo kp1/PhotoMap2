@@ -1,6 +1,6 @@
 package net.mmho.photomap2
 
-import android.R
+import android.R.layout.simple_list_item_2
 import android.app.AlertDialog
 import android.app.Dialog
 import android.location.Address
@@ -14,7 +14,7 @@ class SearchResultDialogFragment : DialogFragment() {
         val title = arguments.getString("title")
         @Suppress("UNCHECKED_CAST")
         val list = arguments.getParcelableArray("address") as Array<Address>
-        val adapter = AddressListAdapter(activity, R.layout.simple_list_item_2, list)
+        val adapter = AddressListAdapter(activity,simple_list_item_2, list)
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(getString(net.mmho.photomap2.R.string.search_title, title))
         builder.setAdapter(adapter) { dialog, which ->
