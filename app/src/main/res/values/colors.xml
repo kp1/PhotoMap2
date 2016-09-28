@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#FF66AA66</color>
-    <color name="primaryDark">#FF338833</color>
-    <color name="accent">#FF003300</color>
-    <color name="textPrimary">#FFFFFFFF</color>
-    <color name="textSecondary">#FFFFFFFF</color>
-    <color name="textPrimaryInverse">#FF000000</color>
-    <color name="textSecondaryInverse">#FF333333</color>
-    <color name="textTertiaryInverse">#FF333333</color>
-    <color name="overflow">#DD333333</color>
+    <color name="primary">#4CAF50</color>
+    <color name="primaryDark">#388E3C</color>
+    <color name="accent">#FF9800</color>
+    <color name="textPrimary">#212121</color>
+    <color name="textSecondary">#757575</color>
+    <color name="textPrimaryInverse">#FFFFFF</color>
+    <color name="textSecondaryInverse">#333333</color>
+    <color name="textTertiaryInverse">#333333</color>
     <color name="selectItem">#ff70dfff</color>
-    <color name="progress">#ff52b9b8</color>
+    <color name="progress">#4db6ac</color>
     <color name="background">#DDDDDD</color>
     <color name="separator">@android:color/darker_gray</color>
     <color name="thumbnail_background">@android:color/darker_gray</color>

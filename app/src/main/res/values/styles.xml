@@ -10,7 +10,7 @@
         <item name="android:textColorPrimaryInverse">@color/textPrimaryInverse</item>
         <item name="android:textColorSecondaryInverse">@color/textSecondaryInverse</item>
         <item name="android:textColorTertiaryInverse">@color/textTertiaryInverse</item>
-        <item name="android:textColor">@color/abc_primary_text_material_light</item>
+        <item name="android:textColor">@color/textPrimary</item>
     </style>
 
     <style name="LoadProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
