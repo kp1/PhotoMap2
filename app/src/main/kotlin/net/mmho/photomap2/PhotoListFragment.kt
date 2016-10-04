@@ -210,9 +210,9 @@ class PhotoListFragment : Fragment() {
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0, DistanceActionProvider.getDistance(distance)) }
             .doOnNext { group_count++ }
-            .concatMap {
-                group -> group.map { p -> PhotoGroup(p) }
-                .reduce { hashedPhotos, o -> hashedPhotos.append(o) } }
+            .flatMap {
+                it.map(::PhotoGroup).reduce(PhotoGroup::append)
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 adapter?.clear()
