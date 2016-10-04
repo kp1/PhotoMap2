@@ -21,7 +21,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
     var description = ""
         private set
 
-    var date_taken:Int = 0
+    var date_taken:Long = 0
         private set
 
 
@@ -30,6 +30,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         hash = GeoHash.CREATOR.createFromParcel(src)
         title = src.readString()
         description = src.readString()
+        date_taken = src.readLong()
 
     }
 
@@ -68,19 +69,16 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
     val center: LatLng
         get() = hash.center
 
-    override fun toString(): String {
-        return description
-    }
+    override fun toString(): String = description
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
     override fun writeToParcel(out: Parcel, flags: Int) {
         out.writeTypedList(this)
         hash.writeToParcel(out, flags)
         out.writeString(title)
         out.writeString(description)
+        out.writeLong(date_taken)
     }
 
     companion object {

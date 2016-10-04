@@ -19,8 +19,8 @@ internal class PhotoCursor(cursor: Cursor) : CursorWrapper(cursor) {
             return LatLng(latitude.toDouble(), longitude.toDouble())
         }
 
-    val date_taken:Int
-        get() = getInt(getColumnIndexOrThrow(DATE_TAKEN))
+    val date_taken:Long
+        get() = getLong(getColumnIndexOrThrow(DATE_TAKEN))
 
     fun getGeoHash(character: Int): GeoHash {
         return GeoHash.createWithCharacterCount(location, character)

@@ -33,9 +33,6 @@ class PhotoListFragment : Fragment() {
     private var newest = true
     private var distance_index: Int = 0
 
-    // progress
-    private var listener: ProgressChangeListener? = null
-
     // rxAndroid
     private var subscription: Subscription? = null
     private var subject: PublishSubject<Int>? = null
@@ -172,15 +169,6 @@ class PhotoListFragment : Fragment() {
         outState.putString("title", activity.title.toString())
     }
 
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        if (activity !is ProgressChangeListener) {
-            throw RuntimeException(activity.localClassName + " must implement net.mmho.photomap2.ProgressChangeListener")
-        }
-        listener = activity as ProgressChangeListener
-    }
-
     private var order :String? = null
     private val photoCursorCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
         override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor> {
@@ -205,25 +193,23 @@ class PhotoListFragment : Fragment() {
     private var progress: Int = 0
     private var group_count: Int = 0
 
-    private fun groupObservable(distance: Int): Observable<PhotoGroup> {
+    private fun groupObservable(distance: Int): Observable<List<PhotoGroup>> {
         val length =  DistanceActionProvider.getDistance(distance)
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
             .doOnNext { group_count++ }
             .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
+            .toSortedList{ g1,g2 -> g2.date_taken.compareTo(g1.date_taken) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 adapter?.clear()
-                listener?.showProgress(0)
                 progress = 0
                 group_count = 0
             }
-            .doOnNext { g ->
-                listener?.showProgress(++progress * 10000 / group_count)
-                adapter?.add(g)
+            .doOnNext { list ->
+                for(g in list) adapter?.add(g)
             }
-            .doOnCompleted { listener?.endProgress() }
     }
 
     fun grantedPermission(granted: Boolean) {
