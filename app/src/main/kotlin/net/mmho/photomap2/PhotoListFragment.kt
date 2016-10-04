@@ -17,6 +17,7 @@ import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
 import android.support.v4.view.MenuItemCompat
 import android.view.*
+import android.widget.AdapterView
 import android.widget.GridView
 import kotlinx.android.synthetic.main.fragment_photo_list.view.*
 import rx.Observable
@@ -140,27 +141,30 @@ class PhotoListFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_thumbnail, container, false)
     }
 
+    val onItemClickListener = AdapterView.OnItemClickListener{
+        p, v, position, id ->
+        val group = adapter?.getItem(position)
+        val intent: Intent
+        when(group?.size){
+            null -> return@OnItemClickListener
+            1 ->{
+                intent = Intent(activity, PhotoViewActivity::class.java)
+                intent.putExtra(PhotoViewActivity.EXTRA_GROUP, group as Parcelable)
+            }
+            else->{
+                intent = Intent(activity, ThumbnailActivity::class.java)
+                intent.putExtra(ThumbnailActivity.EXTRA_GROUP, group as Parcelable)
+            }
+        }
+        startActivity(intent)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // photo list
         val list = view.thumbnail_grid as GridView
         list.adapter = adapter
-        list.setOnItemClickListener listener@ { p, v, position, id ->
-            val group = adapter?.getItem(position)
-            val intent: Intent
-            when(group?.size){
-                null -> return@listener
-                1 ->{
-                    intent = Intent(activity, PhotoViewActivity::class.java)
-                    intent.putExtra(PhotoViewActivity.EXTRA_GROUP, group as Parcelable)
-                }
-                else->{
-                    intent = Intent(activity, ThumbnailActivity::class.java)
-                    intent.putExtra(ThumbnailActivity.EXTRA_GROUP, group as Parcelable)
-                }
-            }
-            startActivity(intent)
-        }
+        list.onItemClickListener = onItemClickListener
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -192,11 +196,15 @@ class PhotoListFragment : Fragment() {
 
     private fun groupObservable(distance: Int): Observable<List<PhotoGroup>> {
         val length =  DistanceActionProvider.getDistance(distance)
+        val older = order == QueryBuilder.sortDateOldest()
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
             .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
-            .toSortedList{ g1,g2 -> g2.date_taken.compareTo(g1.date_taken) }
+            .toSortedList{ g1,g2 ->
+                if(older)  g1.date_taken.compareTo(g2.date_taken)
+                else g2.date_taken.compareTo(g1.date_taken)
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { adapter?.clear() }
             .doOnNext { list -> for(g in list) adapter?.add(g) }
