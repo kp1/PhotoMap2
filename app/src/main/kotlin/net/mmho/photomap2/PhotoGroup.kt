@@ -21,6 +21,10 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
     var description = ""
         private set
 
+    var date_taken:Int = 0
+        private set
+
+
     constructor(src: Parcel) {
         src.readTypedList(this, HashedPhoto.CREATOR)
         hash = GeoHash.CREATOR.createFromParcel(src)
@@ -31,6 +35,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
 
     constructor(p: HashedPhoto) {
         hash = p.hash
+        date_taken = p.date_taken
         add(p)
     }
 

@@ -5,13 +5,15 @@ import android.os.Parcelable
 
 import net.mmho.photomap2.geohash.GeoHash
 
-data class HashedPhoto(val photo_id:Long, val hash:GeoHash) : Parcelable {
-    constructor(source: Parcel): this(source.readLong(), source.readParcelable<GeoHash>(GeoHash::class.java.classLoader))
+data class HashedPhoto(val photo_id:Long,val date_taken: Int,val hash:GeoHash) : Parcelable {
+    constructor(source: Parcel):
+        this(source.readLong(), source.readInt(), source.readParcelable<GeoHash>(GeoHash::class.java.classLoader))
 
     override fun describeContents() = 0
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
         dest?.writeLong(photo_id)
+        dest?.writeInt(date_taken)
         dest?.writeParcelable(hash, 0)
     }
 
