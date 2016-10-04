@@ -22,6 +22,7 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -213,6 +214,30 @@ class PhotoMapFragment : SupportMapFragment() {
         return null
     }
 
+    private val  TAG: String = "PhotoMapFragment"
+    val markerClickListener = GoogleMap.OnMarkerClickListener {
+        marker ->
+        Observable.from(groupList)
+            .filter { g -> g.marker == marker }
+            .first()
+            .subscribe({ g ->
+                val i: Intent
+                when(g.size) {
+                    1 -> {
+                        i = Intent(this@PhotoMapFragment.activity, PhotoViewActivity::class.java)
+                        i.putExtra(PhotoViewActivity.EXTRA_GROUP, g as Parcelable)
+                    }
+                    else -> {
+                        i = Intent(this@PhotoMapFragment.activity, ThumbnailActivity::class.java)
+                        i.putExtra(ThumbnailActivity.EXTRA_GROUP, g as Parcelable)
+                    }
+                }
+                this@PhotoMapFragment.startActivity(i)
+            },
+            {e -> Log.d(TAG,"${e.message}")})
+        true
+    }
+
     private fun initMap() {
 
         if (googleMap != null) {
@@ -228,26 +253,7 @@ class PhotoMapFragment : SupportMapFragment() {
 
             googleMap?.setOnCameraMoveStartedListener { googleMap?.clear() }
             googleMap?.setOnCameraIdleListener(photoMapCameraIdleListener)
-            googleMap?.setOnMarkerClickListener { marker ->
-                Observable.from(groupList)
-                    .filter { g -> g.marker == marker }
-                    .first()
-                    .subscribe { g ->
-                        val i: Intent
-                        when(g.size) {
-                            1 -> {
-                                i = Intent(this@PhotoMapFragment.activity, PhotoViewActivity::class.java)
-                                i.putExtra(PhotoViewActivity.EXTRA_GROUP, g as Parcelable)
-                            }
-                            else -> {
-                                i = Intent(this@PhotoMapFragment.activity, ThumbnailActivity::class.java)
-                                i.putExtra(ThumbnailActivity.EXTRA_GROUP, g as Parcelable)
-                            }
-                        }
-                        this@PhotoMapFragment.startActivity(i)
-                    }
-                true
-            }
+            googleMap?.setOnMarkerClickListener(markerClickListener)
             googleMap?.setOnMapClickListener {
                 if (actionBar.isShowing)
                     this@PhotoMapFragment.hideActionBar()
@@ -358,12 +364,11 @@ class PhotoMapFragment : SupportMapFragment() {
     private var progress: Int = 0
     private var group_count: Int = 0
     private fun groupObservable(distance: Int): Observable<PhotoGroup> {
-        return Observable.from(photoList).subscribeOn(Schedulers.newThread())
+        return Observable.from(photoList)
+            .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.binaryString.substring(0, distance) }
             .doOnNext { group_count++ }
-            .concatMap {
-                group -> group.map { p -> PhotoGroup(p) }
-                .reduce { hashedPhotos, o -> hashedPhotos.append(o) } }
+            .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 progress = 0
@@ -373,10 +378,10 @@ class PhotoMapFragment : SupportMapFragment() {
             }
             .doOnNext { g ->
                 listener?.showProgress(++progress * 10000 / group_count)
-                groupList?.add(g)
                 val ops = MarkerOptions().position(g.center)
                 ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size)))
                 g.marker = googleMap?.addMarker(ops)
+                groupList?.add(g)
             }
             .doOnCompleted {
                 this@PhotoMapFragment.hideActionBarDelayed()
