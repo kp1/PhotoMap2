@@ -206,13 +206,12 @@ class PhotoListFragment : Fragment() {
     private var group_count: Int = 0
 
     private fun groupObservable(distance: Int): Observable<PhotoGroup> {
+        val length =  DistanceActionProvider.getDistance(distance)
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
-            .groupBy { hash -> hash.hash.toBase32().substring(0, DistanceActionProvider.getDistance(distance)) }
+            .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
             .doOnNext { group_count++ }
-            .flatMap {
-                it.map(::PhotoGroup).reduce(PhotoGroup::append)
-            }
+            .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 adapter?.clear()
