@@ -190,26 +190,16 @@ class PhotoListFragment : Fragment() {
         }
     }
 
-    private var progress: Int = 0
-    private var group_count: Int = 0
-
     private fun groupObservable(distance: Int): Observable<List<PhotoGroup>> {
         val length =  DistanceActionProvider.getDistance(distance)
         return Observable.from(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
-            .doOnNext { group_count++ }
             .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
             .toSortedList{ g1,g2 -> g2.date_taken.compareTo(g1.date_taken) }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                adapter?.clear()
-                progress = 0
-                group_count = 0
-            }
-            .doOnNext { list ->
-                for(g in list) adapter?.add(g)
-            }
+            .doOnSubscribe { adapter?.clear() }
+            .doOnNext { list -> for(g in list) adapter?.add(g) }
     }
 
     fun grantedPermission(granted: Boolean) {
