@@ -218,7 +218,7 @@ class PhotoMapFragment : SupportMapFragment() {
     val markerClickListener = GoogleMap.OnMarkerClickListener {
         marker ->
         Observable.from(groupList)
-            .filter { g -> g.marker == marker }
+            .filter { g -> g.marker == marker || g.marker?.position == marker.position }
             .first()
             .subscribe({ g ->
                 val i: Intent
