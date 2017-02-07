@@ -11,10 +11,7 @@ import java.util.ArrayList
 internal class PhotoListAdapter(context: Context, private val resource: Int, objects: ArrayList<PhotoGroup>)
         : ArrayAdapter<PhotoGroup>(context, resource, objects) {
     private val inflater: LayoutInflater
-
-    init {
-        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    }
+        = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v: View =

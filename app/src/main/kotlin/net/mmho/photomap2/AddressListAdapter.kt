@@ -13,10 +13,7 @@ import java.util.Locale
 internal class AddressListAdapter(context: Context, private val resource: Int, addresses: Array<Address>)
     : ArrayAdapter<Address>(context, resource, addresses) {
     private val inflater: LayoutInflater
-
-    init {
-        inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    }
+        = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v: View = convertView ?: inflater.inflate(resource, null)

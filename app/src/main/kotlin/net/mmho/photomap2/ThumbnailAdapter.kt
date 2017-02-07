@@ -11,10 +11,7 @@ internal class ThumbnailAdapter(c: Context, private val resource: Int, objects: 
         : ArrayAdapter<HashedPhoto>(c, resource, objects) {
 
     private val inflater: LayoutInflater
-
-    init {
-        inflater = c.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-    }
+        = c.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v: View =
