@@ -28,9 +28,7 @@ class GeoHash : Parcelable {
         }
     }
 
-    private constructor() {
-
-    }
+    private constructor()
 
     val binaryString: String
         get() = java.lang.Long.toBinaryString(long).substring(0, significantBits)
