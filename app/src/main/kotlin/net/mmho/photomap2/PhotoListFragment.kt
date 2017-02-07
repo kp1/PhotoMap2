@@ -207,7 +207,7 @@ class PhotoListFragment : Fragment() {
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { adapter?.clear() }
-            .doOnNext { list -> for(g in list) adapter?.add(g) }
+            .doOnNext { list -> adapter?.addAll(list) }
     }
 
     fun grantedPermission(granted: Boolean) {
