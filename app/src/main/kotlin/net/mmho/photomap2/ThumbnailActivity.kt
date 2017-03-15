@@ -27,11 +27,6 @@ class ThumbnailActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        fragment?.setPosition(data?.extras?.getInt(PhotoViewActivity.EXTRA_GROUP) ?: 0)
-    }
-
     companion object {
         val EXTRA_GROUP = "thumbnail_group"
     }

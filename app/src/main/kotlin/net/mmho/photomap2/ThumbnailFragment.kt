@@ -50,7 +50,6 @@ class ThumbnailFragment : Fragment() {
 
     fun setPosition(position: Int) {
         list?.setSelection(position)
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
@@ -67,6 +66,12 @@ class ThumbnailFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val position = data?.getIntExtra(PhotoViewActivity.EXTRA_POSITION,0) ?: 0
+        setPosition(position)
     }
 
     private val clickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
