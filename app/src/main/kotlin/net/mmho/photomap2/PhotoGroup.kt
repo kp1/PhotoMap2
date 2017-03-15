@@ -55,7 +55,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
                     Geocoder(context).getFromLocation(center.latitude, center.longitude, 1)
                 when (addresses?.size) {
                     1 -> {
-                        title = addresses?.first()?.getTitle(context)
+                        title = addresses.first().getTitle(context)
                         return true
                     }
                 }

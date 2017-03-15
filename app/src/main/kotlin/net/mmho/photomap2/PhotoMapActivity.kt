@@ -47,7 +47,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(next@ { list ->
-                    if (list == null || list.size == 0) {
+                    if (list == null || list.isEmpty()) {
                         Toast.makeText(this@PhotoMapActivity.applicationContext,
                             this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
                             Toast.LENGTH_LONG).show()
@@ -95,7 +95,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                 fragmentTransaction.replace(R.id.map, mapFragment).commit()
             }
         } else if (api.isUserResolvableError(result)) {
-            api.showErrorDialogFragment(this, result, 1) { dialog -> finish() }
+            api.showErrorDialogFragment(this, result, 1) { finish() }
         } else {
             finish()
         }

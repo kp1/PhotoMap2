@@ -69,7 +69,7 @@ class ThumbnailFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private val clickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+    private val clickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
         val i = Intent(activity, PhotoViewActivity::class.java)
         i.putExtra(PhotoViewActivity.EXTRA_GROUP, group as Parcelable?)
         i.putExtra(PhotoViewActivity.EXTRA_POSITION, position)

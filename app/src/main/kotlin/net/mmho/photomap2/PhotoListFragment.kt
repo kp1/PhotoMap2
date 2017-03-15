@@ -142,7 +142,7 @@ class PhotoListFragment : Fragment() {
     }
 
     val onItemClickListener = AdapterView.OnItemClickListener{
-        p, v, position, id ->
+        _, _, position, _ ->
         val group = adapter?.getItem(position)
         val intent: Intent
         when(group?.size){

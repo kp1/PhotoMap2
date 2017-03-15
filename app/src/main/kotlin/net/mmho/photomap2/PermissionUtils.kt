@@ -16,7 +16,7 @@ internal object PermissionUtils {
 
             snackbar.setActionTextColor(c.resources.getColor(R.color.primary,null))
             text.setTextColor(c.resources.getColor(R.color.textPrimary, null))
-            snackbar.setAction(R.string.setting) { v ->
+            snackbar.setAction(R.string.setting) {
                 val uri = Uri.parse("package:" + c.applicationContext.packageName)
                 val i = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri)
                 c.startActivity(i)

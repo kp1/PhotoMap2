@@ -102,7 +102,7 @@ class PhotoMapFragment : SupportMapFragment() {
         searchView.setOnQueryTextListener(onQueryTextListener)
         searchMenuItem = menu.findItem(R.id.search)
         MenuItemCompat.setOnActionExpandListener(searchMenuItem, actionExpandListener)
-        searchView.setOnQueryTextFocusChangeListener { v, hasFocus -> if (!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem) }
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> if (!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem) }
         searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.componentName))
         searchView.isQueryRefinementEnabled = true
 
