@@ -21,15 +21,14 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
     internal var thumbnail = false
     private var id: Long = -1L
 
-    private var subject: PublishSubject<Long>
+    private var subject: PublishSubject<Long> = PublishSubject.create<Long>()
     private var subscription: Subscription? = null
 
     init {
-        subject = PublishSubject.create<Long>()
         subscription = subject
             .switchMap { id ->
                 loadImageObservable(id)
-                    .subscribeOn(Schedulers.newThread())
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
             }
             .subscribe { setBitmap(it) }
@@ -37,12 +36,6 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
     open fun setBitmap(bitmap: Bitmap) {
         setImageBitmap(bitmap)
-    }
-
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        subscription?.unsubscribe()
-        subscription = null
     }
 
     fun load(image_id: Long) {
@@ -57,7 +50,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
 
         if (bitmap != null) return
 
-        post { subject.onNext(image_id) }
+        subject.onNext(image_id)
     }
 
     private fun loadImageObservable(image_id: Long): Observable<Bitmap> {
