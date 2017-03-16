@@ -106,7 +106,7 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
         val fragment = supportFragmentManager.findFragmentById(R.id.map)
         when (requestCode) {
             PERMISSIONS_REQUEST -> {
-                val granted = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (fragment != null && fragment is PhotoMapFragment) {
                     fragment.grantedPermission(granted)
                 }
@@ -137,24 +137,24 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
 
     override fun endProgress() {
         progress.progress = progress.max
-        val fadeout: AlphaAnimation
-        fadeout = AlphaAnimation(1f, 0f)
-        fadeout.duration = 300
-        fadeout.fillAfter = true
-        fadeout.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {
+        val fadeout = AlphaAnimation(1f, 0f).apply{
+            duration = 300
+            fillAfter = true
+            setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation) {
 
-            }
+                }
 
-            override fun onAnimationEnd(animation: Animation) {
-                progress.visibility = View.GONE
-                progress.animation = null
-            }
+                override fun onAnimationEnd(animation: Animation) {
+                    progress.visibility = View.GONE
+                    progress.animation = null
+                }
 
-            override fun onAnimationRepeat(animation: Animation) {
+                override fun onAnimationRepeat(animation: Animation) {
 
-            }
-        })
+                }
+            })
+        }
         progress.startAnimation(fadeout)
     }
 

@@ -22,7 +22,7 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
         val fragment = supportFragmentManager.findFragmentById(R.id.fragment)
         when (requestCode) {
             PERMISSIONS_REQUEST -> {
-                val granted = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 (fragment as PhotoListFragment).grantedPermission(granted)
             }
         }
