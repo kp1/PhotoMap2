@@ -32,11 +32,11 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import rx.Observable
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subjects.PublishSubject
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.processors.PublishProcessor
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import java.util.regex.Pattern
 
@@ -52,8 +52,8 @@ class PhotoMapFragment : SupportMapFragment() {
     private var listener: ProgressChangeListener? = null
 
 
-    private lateinit var subject: PublishSubject<Int>
-    private var subscription: Subscription? = null
+    private lateinit var subject: PublishProcessor<Int>
+    private var disposable: Disposable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,20 +61,20 @@ class PhotoMapFragment : SupportMapFragment() {
         setHasOptionsMenu(true)
         photoList = ArrayList<HashedPhoto>()
         groupList = ArrayList<PhotoGroup>()
-        subject = PublishSubject.create<Int>()
+        subject = PublishProcessor.create<Int>()
     }
 
     override fun onStart() {
         super.onStart()
-        if (subscription == null) {
-            subscription = subject.onBackpressureLatest().switchMap { this.groupObservable(it) }.subscribe()
+        if (disposable == null) {
+            disposable = subject.onBackpressureLatest().switchMap { this.groupFlowable(it) }.subscribe()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        subscription?.unsubscribe()
-        subscription = null
+        disposable?.dispose()
+        disposable = null
     }
 
     override fun onAttach(context: Context?) {
@@ -217,9 +217,9 @@ class PhotoMapFragment : SupportMapFragment() {
     private val  TAG: String = "PhotoMapFragment"
     val markerClickListener = GoogleMap.OnMarkerClickListener {
         marker ->
-        Observable.from(groupList)
+        Flowable.fromIterable(groupList)
             .filter { g -> g.marker == marker || g.marker?.position == marker.position }
-            .first()
+            .firstElement()
             .subscribe({ g ->
                 val i: Intent
                 when(g.size) {
@@ -363,12 +363,12 @@ class PhotoMapFragment : SupportMapFragment() {
 
     private var progress: Int = 0
     private var group_count: Int = 0
-    private fun groupObservable(distance: Int): Observable<PhotoGroup> {
-        return Observable.from(photoList)
-            .subscribeOn(Schedulers.newThread())
+    private fun groupFlowable(distance: Int): Flowable<PhotoGroup> {
+        return Flowable.fromIterable(photoList)
+            .subscribeOn(Schedulers.computation())
             .groupBy { hash -> hash.hash.binaryString.substring(0, distance) }
             .doOnNext { group_count++ }
-            .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
+            .flatMapSingle { it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle() }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 progress = 0
@@ -383,7 +383,7 @@ class PhotoMapFragment : SupportMapFragment() {
                 g.marker = googleMap?.addMarker(ops)
                 groupList?.add(g)
             }
-            .doOnCompleted {
+            .doOnComplete {
                 this@PhotoMapFragment.hideActionBarDelayed()
                 listener?.endProgress()
             }

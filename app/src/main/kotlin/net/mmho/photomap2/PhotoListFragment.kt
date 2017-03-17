@@ -18,12 +18,13 @@ import android.support.v4.view.MenuItemCompat
 import android.view.*
 import android.widget.AdapterView
 import android.widget.GridView
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_photo_list.view.*
-import org.reactivestreams.Subscription
 import java.util.*
 
 class PhotoListFragment : Fragment() {
@@ -34,7 +35,7 @@ class PhotoListFragment : Fragment() {
     private var distance_index: Int = 0
 
     // rxAndroid
-    private var subscription: Subscription? = null
+    private var disposable: Disposable? = null
     private var subject: PublishSubject<Int>? = null
     private var permission_granted: Boolean = false
 
@@ -76,14 +77,14 @@ class PhotoListFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        if (subscription == null)
-            subscription = subject?.switchMap { distance -> this@PhotoListFragment.groupObservable(distance) }?.subscribe()
+        if (disposable == null)
+            disposable = subject?.switchMap { distance -> this@PhotoListFragment.groupObservable(distance) }?.subscribe()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        subscription?.unsubscribe()
-        subscription = null
+        disposable?.dispose()
+        disposable = null
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -196,17 +197,18 @@ class PhotoListFragment : Fragment() {
     private fun groupObservable(distance: Int): Observable<List<PhotoGroup>> {
         val length =  DistanceActionProvider.getDistance(distance)
         val older = order == QueryBuilder.sortDateOldest()
-        return Observable.fromArray(photoList)
+        return Flowable.fromIterable(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
-            .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
+            .flatMapSingle { it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle() }
             .toSortedList{ g1,g2 ->
                 if(older)  g1.date_taken.compareTo(g2.date_taken)
                 else g2.date_taken.compareTo(g1.date_taken)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { adapter?.clear() }
-            .doOnNext { list -> adapter?.addAll(list) }
+            .doOnSuccess { list -> adapter?.addAll(list) }
+            .toObservable()
     }
 
     fun grantedPermission(granted: Boolean) {

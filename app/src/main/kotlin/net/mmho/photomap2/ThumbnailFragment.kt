@@ -7,10 +7,10 @@ import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.AdapterView
 import android.widget.GridView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.layout_thumbnail.view.*
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 
 class ThumbnailFragment : Fragment() {
 
@@ -34,10 +34,10 @@ class ThumbnailFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         Observable
             .just(group)
-            .subscribeOn(Schedulers.newThread())
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { g -> g?.resolveAddress(activity)}
-            .doOnCompleted { activity.title = group?.title }
+            .doOnComplete { activity.title = group?.title }
             .subscribe()
     }
 

@@ -9,11 +9,10 @@ import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.provider.MediaStore.Images.Thumbnails.getThumbnail
 import android.util.AttributeSet
 import android.widget.ImageView
-import rx.Observable
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subjects.PublishSubject
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 
 open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
         : ImageView(context, attrs, defStyle) {
@@ -22,14 +21,14 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
     private var id: Long = -1L
 
     private var subject: PublishSubject<Long> = PublishSubject.create<Long>()
-    private var subscription: Subscription? = null
 
     init {
-        subscription = subject
+        subject
             .switchMap { id ->
                 loadImageObservable(id)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+                    .toObservable()
             }
             .subscribe { setBitmap(it) }
     }
@@ -53,8 +52,8 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
         subject.onNext(image_id)
     }
 
-    private fun loadImageObservable(image_id: Long): Observable<Bitmap> {
-        return Observable.create { subscriber ->
+    private fun loadImageObservable(image_id: Long): Single<Bitmap> {
+        return Single.create { subscriber ->
             val c = query(context.contentResolver, EXTERNAL_CONTENT_URI,arrayOf(_ID,ORIENTATION,DATA),
                 QueryBuilder.createQuery(image_id), null, null)
 
@@ -86,8 +85,7 @@ open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: 
                 }
             }
             if (thumbnail && bmp != null) ThumbnailCache.instance.put(image_id, bmp)
-            if(bmp!=null) subscriber.onNext(bmp)
-            subscriber.onCompleted()
+            if(bmp!=null) subscriber.onSuccess(bmp)
             c.close()
         }
     }
