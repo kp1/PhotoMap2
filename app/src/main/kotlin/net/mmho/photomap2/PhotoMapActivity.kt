@@ -16,11 +16,11 @@ import android.widget.Toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.maps.CameraUpdateFactory
+import io.reactivex.Single
+import io.reactivex.SingleEmitter
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_photo_map.*
-import rx.Observable
-import rx.Subscriber
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
 import java.io.IOException
 
 class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
@@ -32,21 +32,19 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
     private fun handleIntent(intent: Intent) {
         if (Intent.ACTION_SEARCH == intent.action) {
             val searchQuery = intent.getStringExtra(SearchManager.QUERY)
-            Observable
-                .create { subscriber: Subscriber<in List<Address>> ->
+            Single
+                .create { subscriber:SingleEmitter<List<Address>> ->
                     var data: List<Address>? = null
                     try {
                         data = Geocoder(applicationContext).getFromLocationName(searchQuery, 5)
                     } catch (e: IOException) {
                         subscriber.onError(e)
                     }
-
-                    subscriber.onNext(data)
-                    subscriber.onCompleted()
+                    subscriber.onSuccess(data)
                 }
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(next@ { list ->
+                .doOnSuccess(next@ { list ->
                     if (list == null || list.isEmpty()) {
                         Toast.makeText(this@PhotoMapActivity.applicationContext,
                             this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
