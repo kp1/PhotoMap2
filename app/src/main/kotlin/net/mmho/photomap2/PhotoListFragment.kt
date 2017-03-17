@@ -18,12 +18,12 @@ import android.support.v4.view.MenuItemCompat
 import android.view.*
 import android.widget.AdapterView
 import android.widget.GridView
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.fragment_photo_list.view.*
-import rx.Observable
-import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
-import rx.schedulers.Schedulers
-import rx.subjects.PublishSubject
+import org.reactivestreams.Subscription
 import java.util.*
 
 class PhotoListFragment : Fragment() {
@@ -196,7 +196,7 @@ class PhotoListFragment : Fragment() {
     private fun groupObservable(distance: Int): Observable<List<PhotoGroup>> {
         val length =  DistanceActionProvider.getDistance(distance)
         val older = order == QueryBuilder.sortDateOldest()
-        return Observable.from(photoList)
+        return Observable.fromArray(photoList)
             .subscribeOn(Schedulers.newThread())
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
             .flatMap { it.map(::PhotoGroup).reduce(PhotoGroup::append) }
