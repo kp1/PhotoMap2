@@ -12,9 +12,11 @@ data class HashedPhoto(val photo_id:Long,val date_taken: Long,val hash:GeoHash) 
     override fun describeContents() = 0
 
     override fun writeToParcel(dest: Parcel?, flags: Int) {
-        dest?.writeLong(photo_id)
-        dest?.writeLong(date_taken)
-        dest?.writeParcelable(hash, 0)
+        dest?.run{
+            writeLong(photo_id)
+            writeLong(date_taken)
+            writeParcelable(hash, 0)
+        }
     }
 
     companion object {

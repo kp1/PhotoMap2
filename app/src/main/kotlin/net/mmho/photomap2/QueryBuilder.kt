@@ -20,23 +20,13 @@ internal object QueryBuilder {
 
     }
 
-    fun createQuery(id: Long): String {
-        return "${BaseColumns._ID} is $id"
-    }
+    fun createQuery(id: Long): String = "${BaseColumns._ID} is $id"
 
-    fun createQuery(): String {
-        return "$LATITUDE not null and $LONGITUDE not null"
-    }
+    fun createQuery(): String = "$LATITUDE not null and $LONGITUDE not null"
 
-    fun createQueryNoLocation(): String {
-        return "$LATITUDE is null or $LONGITUDE is null"
-    }
+    fun createQueryNoLocation(): String = "$LATITUDE is null or $LONGITUDE is null"
 
-    fun sortDateNewest(): String {
-        return "$DATE_TAKEN desc"
-    }
+    fun sortDateNewest(): String = "$DATE_TAKEN desc"
 
-    fun sortDateOldest(): String {
-        return "$DATE_TAKEN asc"
-    }
+    fun sortDateOldest(): String = "$DATE_TAKEN asc"
 }

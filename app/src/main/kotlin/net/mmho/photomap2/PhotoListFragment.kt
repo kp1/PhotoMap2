@@ -45,7 +45,7 @@ class PhotoListFragment : Fragment() {
         retainInstance = true
         setHasOptionsMenu(true)
 
-        photoList = ArrayList<HashedPhoto>()
+        photoList = ArrayList()
         adapter = PhotoListAdapter(activity, R.layout.layout_photo_card, ArrayList<PhotoGroup>())
         when(savedInstanceState) {
             null -> {
@@ -137,11 +137,10 @@ class PhotoListFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_thumbnail, container, false)
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.fragment_thumbnail, container, false)
 
-    val onItemClickListener = AdapterView.OnItemClickListener{
+    private val onItemClickListener = AdapterView.OnItemClickListener{
         _, _, position, _ ->
         val group = adapter?.getItem(position)
         val intent: Intent

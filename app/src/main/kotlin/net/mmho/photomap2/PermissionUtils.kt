@@ -1,14 +1,17 @@
 package net.mmho.photomap2
 
+import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.view.View
 import android.widget.TextView
 
 internal object PermissionUtils {
+    @TargetApi(Build.VERSION_CODES.M)
     fun requestPermission(rootView: View?, c: Context) {
         if (rootView != null) {
             val snackbar = Snackbar.make(rootView, R.string.request_permission, Snackbar.LENGTH_LONG)
