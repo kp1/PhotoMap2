@@ -15,11 +15,14 @@ import kotlinx.android.synthetic.main.fragment_photo_view.*
 open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     :LoadableImageView(context,attrs,defStyle){
 
+    companion object {
+        private val MAX_SCALE = 3f
+        private val MIN_SCALE = 1f
+    }
+
     private var detector: GestureDetectorCompat
     private var scaleDetector:ScaleGestureDetector
 
-    private val MAX_SCALE = 3f
-    private val MIN_SCALE = 1f
     private lateinit var baseMatrix:Matrix
     private var bitmap:Bitmap? = null
 
@@ -154,6 +157,6 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
 fun Matrix.scale():Float{
     val values = FloatArray(9)
-    this.getValues(values)
+    getValues(values)
     return values[Matrix.MSCALE_X]
 }

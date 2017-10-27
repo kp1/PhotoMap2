@@ -8,19 +8,19 @@ import android.view.ViewGroup
 import kotlinx.android.synthetic.main.photo_view.view.*
 
 class PhotoViewFragment : Fragment() {
-    private var image_id: Long = 0
+    private var imageId: Long = 0
     private var image: LoadableImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
-        image_id = arguments.getLong(EXTRA_IMAGE_ID)
+        imageId = arguments.getLong(EXTRA_IMAGE_ID)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.photo_view, container, false)
         image = v.photo
-        image?.load(image_id)
+        image?.load(imageId)
         return v
     }
 
@@ -31,6 +31,6 @@ class PhotoViewFragment : Fragment() {
 
     companion object {
 
-        val EXTRA_IMAGE_ID = "image_id"
+        val EXTRA_IMAGE_ID = "imageId"
     }
 }

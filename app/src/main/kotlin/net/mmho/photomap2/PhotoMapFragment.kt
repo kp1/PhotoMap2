@@ -59,8 +59,8 @@ class PhotoMapFragment : SupportMapFragment() {
         super.onCreate(savedInstanceState)
         retainInstance = true
         setHasOptionsMenu(true)
-        photoList = ArrayList<HashedPhoto>()
-        groupList = ArrayList<PhotoGroup>()
+        photoList = ArrayList()
+        groupList = ArrayList()
         subject = PublishProcessor.create<Int>()
     }
 
@@ -156,10 +156,10 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     private fun expandLatLngBounds(bounds: LatLngBounds, percentile: Double): LatLngBounds {
-        val lat_distance = (bounds.northeast.latitude - bounds.southwest.latitude) * ((percentile - 1.0) / 2)
-        val lng_distance = (bounds.northeast.longitude - bounds.southwest.longitude) * ((percentile - 1.0) / 2)
-        val northeast = LatLng(bounds.northeast.latitude + lat_distance, bounds.northeast.longitude + lng_distance)
-        val southwest = LatLng(bounds.southwest.latitude - lat_distance, bounds.southwest.longitude - lng_distance)
+        val latDistance = (bounds.northeast.latitude - bounds.southwest.latitude) * ((percentile - 1.0) / 2)
+        val lngDistance = (bounds.northeast.longitude - bounds.southwest.longitude) * ((percentile - 1.0) / 2)
+        val northeast = LatLng(bounds.northeast.latitude + latDistance, bounds.northeast.longitude + lngDistance)
+        val southwest = LatLng(bounds.southwest.latitude - latDistance, bounds.southwest.longitude - lngDistance)
         return LatLngBounds(southwest, northeast)
     }
 

@@ -7,8 +7,7 @@ class NetworkUtils {
     companion object {
         fun networkCheck(context: Context):Boolean{
             val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val info = cm.activeNetworkInfo
-            return info != null && info.isConnected
+            return cm.activeNetworkInfo?.isConnected ?: false
         }
     }
 }

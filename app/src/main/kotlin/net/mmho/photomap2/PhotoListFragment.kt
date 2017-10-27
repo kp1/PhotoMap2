@@ -201,8 +201,8 @@ class PhotoListFragment : Fragment() {
             .groupBy { hash -> hash.hash.toBase32().substring(0,length) }
             .flatMapSingle { it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle() }
             .toSortedList{ g1,g2 ->
-                if(older)  g1.date_taken.compareTo(g2.date_taken)
-                else g2.date_taken.compareTo(g1.date_taken)
+                if(older)  g1.dateTaken.compareTo(g2.dateTaken)
+                else g2.dateTaken.compareTo(g1.dateTaken)
             }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { adapter?.clear() }

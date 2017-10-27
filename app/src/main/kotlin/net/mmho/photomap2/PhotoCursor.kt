@@ -19,14 +19,14 @@ internal class PhotoCursor(cursor: Cursor) : CursorWrapper(cursor) {
             return LatLng(latitude.toDouble(), longitude.toDouble())
         }
 
-    val date_taken:Long
+    private val dateTaken:Long
         get() = getLong(getColumnIndexOrThrow(DATE_TAKEN))
 
-    fun getGeoHash(character: Int): GeoHash =
+    private fun getGeoHash(character: Int): GeoHash =
         GeoHash.createWithCharacterCount(location, character)
 
-    fun getHashedPhoto(character: Int): HashedPhoto =
-        HashedPhoto(id,date_taken, getGeoHash(character))
+    private fun getHashedPhoto(character: Int): HashedPhoto =
+        HashedPhoto(id, dateTaken, getGeoHash(character))
 
     val hashedPhotoList: ArrayList<HashedPhoto>
         get() {

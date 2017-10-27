@@ -21,7 +21,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
     var description = ""
         private set
 
-    var date_taken:Long = 0
+    var dateTaken:Long = 0
         private set
 
 
@@ -30,13 +30,13 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         hash = GeoHash.CREATOR.createFromParcel(src)
         title = src.readString()
         description = src.readString()
-        date_taken = src.readLong()
+        dateTaken = src.readLong()
 
     }
 
     constructor(p: HashedPhoto) {
         hash = p.hash
-        date_taken = p.date_taken
+        dateTaken = p.date_taken
         add(p)
     }
 
@@ -74,19 +74,21 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
     override fun describeContents(): Int = 0
 
     override fun writeToParcel(out: Parcel, flags: Int) {
-        out.writeTypedList(this)
-        hash.writeToParcel(out, flags)
-        out.writeString(title)
-        out.writeString(description)
-        out.writeLong(date_taken)
+        out.run{
+            writeTypedList(this@PhotoGroup)
+            hash.writeToParcel(this, flags)
+            writeString(title)
+            writeString(description)
+            writeLong(dateTaken)
+        }
     }
 
     companion object {
         @JvmField
         val CREATOR = object : Parcelable.Creator<PhotoGroup> {
 
-            override fun createFromParcel(`in`: Parcel): PhotoGroup {
-                return PhotoGroup(`in`)
+            override fun createFromParcel(src: Parcel): PhotoGroup {
+                return PhotoGroup(src)
             }
 
             override fun newArray(size: Int): Array<PhotoGroup?> {
@@ -95,19 +97,11 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         }
 
         fun getMarkerColor(size: Int): Float {
-            return when {
-                size >= 100 -> {
-                    BitmapDescriptorFactory.HUE_RED
-                }
-                size >= 10 -> {
-                    BitmapDescriptorFactory.HUE_ROSE
-                }
-                size > 1 -> {
-                    BitmapDescriptorFactory.HUE_ORANGE
-                }
-                else -> {
-                    BitmapDescriptorFactory.HUE_GREEN
-                }
+            return when(size) {
+                1 -> BitmapDescriptorFactory.HUE_GREEN
+                in 2..10 -> BitmapDescriptorFactory.HUE_ORANGE
+                in 11..100 -> BitmapDescriptorFactory.HUE_ROSE
+                else -> BitmapDescriptorFactory.HUE_RED
             }
         }
     }
