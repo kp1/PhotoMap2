@@ -15,7 +15,7 @@ internal object PermissionUtils {
     fun requestPermission(rootView: View?, c: Context) {
         if (rootView != null) {
             val snackBar = Snackbar.make(rootView, R.string.request_permission, Snackbar.LENGTH_LONG)
-            val text = snackBar.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
+            val text:TextView = snackBar.view.findViewById(android.support.design.R.id.snackbar_text)
 
             snackBar.setActionTextColor(c.resources.getColor(R.color.primary,null))
             text.setTextColor(c.resources.getColor(R.color.textPrimary, null))
