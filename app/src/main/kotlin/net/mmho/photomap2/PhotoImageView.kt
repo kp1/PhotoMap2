@@ -16,8 +16,8 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
     :LoadableImageView(context,attrs,defStyle){
 
     companion object {
-        private val MAX_SCALE = 3f
-        private val MIN_SCALE = 1f
+        private const val MAX_SCALE = 3f
+        private const val MIN_SCALE = 1f
     }
 
     private var detector: GestureDetectorCompat
@@ -49,16 +49,16 @@ open class PhotoImageView @JvmOverloads constructor(context: Context, attrs: Att
 
             override fun onScaleEnd(detector: ScaleGestureDetector?) {
                 val bmp = bitmap ?: return
-                val base_scale = baseMatrix.scale()
+                val baseScale = baseMatrix.scale()
                 val values = FloatArray(9)
                 imageMatrix.getValues(values)
                 var cur = values[Matrix.MSCALE_X]
 
-                val scale = cur/base_scale
+                val scale = cur/baseScale
                 val s =
                     when{
-                        scale > MAX_SCALE -> base_scale*MAX_SCALE/cur
-                        scale < MIN_SCALE -> base_scale*MIN_SCALE/cur
+                        scale > MAX_SCALE -> baseScale*MAX_SCALE/cur
+                        scale < MIN_SCALE -> baseScale*MIN_SCALE/cur
                         else -> 1f
                     }
                 cur *= s

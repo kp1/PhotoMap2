@@ -32,12 +32,12 @@ class PhotoListFragment : Fragment() {
     private var adapter: PhotoListAdapter? = null
     private var photoList: ArrayList<HashedPhoto>? = null
     private var newest = true
-    private var distance_index: Int = 0
+    private var distanceIndex: Int = 0
 
     // rxAndroid
     private var disposable: Disposable? = null
     private var subject: PublishSubject<Int>? = null
-    private var permission_granted: Boolean = false
+    private var permissionGranted: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +46,13 @@ class PhotoListFragment : Fragment() {
         setHasOptionsMenu(true)
 
         photoList = ArrayList()
-        adapter = PhotoListAdapter(activity, R.layout.layout_photo_card, ArrayList<PhotoGroup>())
+        adapter = PhotoListAdapter(activity, R.layout.layout_photo_card, ArrayList())
         when(savedInstanceState) {
             null -> {
-                distance_index = DistanceActionProvider.initialIndex()
+                distanceIndex = DistanceActionProvider.initialIndex()
             }
             else -> {
-                distance_index = savedInstanceState.getInt("DISTANCE")
+                distanceIndex = savedInstanceState.getInt("DISTANCE")
                 activity.title = savedInstanceState.getString("title")
             }
         }
@@ -92,10 +92,10 @@ class PhotoListFragment : Fragment() {
 
         val distance = menu.findItem(R.id.distance)
         val distanceActionProvider = MenuItemCompat.getActionProvider(distance) as DistanceActionProvider
-        distanceActionProvider.setDistanceIndex(distance_index)
+        distanceActionProvider.setDistanceIndex(distanceIndex)
         distanceActionProvider.setOnDistanceChangeListener(object : DistanceActionProvider.OnDistanceChangeListener {
             override fun onDistanceChange(index: Int) {
-                distance_index = index
+                distanceIndex = index
                 subject?.onNext(index)
             }
         })
@@ -123,7 +123,7 @@ class PhotoListFragment : Fragment() {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        when (permission_granted){
+        when (permissionGranted){
             true ->{
                 menu.findItem(R.id.newest).isEnabled = !newest
                 menu.findItem(R.id.oldest).isEnabled = newest
@@ -168,7 +168,7 @@ class PhotoListFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putInt("DISTANCE", distance_index)
+        outState.putInt("DISTANCE", distanceIndex)
         outState.putString("title", activity.title.toString())
     }
 
@@ -178,14 +178,14 @@ class PhotoListFragment : Fragment() {
             val q = QueryBuilder.createQuery()  // all list
             val o = if (newest) QueryBuilder.sortDateNewest() else QueryBuilder.sortDateOldest()
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            return CursorLoader(activity, uri, PhotoCursor.Companion.projection, q, null, o)
+            return CursorLoader(activity, uri, PhotoCursor.projection, q, null, o)
         }
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
-            val new_order = (loader as CursorLoader).sortOrder
-            if(order!=new_order || photoList?.size!=data.count) {
-                order = new_order
+            val newOrder = (loader as CursorLoader).sortOrder
+            if(order!=newOrder || photoList?.size!=data.count) {
+                order = newOrder
                 photoList = PhotoCursor(data).hashedPhotoList
-                subject?.onNext(distance_index)
+                subject?.onNext(distanceIndex)
             }
         }
 
@@ -218,10 +218,10 @@ class PhotoListFragment : Fragment() {
             val v = view
             if (v != null) PermissionUtils.requestPermission(v, context)
         }
-        permission_granted = granted
+        permissionGranted = granted
     }
 
     companion object {
-        private val CURSOR_LOADER_ID = 0
+        private const val CURSOR_LOADER_ID = 0
     }
 }

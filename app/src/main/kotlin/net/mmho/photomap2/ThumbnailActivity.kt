@@ -18,7 +18,7 @@ class ThumbnailActivity : AppCompatActivity() {
             }
             else -> {
                 fragment = supportFragmentManager.findFragmentById(R.id.list) as ThumbnailFragment
-                fragment?.setList(bundle.getParcelable<PhotoGroup>(EXTRA_GROUP))
+                fragment?.setList(bundle.getParcelable(EXTRA_GROUP))
             }
         }
 
@@ -27,6 +27,6 @@ class ThumbnailActivity : AppCompatActivity() {
     }
 
     companion object {
-        val EXTRA_GROUP = "thumbnail_group"
+        const val EXTRA_GROUP = "thumbnail_group"
     }
 }

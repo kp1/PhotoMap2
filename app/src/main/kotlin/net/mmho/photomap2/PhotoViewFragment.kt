@@ -30,7 +30,6 @@ class PhotoViewFragment : Fragment() {
     }
 
     companion object {
-
-        val EXTRA_IMAGE_ID = "imageId"
+        const val EXTRA_IMAGE_ID = "imageId"
     }
 }

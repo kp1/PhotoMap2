@@ -214,8 +214,7 @@ class PhotoMapFragment : SupportMapFragment() {
         return null
     }
 
-    private val  TAG: String = "PhotoMapFragment"
-    val markerClickListener = GoogleMap.OnMarkerClickListener {
+    private val markerClickListener = GoogleMap.OnMarkerClickListener {
         marker ->
         Flowable.fromIterable(groupList)
             .filter { g -> g.marker == marker || g.marker?.position == marker.position }
@@ -310,12 +309,12 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     private fun hideActionBarDelayed() {
-        val DELAY = (3 * 1000).toLong()  // 3sec
+        val delay = (3 * 1000).toLong()  // 3sec
         handler.removeCallbacks(runnable)
-        handler.postDelayed(runnable, DELAY)
+        handler.postDelayed(runnable, delay)
     }
 
-    private val photoMapCameraIdleListener = GoogleMap.OnCameraIdleListener { ->
+    private val photoMapCameraIdleListener = GoogleMap.OnCameraIdleListener {
         val position = googleMap?.cameraPosition
 
         if (position !=null && (position.zoom > MAXIMUM_ZOOM || position.zoom < MINIMUM_ZOOM)) {
@@ -362,22 +361,22 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     private var progress: Int = 0
-    private var group_count: Int = 0
+    private var groupCount: Int = 0
     private fun groupFlowable(distance: Int): Flowable<PhotoGroup> {
         return Flowable.fromIterable(photoList)
             .subscribeOn(Schedulers.computation())
             .groupBy { hash -> hash.hash.binaryString.substring(0, distance) }
-            .doOnNext { group_count++ }
+            .doOnNext { groupCount++ }
             .flatMapSingle { it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle() }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 progress = 0
-                group_count = 0
+                groupCount = 0
                 listener?.showProgress(0)
                 groupList?.clear()
             }
             .doOnNext { g ->
-                listener?.showProgress(++progress * 10000 / group_count)
+                listener?.showProgress(++progress * 10000 / groupCount)
                 val ops = MarkerOptions().position(g.center)
                 ops.icon(BitmapDescriptorFactory.defaultMarker(PhotoGroup.getMarkerColor(g.size)))
                 g.marker = googleMap?.addMarker(ops)
@@ -399,12 +398,13 @@ class PhotoMapFragment : SupportMapFragment() {
     }
 
     companion object {
-        private val PHOTO_CURSOR_LOADER = 0
+        private const val  TAG = "PhotoMapFragment"
+        private const val PHOTO_CURSOR_LOADER = 0
 
-        val EXTRA_GROUP = "group"
-        val DEFAULT_ZOOM = 15f
+        const val EXTRA_GROUP = "group"
+        const val DEFAULT_ZOOM = 15f
 
-        private val MAXIMUM_ZOOM = 17
-        private val MINIMUM_ZOOM = 4
+        private const val MAXIMUM_ZOOM = 17
+        private const val MINIMUM_ZOOM = 4
     }
 }
