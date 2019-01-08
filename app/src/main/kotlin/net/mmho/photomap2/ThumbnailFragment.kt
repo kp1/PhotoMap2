@@ -25,7 +25,7 @@ class ThumbnailFragment : Fragment() {
 
     fun setList(g: PhotoGroup) {
         group = g
-        val adapter = ThumbnailAdapter(activity, R.layout.adapter_thumbnail, group as PhotoGroup)
+        val adapter = ThumbnailAdapter(requireActivity(), R.layout.adapter_thumbnail, group as PhotoGroup)
         list?.adapter = adapter
     }
 
@@ -36,8 +36,8 @@ class ThumbnailFragment : Fragment() {
             .just(group)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext { g -> g?.resolveAddress(activity)}
-            .doOnComplete { activity.title = group?.title }
+            .doOnNext { g -> g?.resolveAddress(requireContext())}
+            .doOnComplete { requireActivity().title = group?.title }
             .subscribe()
     }
 

@@ -9,8 +9,8 @@ import android.view.ViewGroup
 internal class PhotoViewAdapter(fm: FragmentManager, private val group: PhotoGroup)
         : FragmentPagerAdapter(fm) {
 
-    override fun destroyItem(container: ViewGroup?, position: Int, obj:Any) {
-        val manager = (obj as Fragment).fragmentManager
+    override fun destroyItem(container: ViewGroup, position: Int, obj:Any) {
+        val manager = (obj as Fragment).requireFragmentManager()
         val transaction = manager.beginTransaction()
         transaction.remove(obj)
         transaction.commit()

@@ -18,7 +18,6 @@ import android.support.v4.app.LoaderManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
@@ -80,7 +79,7 @@ class PhotoMapFragment : SupportMapFragment() {
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         if (activity !is ProgressChangeListener) {
-            throw RuntimeException(activity.localClassName + " must implement net.mmho.photomap2.ProgressChangeListener")
+            throw RuntimeException(requireActivity().localClassName + " must implement net.mmho.photomap2.ProgressChangeListener")
         }
         listener = activity as ProgressChangeListener?
     }
@@ -97,13 +96,16 @@ class PhotoMapFragment : SupportMapFragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.photo_map_menu, menu)
 
-        val searchManager = activity.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = MenuItemCompat.getActionView(menu.findItem(R.id.search)) as SearchView
+        val searchManager = requireContext().getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchMenu = menu.findItem(R.id.search)
+        searchMenuItem = searchMenu
+        val searchView = searchMenu.actionView as SearchView
         searchView.setOnQueryTextListener(onQueryTextListener)
-        searchMenuItem = menu.findItem(R.id.search)
-        MenuItemCompat.setOnActionExpandListener(searchMenuItem, actionExpandListener)
-        searchView.setOnQueryTextFocusChangeListener { _, hasFocus -> if (!hasFocus) MenuItemCompat.collapseActionView(searchMenuItem) }
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(activity.componentName))
+        searchMenu.setOnActionExpandListener(actionExpandListener)
+        searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) searchMenu.collapseActionView()
+        }
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(requireActivity().componentName))
         searchView.isQueryRefinementEnabled = true
 
     }
@@ -121,7 +123,7 @@ class PhotoMapFragment : SupportMapFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private val actionExpandListener = object : MenuItemCompat.OnActionExpandListener {
+    private val actionExpandListener = object : MenuItem.OnActionExpandListener {
         override fun onMenuItemActionExpand(item: MenuItem): Boolean {
             showActionBar(false)
             return true
@@ -137,7 +139,7 @@ class PhotoMapFragment : SupportMapFragment() {
     private val onQueryTextListener = object : SearchView.OnQueryTextListener {
 
         override fun onQueryTextSubmit(query: String): Boolean {
-            MenuItemCompat.collapseActionView(searchMenuItem)
+            searchMenuItem?.collapseActionView()
             requestQuery(query)
             return true
         }
@@ -191,11 +193,11 @@ class PhotoMapFragment : SupportMapFragment() {
             Intent.ACTION_SEND ->{
                 val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
                 val projection = arrayOf(MediaStore.Images.Media.LATITUDE, MediaStore.Images.Media.LONGITUDE)
-                val c = PhotoCursor(MediaStore.Images.Media.query(activity.contentResolver, uri, projection,
+                val c = PhotoCursor(MediaStore.Images.Media.query(requireActivity().contentResolver, uri, projection,
                         QueryBuilder.createQuery(), null, null))
                 if (c.count == 0) {
                     Toast.makeText(activity, getString(R.string.no_position_data), Toast.LENGTH_LONG).show()
-                    activity.finish()
+                    requireActivity().finish()
                     return null
                 }
                 c.moveToFirst()
@@ -247,7 +249,7 @@ class PhotoMapFragment : SupportMapFragment() {
         getMapAsync { map ->
             googleMap = map
 
-            val update = this@PhotoMapFragment.handleIntent(this@PhotoMapFragment.activity.intent)
+            val update = this@PhotoMapFragment.handleIntent(this@PhotoMapFragment.requireActivity().intent)
             if(update!=null) this@PhotoMapFragment.view?.post{ googleMap?.moveCamera(update) }
 
             googleMap?.setOnCameraMoveStartedListener { googleMap?.clear() }
@@ -266,14 +268,14 @@ class PhotoMapFragment : SupportMapFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                ActivityCompat.requestPermissions(activity,
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(requireActivity(),
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                     PhotoMapActivity.PERMISSIONS_REQUEST)
             } else {
                 val v = view
-                if (v != null) PermissionUtils.requestPermission(v, context)
+                if (v != null) PermissionUtils.requestPermission(v, requireContext())
             }
         } else {
             initMap()
@@ -340,12 +342,12 @@ class PhotoMapFragment : SupportMapFragment() {
         }
 
     private val photoListLoaderCallback = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(i: Int, bundle: Bundle): Loader<Cursor> {
+        override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor> {
             val mapBounds = googleMap!!.projection.visibleRegion.latLngBounds
             val q = QueryBuilder.createQuery(mapBounds)
             val o = QueryBuilder.sortDateNewest()
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            return CursorLoader(activity, uri, PhotoCursor.projection, q, null, o)
+            return CursorLoader(requireContext(), uri, PhotoCursor.projection, q, null, o)
 
         }
 
@@ -367,7 +369,9 @@ class PhotoMapFragment : SupportMapFragment() {
             .subscribeOn(Schedulers.computation())
             .groupBy { hash -> hash.hash.binaryString.substring(0, distance) }
             .doOnNext { groupCount++ }
-            .flatMapSingle { it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle() }
+            .flatMapSingle {
+                it.map(::PhotoGroup).reduce(PhotoGroup::append).toSingle()
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe {
                 progress = 0
@@ -393,7 +397,7 @@ class PhotoMapFragment : SupportMapFragment() {
             initMap()
         } else {
             val v = view
-            if (v != null) PermissionUtils.requestPermission(v, context)
+            if (v != null) PermissionUtils.requestPermission(v, requireContext())
         }
     }
 

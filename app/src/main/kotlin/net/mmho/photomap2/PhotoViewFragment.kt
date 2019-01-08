@@ -14,7 +14,7 @@ class PhotoViewFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         retainInstance = true
-        imageId = arguments.getLong(EXTRA_IMAGE_ID)
+        imageId = arguments?.getLong(EXTRA_IMAGE_ID) ?: 0
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

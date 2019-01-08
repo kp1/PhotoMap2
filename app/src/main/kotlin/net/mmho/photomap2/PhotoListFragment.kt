@@ -46,14 +46,14 @@ class PhotoListFragment : Fragment() {
         setHasOptionsMenu(true)
 
         photoList = ArrayList()
-        adapter = PhotoListAdapter(activity, R.layout.layout_photo_card, ArrayList())
+        adapter = PhotoListAdapter(requireContext(), R.layout.layout_photo_card, ArrayList())
         when(savedInstanceState) {
             null -> {
                 distanceIndex = DistanceActionProvider.initialIndex()
             }
             else -> {
                 distanceIndex = savedInstanceState.getInt("DISTANCE")
-                activity.title = savedInstanceState.getString("title")
+                requireActivity().title = savedInstanceState.getString("title")
             }
         }
         subject = PublishSubject.create<Int>()
@@ -62,13 +62,13 @@ class PhotoListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (Build.VERSION.SDK_INT >= 23
-            && ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                ActivityCompat.requestPermissions(activity,
+            && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(requireActivity(),
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                     PhotoListActivity.PERMISSIONS_REQUEST)
             } else {
-                PermissionUtils.requestPermission(view, context)
+                PermissionUtils.requestPermission(view, requireContext())
             }
         } else {
             grantedPermission(true)
@@ -169,16 +169,16 @@ class PhotoListFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt("DISTANCE", distanceIndex)
-        outState.putString("title", activity.title.toString())
+        outState.putString("title", activity?.title.toString())
     }
 
     private var order :String? = null
     private val photoCursorCallbacks = object : LoaderManager.LoaderCallbacks<Cursor> {
-        override fun onCreateLoader(id: Int, args: Bundle): Loader<Cursor> {
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
             val q = QueryBuilder.createQuery()  // all list
             val o = if (newest) QueryBuilder.sortDateNewest() else QueryBuilder.sortDateOldest()
             val uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            return CursorLoader(activity, uri, PhotoCursor.projection, q, null, o)
+            return CursorLoader(requireContext(), uri, PhotoCursor.projection, q, null, o)
         }
         override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
             val newOrder = (loader as CursorLoader).sortOrder
@@ -216,7 +216,7 @@ class PhotoListFragment : Fragment() {
                 loaderManager.initLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
         } else {
             val v = view
-            if (v != null) PermissionUtils.requestPermission(v, context)
+            if (v != null) PermissionUtils.requestPermission(v, requireContext())
         }
         permissionGranted = granted
     }

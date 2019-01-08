@@ -11,14 +11,14 @@ import com.google.android.gms.maps.CameraUpdateFactory
 class SearchResultDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val title = arguments.getString("title")
+        val title = arguments?.getString("title")
         @Suppress("UNCHECKED_CAST")
-        val list = arguments.getParcelableArray("address") as Array<Address>
-        val adapter = AddressListAdapter(activity,simple_list_item_2, list)
+        val list = arguments?.getParcelableArray("address") as Array<Address>
+        val adapter = AddressListAdapter(requireActivity(),simple_list_item_2, list)
         val builder = AlertDialog.Builder(activity)
         builder.setTitle(getString(net.mmho.photomap2.R.string.search_title, title))
         builder.setAdapter(adapter) { _, which ->
-            val f = this@SearchResultDialogFragment.activity.supportFragmentManager.findFragmentById(net.mmho.photomap2.R.id.map)
+            val f = this@SearchResultDialogFragment.requireActivity().supportFragmentManager.findFragmentById(net.mmho.photomap2.R.id.map)
             if (f is PhotoMapFragment) {
                 val update = CameraUpdateFactory.newLatLngZoom(list[which].toLatLng(),
                     PhotoMapFragment.DEFAULT_ZOOM)

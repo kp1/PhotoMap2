@@ -7,15 +7,15 @@ import android.graphics.Matrix
 import android.provider.MediaStore.Images.Media.*
 import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.provider.MediaStore.Images.Thumbnails.getThumbnail
+import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
-import android.widget.ImageView
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 
 open class LoadableImageView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
-        : ImageView(context, attrs, defStyle) {
+        : AppCompatImageView(context, attrs, defStyle) {
 
     internal var thumbnail = false
     private var id: Long = -1L

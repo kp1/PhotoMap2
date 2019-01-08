@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "net.mmho.photomap2"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 110
         versionName "1.1.0"
         multiDexEnabled true
@@ -32,8 +32,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api 'com.google.android.gms:play-services-basement:16.1.0'
     api 'com.google.android.gms:play-services-maps:16.0.0'
-    api 'com.android.support:appcompat-v7:26.1.0'
-    api 'com.android.support:design:26.1.0'
+    api 'com.android.support:appcompat-v7:27.1.1'
+    api 'com.android.support:design:27.1.1'
     api 'io.reactivex.rxjava2:rxandroid:2.0.1'
     api 'io.reactivex.rxjava2:rxjava:2.1.2'
     api "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

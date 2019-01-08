@@ -107,7 +107,7 @@ class PhotoViewActivity : AppCompatActivity() {
         val share = menu.findItem(R.id.share)
         shareActionProvider = MenuItemCompat.getActionProvider(share) as ShareActionProvider
         shareActionProvider?.setShareIntent(setShareIntent(Intent(), photo_pager.currentItem))
-        shareActionProvider?.setSubUiVisibilityListener { visible ->
+        shareActionProvider?.setVisibilityListener { visible ->
             if (visible)
                 showActionBar(false)
             else
