@@ -38,13 +38,13 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                     try {
                         Geocoder(applicationContext).getFromLocationName(searchQuery, 5)
                     } catch (e: IOException) {
-                        listOf<Address>()
+                        listOf()
                     }
                     subscriber.onSuccess(data)
                 }
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSuccess({ list ->
+                .doOnSuccess { list ->
                     when(list.size){
                         0 ->{
                             Toast.makeText(this@PhotoMapActivity.applicationContext,
@@ -53,18 +53,18 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                         }
                         1 ->{
                             SearchRecentSuggestions(this@PhotoMapActivity,
-                                MapSuggestionProvider.Companion.AUTHORITY,
-                                MapSuggestionProvider.Companion.MODE).run{
+                                MapSuggestionProvider.AUTHORITY,
+                                MapSuggestionProvider.MODE).run{
                                 saveRecentQuery(searchQuery, null)
                             }
                             val fragment = this@PhotoMapActivity.supportFragmentManager.findFragmentById(R.id.map)
-                            val update = CameraUpdateFactory.newLatLngZoom(list[0].toLatLng(), PhotoMapFragment.Companion.DEFAULT_ZOOM)
+                            val update = CameraUpdateFactory.newLatLngZoom(list[0].toLatLng(), PhotoMapFragment.DEFAULT_ZOOM)
                             (fragment as? PhotoMapFragment)?.getMapAsync { map -> map.moveCamera(update) }
                         }
                         else ->{
                             SearchRecentSuggestions(this@PhotoMapActivity,
-                                MapSuggestionProvider.Companion.AUTHORITY,
-                                MapSuggestionProvider.Companion.MODE).run{
+                                MapSuggestionProvider.AUTHORITY,
+                                MapSuggestionProvider.MODE).run{
                                 saveRecentQuery(searchQuery, null)
                             }
 
@@ -73,11 +73,11 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                                 if (prev != null) remove(prev)
                                 addToBackStack(null)
                             }.commit()
-                            val fragment = SearchResultDialogFragment.Companion.newInstance(searchQuery, list)
+                            val fragment = SearchResultDialogFragment.newInstance(searchQuery, list)
                             fragment.show(this@PhotoMapActivity.supportFragmentManager, TAG_DIALOG)
                         }
                     }
-                })
+                }
                 .subscribe()
         }
     }
@@ -111,10 +111,6 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                 }
             }
         }
-    }
-
-    override fun onPause() {
-        super.onPause()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,9 +154,8 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
     }
 
     companion object {
-
-        private val TAG_DIALOG = "dialog"
-        val PERMISSIONS_REQUEST = 1
+        private const val TAG_DIALOG = "dialog"
+        const val PERMISSIONS_REQUEST = 1
     }
 
 }

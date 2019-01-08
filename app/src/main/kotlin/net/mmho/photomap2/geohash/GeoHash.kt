@@ -38,19 +38,19 @@ class GeoHash : Parcelable {
         if (significantBits % BASE32_BITS != 0) {
             throw IllegalArgumentException()
         }
-        val mask_bits = 0L.inv().ushr(MAX_SIGNIFICANT_BITS - BASE32_BITS)
-        for (i in 0..significantBits / 5 - 1) {
-            b.append(BASE32[(long.ushr(MAX_SIGNIFICANT_BITS - (i + 1) * BASE32_BITS) and mask_bits).toInt()])
+        val maskBits = 0L.inv().ushr(MAX_SIGNIFICANT_BITS - BASE32_BITS)
+        for (i in 0 until significantBits / 5) {
+            b.append(BASE32[(long.ushr(MAX_SIGNIFICANT_BITS - (i + 1) * BASE32_BITS) and maskBits).toInt()])
         }
         return b.toString()
     }
 
     fun extend(ext: GeoHash): GeoHash {
         var significant = Math.min(significantBits, ext.significantBits)
-        var xor_bit = long xor ext.long and 0L.inv().ushr(significant).inv()
-        while (xor_bit != 0L) {
+        var xorBit = long xor ext.long and 0L.inv().ushr(significant).inv()
+        while (xorBit != 0L) {
             significant--
-            xor_bit = long xor ext.long and 0L.inv().ushr(significant).inv()
+            xorBit = long xor ext.long and 0L.inv().ushr(significant).inv()
         }
         val hash = GeoHash()
         hash.long = long and 0L.inv().ushr(significant).inv()
@@ -69,15 +69,15 @@ class GeoHash : Parcelable {
     private val area: Array<Divider>
         get() {
             val dividers = arrayOf(Divider(180.0), Divider(90.0))
-            var check_bit = 0L.inv().ushr(1).inv()
-            for (i in 0..significantBits - 1) {
+            var checkBit = 0L.inv().ushr(1).inv()
+            for (i in 0 until significantBits) {
                 val div = dividers[i % 2]
-                if (long and check_bit != 0L) {
+                if (long and checkBit != 0L) {
                     div.lower = div.middle()
                 } else {
                     div.upper = div.middle()
                 }
-                check_bit = check_bit ushr 1
+                checkBit = checkBit ushr 1
             }
             return dividers
         }
@@ -114,10 +114,10 @@ class GeoHash : Parcelable {
 
     companion object {
 
-        private val MAX_SIGNIFICANT_BITS = 64
-        private val BASE32_BITS = 5
-        @SuppressWarnings("SpellCheckingInspection")
-        private val BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"
+        private const val MAX_SIGNIFICANT_BITS = 64
+        private const val BASE32_BITS = 5
+        @Suppress("SpellCheckingInspection")
+        private const val BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz"
 
         fun createWithCharacterCount(latLng: LatLng, length: Int): GeoHash {
             return create(latLng, length * BASE32_BITS)
@@ -164,7 +164,7 @@ class GeoHash : Parcelable {
 
             val p = doubleArrayOf(longitude, latitude)
             val dividers = arrayOf(Divider(180.0), Divider(90.0))
-            for (i in 0..significant - 1) {
+            for (i in 0 until significant) {
                 val index = i % 2
                 val div = dividers[index]
                 val middle = div.middle()

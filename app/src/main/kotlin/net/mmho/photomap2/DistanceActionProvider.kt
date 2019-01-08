@@ -63,7 +63,7 @@ class DistanceActionProvider(context: Context) : ActionProvider(context), MenuIt
 
     companion object {
 
-        private val INITIAL_INDEX = 1
+        private const val INITIAL_INDEX = 1
 
         private val distance = intArrayOf(7, 6, 5, 4, 3)
         private val meters = intArrayOf(150, 600, 5000, 20000, 150000)

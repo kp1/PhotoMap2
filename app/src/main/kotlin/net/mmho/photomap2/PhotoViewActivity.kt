@@ -74,9 +74,9 @@ class PhotoViewActivity : AppCompatActivity() {
     }
 
     private fun hideActionBarDelayed() {
-        val DELAY = (3 * 1000).toLong()
+        val delay = (3 * 1000).toLong()
         handler.removeCallbacks(runnable)
-        handler.postDelayed(runnable, DELAY)
+        handler.postDelayed(runnable, delay)
     }
 
 
@@ -118,9 +118,9 @@ class PhotoViewActivity : AppCompatActivity() {
     }
 
     private fun setShareIntent(intent: Intent, index: Int): Intent {
-        val image_id = adapter?.getItemID(index)
+        val imageId = adapter?.getItemID(index)
         val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                image_id.toString())
+                imageId.toString())
         intent.action = Intent.ACTION_SEND
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         intent.putExtra(Intent.EXTRA_STREAM, uri)
@@ -152,7 +152,7 @@ class PhotoViewActivity : AppCompatActivity() {
     }
 
     companion object {
-        val EXTRA_GROUP = "photo_group"
-        val EXTRA_POSITION = "position"
+        const val EXTRA_GROUP = "photo_group"
+        const val EXTRA_POSITION = "position"
     }
 }

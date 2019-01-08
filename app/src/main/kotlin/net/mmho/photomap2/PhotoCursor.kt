@@ -40,7 +40,7 @@ internal class PhotoCursor(cursor: Cursor) : CursorWrapper(cursor) {
 
     companion object {
         val projection = arrayOf(_ID, DATA, DISPLAY_NAME, LATITUDE, LONGITUDE, DATE_TAKEN, ORIENTATION)
-        private val HASH_CHARACTER_LENGTH = 9
+        private const val HASH_CHARACTER_LENGTH = 9
     }
 
 }

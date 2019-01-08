@@ -56,6 +56,6 @@ class PhotoListActivity : AppCompatActivity(), ProgressChangeListener {
     }
 
     companion object {
-        val PERMISSIONS_REQUEST = 1
+        const val PERMISSIONS_REQUEST = 1
     }
 }
