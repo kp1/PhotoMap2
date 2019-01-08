@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "net.mmho.photomap2"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 110
         versionName "1.1.0"
