@@ -68,7 +68,9 @@ class PhotoListFragment : Fragment() {
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                     PhotoListActivity.PERMISSIONS_REQUEST)
             } else {
-                PermissionUtils.requestPermission(view, requireContext())
+                view?.let {
+                    PermissionUtils.requestPermission(it, requireContext())
+                }
             }
         } else {
             grantedPermission(true)
@@ -215,10 +217,10 @@ class PhotoListFragment : Fragment() {
             if(loaderManager.getLoader<Cursor>(CURSOR_LOADER_ID)==null)
                 loaderManager.initLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
         } else {
-            val v = view
-            if (v != null) PermissionUtils.requestPermission(v, requireContext())
+            view?.let {
+                PermissionUtils.requestPermission(it, requireContext())
+            }
         }
-        permissionGranted = granted
     }
 
     companion object {

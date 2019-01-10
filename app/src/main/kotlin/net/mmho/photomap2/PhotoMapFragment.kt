@@ -268,14 +268,17 @@ class PhotoMapFragment : SupportMapFragment() {
 
     override fun onResume() {
         super.onResume()
-        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (!ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 ActivityCompat.requestPermissions(requireActivity(),
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                     PhotoMapActivity.PERMISSIONS_REQUEST)
             } else {
-                val v = view
-                if (v != null) PermissionUtils.requestPermission(v, requireContext())
+                view?.let{
+                    PermissionUtils.requestPermission(it, requireContext())
+                }
             }
         } else {
             initMap()
@@ -396,8 +399,9 @@ class PhotoMapFragment : SupportMapFragment() {
         if (granted) {
             initMap()
         } else {
-            val v = view
-            if (v != null) PermissionUtils.requestPermission(v, requireContext())
+            view?.let {
+                PermissionUtils.requestPermission(it, requireContext())
+            }
         }
     }
 
