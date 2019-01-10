@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
@@ -87,7 +86,7 @@ class PhotoMapFragment : SupportMapFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         when (resultCode) {
             AppCompatActivity.RESULT_OK -> {
-                val position = data.extras.getParcelable<LatLng>("location")
+                val position = data.extras?.getParcelable<LatLng>("location")
                 googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM))
             }
         }
@@ -169,7 +168,7 @@ class PhotoMapFragment : SupportMapFragment() {
         when(intent.action){
             Intent.ACTION_VIEW ->{
                 val uri = intent.data
-                if (uri.scheme == "geo") {
+                if (uri?.scheme == "geo") {
                     val position = uri.toString()
                     val pattern = Pattern.compile("(-?\\d+.\\d+),(-?\\d+.\\d+)(\\?([zq])=(.*))?")
                     val matcher = pattern.matcher(position)
@@ -206,10 +205,8 @@ class PhotoMapFragment : SupportMapFragment() {
                 return CameraUpdateFactory.newLatLngZoom(position, DEFAULT_ZOOM)
             }
             else ->{
-                val bundle = intent.extras
-                val group = bundle.getParcelable<PhotoGroup>(EXTRA_GROUP)
-                if (group != null) {
-                    return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(group.hash.bounds, 1.2), 0)
+                intent.extras?.getParcelable<PhotoGroup>(EXTRA_GROUP)?.let {
+                    return CameraUpdateFactory.newLatLngBounds(expandLatLngBounds(it.hash.bounds, 1.2), 0)
                 }
             }
         }
@@ -242,7 +239,8 @@ class PhotoMapFragment : SupportMapFragment() {
     private fun initMap() {
 
         if (googleMap != null) {
-            loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
+            LoaderManager.getInstance(this)
+                .initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback)
             return
         }
 
@@ -265,7 +263,8 @@ class PhotoMapFragment : SupportMapFragment() {
                         showActionBar(true)
                 }
                 m.uiSettings?.isZoomControlsEnabled = false
-                loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
+                LoaderManager.getInstance(this)
+                    .initLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback)
             }
 
         }
@@ -335,7 +334,8 @@ class PhotoMapFragment : SupportMapFragment() {
             return@OnCameraIdleListener
         }
         showActionBar(false)
-        loaderManager.restartLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
+        LoaderManager.getInstance(this)
+            .restartLoader(PHOTO_CURSOR_LOADER, null, photoListLoaderCallback)
     }
 
     private val cancelableCallback: GoogleMap.CancelableCallback

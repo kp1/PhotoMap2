@@ -7,7 +7,9 @@ import net.mmho.photomap2.geohash.GeoHash
 
 data class HashedPhoto(val photo_id:Long,val date_taken: Long,val hash:GeoHash) : Parcelable {
     constructor(source: Parcel):
-        this(source.readLong(), source.readLong(), source.readParcelable<GeoHash>(GeoHash::class.java.classLoader))
+        this(source.readLong(),
+             source.readLong(),
+             source.readParcelable<GeoHash>(GeoHash::class.java.classLoader)!!)
 
     override fun describeContents() = 0
 

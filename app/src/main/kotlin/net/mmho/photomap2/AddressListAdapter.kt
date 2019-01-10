@@ -19,9 +19,10 @@ internal class AddressListAdapter(context: Context, private val resource: Int, a
         val v: View = convertView ?: inflater.inflate(resource, null)
         val text1:TextView = v.findViewById(android.R.id.text1)
         val text2:TextView = v.findViewById(android.R.id.text2)
-        val address = getItem(position)
-        text1.text = address.getDescription()
-        text2.text = "%6.4f,%6.4f".format(Locale.ENGLISH, address.latitude, address.longitude)
+        getItem(position)?.let {
+            text1.text = it.getDescription()
+            text2.text = "%6.4f,%6.4f".format(Locale.ENGLISH, it.latitude, it.longitude)
+        }
         return v
     }
 

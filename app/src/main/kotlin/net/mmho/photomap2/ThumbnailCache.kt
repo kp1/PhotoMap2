@@ -5,7 +5,7 @@ import android.support.v4.util.LruCache
 
 class ThumbnailCache private constructor(maxSize: Int) : LruCache<Long, Bitmap>(maxSize) {
 
-    override fun sizeOf(key: Long?, bitmap: Bitmap): Int {
+    override fun sizeOf(key: Long, bitmap: Bitmap): Int {
         return bitmap.rowBytes * bitmap.height / 1024
     }
 

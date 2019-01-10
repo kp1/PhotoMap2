@@ -17,7 +17,9 @@ internal class ThumbnailAdapter(c: Context, private val resource: Int, objects: 
         val v: View =
             if(position!=0 && convertView!=null) convertView
             else inflater.inflate(resource, null)
-        v.thumbnail.load(getItem(position).photo_id)
+        getItem(position)?.let {
+            v.thumbnail.load(it.photo_id)
+        }
         return v
     }
 }

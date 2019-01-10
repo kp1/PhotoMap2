@@ -40,7 +40,7 @@ class PhotoViewActivity : AppCompatActivity() {
         supportActionBar?.addOnMenuVisibilityListener(menuVisibilityListener)
 
         val group = bundle.getParcelable<PhotoGroup>(EXTRA_GROUP)
-        title = group.title
+        title = group?.title
 
         val position = bundle.getInt(EXTRA_POSITION)
         adapter = PhotoViewAdapter(supportFragmentManager, group)

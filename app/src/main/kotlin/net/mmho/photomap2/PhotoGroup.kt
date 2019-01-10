@@ -29,7 +29,7 @@ class PhotoGroup : ArrayList<HashedPhoto>, Parcelable {
         src.readTypedList(this, HashedPhoto.CREATOR)
         hash = GeoHash.CREATOR.createFromParcel(src)
         title = src.readString()
-        description = src.readString()
+        description = src.readString() ?: ""
         dateTaken = src.readLong()
 
     }

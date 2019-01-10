@@ -23,7 +23,7 @@ class ThumbnailFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    fun setList(g: PhotoGroup) {
+    fun setList(g: PhotoGroup?) {
         group = g
         val adapter = ThumbnailAdapter(requireActivity(), R.layout.adapter_thumbnail, group as PhotoGroup)
         list?.adapter = adapter

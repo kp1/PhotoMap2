@@ -108,11 +108,13 @@ class PhotoListFragment : Fragment() {
         when (item?.itemId) {
             R.id.oldest -> {
                 newest = false
-                loaderManager.restartLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
+                LoaderManager.getInstance(this)
+                    .restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks)
             }
             R.id.newest -> {
                 newest = true
-                loaderManager.restartLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
+                LoaderManager.getInstance(this)
+                    .restartLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks)
             }
             R.id.about -> {
                 val i = Intent(activity, AboutActivity::class.java)
@@ -214,8 +216,8 @@ class PhotoListFragment : Fragment() {
 
     fun grantedPermission(granted: Boolean) {
         if (granted) {
-            if(loaderManager.getLoader<Cursor>(CURSOR_LOADER_ID)==null)
-                loaderManager.initLoader(CURSOR_LOADER_ID, Bundle(), photoCursorCallbacks)
+            LoaderManager.getInstance(this)
+                .initLoader(CURSOR_LOADER_ID, null, photoCursorCallbacks)
         } else {
             view?.let {
                 PermissionUtils.requestPermission(it, requireContext())
