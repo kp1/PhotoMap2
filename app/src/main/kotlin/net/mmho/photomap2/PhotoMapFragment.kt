@@ -249,20 +249,25 @@ class PhotoMapFragment : SupportMapFragment() {
         getMapAsync { map ->
             googleMap = map
 
-            val update = this@PhotoMapFragment.handleIntent(this@PhotoMapFragment.requireActivity().intent)
-            if(update!=null) this@PhotoMapFragment.view?.post{ googleMap?.moveCamera(update) }
+            map?.also { m ->
+                val update = handleIntent(requireActivity().intent)
+                update?.let {
+                    view?.post{ m.moveCamera(it) }
+                }
 
-            googleMap?.setOnCameraMoveStartedListener { googleMap?.clear() }
-            googleMap?.setOnCameraIdleListener(photoMapCameraIdleListener)
-            googleMap?.setOnMarkerClickListener(markerClickListener)
-            googleMap?.setOnMapClickListener {
-                if (actionBar.isShowing)
-                    this@PhotoMapFragment.hideActionBar()
-                else
-                    this@PhotoMapFragment.showActionBar(true)
+                m.setOnCameraMoveStartedListener { m.clear() }
+                m.setOnCameraIdleListener(photoMapCameraIdleListener)
+                m.setOnMarkerClickListener(markerClickListener)
+                m.setOnMapClickListener {
+                    if (actionBar.isShowing)
+                        hideActionBar()
+                    else
+                        showActionBar(true)
+                }
+                m.uiSettings?.isZoomControlsEnabled = false
+                loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
             }
-            googleMap?.uiSettings?.isZoomControlsEnabled = false
-            this@PhotoMapFragment.loaderManager.initLoader(PHOTO_CURSOR_LOADER, Bundle(), photoListLoaderCallback)
+
         }
     }
 
