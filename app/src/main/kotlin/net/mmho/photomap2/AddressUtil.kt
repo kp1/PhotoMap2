@@ -7,20 +7,20 @@ import com.google.android.gms.maps.model.LatLng
 fun Address.getTitle(c:Context):String{
     return buildString {
         val sep = c.getString(R.string.address_separator)
-        if(this@getTitle.adminArea!=null) append(this@getTitle.adminArea,sep)
-        if(this@getTitle.subAdminArea!=null) append(this@getTitle.subAdminArea,sep)
-        if(this@getTitle.locality!=null) append(this@getTitle.locality)
-        if(length==0) append(this@getTitle.featureName)
+        if(adminArea!=null) append(adminArea,sep)
+        if(subAdminArea!=null) append(subAdminArea,sep)
+        if(locality!=null) append(locality)
+        if(length==0) append(featureName)
     }
 }
 
 fun Address.getDescription() : String {
 
     return buildString {
-        val lines = this@getDescription.maxAddressLineIndex
+        val lines = maxAddressLineIndex
 
         repeat(lines){
-            append(this@getDescription.getAddressLine(it))
+            append(getAddressLine(it))
         }
     }
 }

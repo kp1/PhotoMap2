@@ -80,7 +80,7 @@ class PhotoListFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         if (disposable == null)
-            disposable = subject?.switchMap { distance -> this@PhotoListFragment.groupObservable(distance) }?.subscribe()
+            disposable = subject?.switchMap { distance -> groupObservable(distance) }?.subscribe()
     }
 
     override fun onDestroy() {

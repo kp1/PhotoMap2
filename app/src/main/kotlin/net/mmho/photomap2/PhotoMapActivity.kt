@@ -47,34 +47,34 @@ class PhotoMapActivity : AppCompatActivity(), ProgressChangeListener {
                 .doOnSuccess { list ->
                     when(list.size){
                         0 ->{
-                            Toast.makeText(this@PhotoMapActivity.applicationContext,
-                                this@PhotoMapActivity.getString(R.string.location_not_found, searchQuery),
+                            Toast.makeText(applicationContext,
+                                getString(R.string.location_not_found, searchQuery),
                                 Toast.LENGTH_LONG).show()
                         }
                         1 ->{
-                            SearchRecentSuggestions(this@PhotoMapActivity,
+                            SearchRecentSuggestions(this,
                                 MapSuggestionProvider.AUTHORITY,
                                 MapSuggestionProvider.MODE).run{
                                 saveRecentQuery(searchQuery, null)
                             }
-                            val fragment = this@PhotoMapActivity.supportFragmentManager.findFragmentById(R.id.map)
+                            val fragment = supportFragmentManager.findFragmentById(R.id.map)
                             val update = CameraUpdateFactory.newLatLngZoom(list[0].toLatLng(), PhotoMapFragment.DEFAULT_ZOOM)
                             (fragment as? PhotoMapFragment)?.getMapAsync { map -> map.moveCamera(update) }
                         }
                         else ->{
-                            SearchRecentSuggestions(this@PhotoMapActivity,
+                            SearchRecentSuggestions(this,
                                 MapSuggestionProvider.AUTHORITY,
                                 MapSuggestionProvider.MODE).run{
                                 saveRecentQuery(searchQuery, null)
                             }
 
-                            this@PhotoMapActivity.supportFragmentManager.beginTransaction().apply{
-                                val prev = this@PhotoMapActivity.supportFragmentManager.findFragmentByTag(TAG_DIALOG)
+                            supportFragmentManager.beginTransaction().apply{
+                                val prev = supportFragmentManager.findFragmentByTag(TAG_DIALOG)
                                 if (prev != null) remove(prev)
                                 addToBackStack(null)
                             }.commit()
                             val fragment = SearchResultDialogFragment.newInstance(searchQuery, list)
-                            fragment.show(this@PhotoMapActivity.supportFragmentManager, TAG_DIALOG)
+                            fragment.show(supportFragmentManager, TAG_DIALOG)
                         }
                     }
                 }

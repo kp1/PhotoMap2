@@ -225,15 +225,15 @@ class PhotoMapFragment : SupportMapFragment() {
                 val i: Intent
                 when(g.size) {
                     1 -> {
-                        i = Intent(this@PhotoMapFragment.activity, PhotoViewActivity::class.java)
+                        i = Intent(activity, PhotoViewActivity::class.java)
                         i.putExtra(PhotoViewActivity.EXTRA_GROUP, g as Parcelable)
                     }
                     else -> {
-                        i = Intent(this@PhotoMapFragment.activity, ThumbnailActivity::class.java)
+                        i = Intent(activity, ThumbnailActivity::class.java)
                         i.putExtra(ThumbnailActivity.EXTRA_GROUP, g as Parcelable)
                     }
                 }
-                this@PhotoMapFragment.startActivity(i)
+                startActivity(i)
             },
             {e -> Log.d(TAG,"${e.message}")})
         true
@@ -395,7 +395,7 @@ class PhotoMapFragment : SupportMapFragment() {
                 groupList?.add(g)
             }
             .doOnComplete {
-                this@PhotoMapFragment.hideActionBarDelayed()
+                hideActionBarDelayed()
                 listener?.endProgress()
             }
     }

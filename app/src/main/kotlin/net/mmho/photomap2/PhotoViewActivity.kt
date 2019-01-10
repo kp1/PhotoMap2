@@ -82,17 +82,17 @@ class PhotoViewActivity : AppCompatActivity() {
 
     private val menuVisibilityListener = ActionBar.OnMenuVisibilityListener {
         when {
-            it -> this@PhotoViewActivity.showActionBar(false)
-            else -> this@PhotoViewActivity.hideActionBarDelayed()
+            it -> showActionBar(false)
+            else -> hideActionBarDelayed()
         }
     }
 
     private val onClickListener = View.OnClickListener {
-        val bar = this@PhotoViewActivity.supportActionBar
+        val bar = supportActionBar
         when {
             bar == null -> {}
-            bar.isShowing -> this@PhotoViewActivity.hideActionBar()
-            else -> this@PhotoViewActivity.showActionBar(true)
+            bar.isShowing -> hideActionBar()
+            else -> showActionBar(true)
         }
     }
 
