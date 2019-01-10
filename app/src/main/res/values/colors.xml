@@ -13,4 +13,5 @@
     <color name="background">#DDDDDD</color>
     <color name="separator">@android:color/darker_gray</color>
     <color name="thumbnail_background">@android:color/darker_gray</color>
+    <color name="snackbar_background">#AA333333</color>
 </resources>
