@@ -7,7 +7,7 @@
         android:title="@string/search_map"
         android:icon="@drawable/places_ic_search"
         appcompat:showAsAction="collapseActionView|ifRoom"
-        appcompat:actionViewClass="android.support.v7.widget.SearchView"
+        appcompat:actionViewClass="androidx.appcompat.widget.SearchView"
     />
     <item
         android:id="@+id/clear_history"

@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.support.design.widget.Snackbar
+import com.google.android.material.snackbar.Snackbar
 import android.view.View
 import android.widget.TextView
 
@@ -14,7 +14,7 @@ internal object PermissionUtils {
     @TargetApi(Build.VERSION_CODES.M)
     fun requestPermission(rootView: View, c: Context) {
         val snackBar = Snackbar.make(rootView, R.string.request_permission, Snackbar.LENGTH_INDEFINITE)
-        val text:TextView = snackBar.view.findViewById(android.support.design.R.id.snackbar_text)
+        val text:TextView = snackBar.view.findViewById(com.google.android.material.R.id.snackbar_text)
 
         snackBar.setActionTextColor(c.resources.getColor(R.color.primary,null))
         snackBar.view.setBackgroundColor(c.resources.getColor(R.color.snackbar_background,null))

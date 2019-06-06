@@ -5,7 +5,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.location.Address
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import androidx.fragment.app.DialogFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 
 class SearchResultDialogFragment : DialogFragment() {
