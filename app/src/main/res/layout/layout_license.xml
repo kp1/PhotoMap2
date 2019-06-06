@@ -9,10 +9,8 @@
         android:id="@+id/title"
         android:textStyle="bold"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_margin"/>
+        android:layout_height="wrap_content"
+        android:paddingBottom="8dp"/>
     <TextView
         android:id="@+id/license"
         android:layout_width="match_parent"

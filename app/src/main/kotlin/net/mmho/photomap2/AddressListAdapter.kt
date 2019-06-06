@@ -1,5 +1,6 @@
 package net.mmho.photomap2
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ internal class AddressListAdapter(context: Context, private val resource: Int, a
         val text2:TextView = v.findViewById(android.R.id.text2)
         getItem(position)?.let {
             text1.text = it.getDescription()
+            @SuppressLint("SetTextI18n")
             text2.text = "%6.4f,%6.4f".format(Locale.ENGLISH, it.latitude, it.longitude)
         }
         return v

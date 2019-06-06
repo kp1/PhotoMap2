@@ -1,5 +1,6 @@
 package net.mmho.photomap2
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.RelativeLayout
@@ -10,6 +11,7 @@ class PhotoCardLayout @JvmOverloads constructor(context: Context, attrs: Attribu
         : RelativeLayout(context, attrs, defStyle) {
 
     fun setData(g: PhotoGroup) {
+        @SuppressLint("SetTextI18n")
         count.text = "%2d".format(g.size)
         thumbnail.load(g[0].photo_id)
     }
