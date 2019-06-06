@@ -1,7 +1,7 @@
 package net.mmho.photomap2
 
 import android.graphics.Bitmap
-import android.support.v4.util.LruCache
+import androidx.collection.LruCache
 
 class ThumbnailCache private constructor(maxSize: Int) : LruCache<Long, Bitmap>(maxSize) {
 

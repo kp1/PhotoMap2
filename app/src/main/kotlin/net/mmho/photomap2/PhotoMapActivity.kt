@@ -7,8 +7,8 @@ import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
 import android.provider.SearchRecentSuggestions
-import android.support.v4.view.WindowCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation

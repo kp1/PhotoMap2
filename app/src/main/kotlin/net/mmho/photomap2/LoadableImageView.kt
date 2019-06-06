@@ -7,7 +7,7 @@ import android.graphics.Matrix
 import android.provider.MediaStore.Images.Media.*
 import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.provider.MediaStore.Images.Thumbnails.getThumbnail
-import android.support.v7.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatImageView
 import android.util.AttributeSet
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
