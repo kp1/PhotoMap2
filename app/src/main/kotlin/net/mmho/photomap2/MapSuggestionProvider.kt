@@ -10,6 +10,6 @@ class MapSuggestionProvider : SearchRecentSuggestionsProvider() {
 
     companion object {
         const val AUTHORITY = "net.mmho.MapSuggestionProvider"
-        const val MODE = SearchRecentSuggestionsProvider.DATABASE_MODE_QUERIES
+        const val MODE = DATABASE_MODE_QUERIES
     }
 }

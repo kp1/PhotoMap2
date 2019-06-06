@@ -16,9 +16,9 @@ class SearchResultDialogFragment : DialogFragment() {
         val list = arguments?.getParcelableArray("address") as Array<Address>
         val adapter = AddressListAdapter(requireActivity(),simple_list_item_2, list)
         val builder = AlertDialog.Builder(activity)
-        builder.setTitle(getString(net.mmho.photomap2.R.string.search_title, title))
+        builder.setTitle(getString(R.string.search_title, title))
         builder.setAdapter(adapter) { _, which ->
-            val f = requireActivity().supportFragmentManager.findFragmentById(net.mmho.photomap2.R.id.map)
+            val f = requireActivity().supportFragmentManager.findFragmentById(R.id.map)
             if (f is PhotoMapFragment) {
                 val update = CameraUpdateFactory.newLatLngZoom(list[which].toLatLng(),
                     PhotoMapFragment.DEFAULT_ZOOM)

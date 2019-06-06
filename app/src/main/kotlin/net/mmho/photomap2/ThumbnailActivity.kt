@@ -11,8 +11,7 @@ class ThumbnailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_thumbnail_list)
 
-        val bundle = intent.extras
-        when (bundle) {
+        when (val bundle = intent.extras) {
             null -> {
                 finish()
             }
